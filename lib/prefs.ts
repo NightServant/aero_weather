@@ -25,7 +25,7 @@ export type Prefs = {
 };
 
 export const DEFAULT_PREFS: Prefs = {
-  units: { temperature: "fahrenheit", wind: "kmh", precipitation: "mm" },
+  units: { temperature: "celsius", wind: "kmh", precipitation: "mm" },
   timeFormat: "12h",
   firstDayOfWeek: "mon",
   palette: "sunny",

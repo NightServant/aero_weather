@@ -7,6 +7,7 @@ const CURRENT_FIELDS = [
   "temperature_2m",
   "apparent_temperature",
   "relative_humidity_2m",
+  "dew_point_2m",
   "precipitation",
   "weather_code",
   "wind_speed_10m",
@@ -20,6 +21,7 @@ const CURRENT_FIELDS = [
 
 const HOURLY_FIELDS = [
   "temperature_2m",
+  "dew_point_2m",
   "precipitation_probability",
   "weather_code",
   "is_day",
@@ -41,10 +43,16 @@ type RawForecast = {
   latitude: number;
   longitude: number;
   timezone: string;
-  current: Record<string, number | string>;
-  hourly: Record<string, (number | string)[]>;
-  daily: Record<string, (number | string)[]>;
+  current: Record<string, number | string | null>;
+  hourly: Record<string, (number | string | null)[]>;
+  daily: Record<string, (number | string | null)[]>;
 };
+
+/** Open-Meteo emits `null` for fields beyond a model's horizon. `Number(null)`
+ *  is 0, which reads like a real measurement — keep those as `undefined`. */
+function optionalNumber(v: number | string | null | undefined): number | undefined {
+  return v == null ? undefined : Number(v);
+}
 
 export async function getForecast(
   lat: number,
@@ -64,7 +72,7 @@ export async function getForecast(
       wind_speed_unit: units.wind,
       precipitation_unit: units.precipitation,
       timezone: "auto",
-      forecast_days: 7,
+      forecast_days: 14,
       forecast_hours: 24,
     },
     { revalidate: 600, signal },
@@ -77,6 +85,7 @@ export async function getForecast(
       temperature: Number(raw.current.temperature_2m),
       apparentTemperature: Number(raw.current.apparent_temperature),
       humidity: Number(raw.current.relative_humidity_2m),
+      dewPoint: optionalNumber(raw.current.dew_point_2m),
       precipitation: Number(raw.current.precipitation),
       weatherCode: Number(raw.current.weather_code),
       windSpeed: Number(raw.current.wind_speed_10m),
@@ -90,6 +99,7 @@ export async function getForecast(
     hourly: (raw.hourly.time as string[]).map((time, i) => ({
       time,
       temperature: Number(raw.hourly.temperature_2m[i]),
+      dewPoint: optionalNumber(raw.hourly.dew_point_2m[i]),
       precipitationProbability: Number(raw.hourly.precipitation_probability[i]),
       weatherCode: Number(raw.hourly.weather_code[i]),
       isDay: Number(raw.hourly.is_day[i]) === 1,

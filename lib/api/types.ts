@@ -25,6 +25,8 @@ export type CurrentConditions = {
   temperature: number;
   apparentTemperature: number;
   humidity: number;
+  /** Optional: Open-Meteo may return null beyond a model's horizon. */
+  dewPoint?: number;
   precipitation: number;
   windSpeed: number;
   windDirection: number;
@@ -39,6 +41,8 @@ export type CurrentConditions = {
 export type HourlyPoint = {
   time: string;
   temperature: number;
+  /** Optional: Open-Meteo may return null beyond a model's horizon. */
+  dewPoint?: number;
   precipitationProbability: number;
   weatherCode: number;
   isDay: boolean;
