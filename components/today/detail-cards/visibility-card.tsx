@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye } from "lucide-react";
+import { DetailTile } from "./detail-tile";
 
 /** Below-fold detail: live visibility distance. */
 export function VisibilityCard({ meters }: { meters: number }) {
@@ -15,16 +16,12 @@ export function VisibilityCard({ meters }: { meters: number }) {
           : "Low visibility - take care on the roads";
 
   return (
-    <div className="tint-card flex flex-col p-5" data-animate="">
-      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
-        <Eye className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        <h3 className="card-subtitle-caps">Visibility</h3>
-      </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="stat-value text-3xl">{km}</span>
-        <span className="caption">km</span>
-      </div>
-      <p className="caption mt-3">{desc}</p>
-    </div>
+    <DetailTile
+      icon={<Eye className="size-4" strokeWidth={1.5} aria-hidden="true" />}
+      label="Visibility"
+      value={km}
+      unit="km"
+      caption={desc}
+    />
   );
 }

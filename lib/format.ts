@@ -83,6 +83,26 @@ export function dewPoint(temperatureC: number, humidity: number): number {
   return (b * alpha) / (a - alpha);
 }
 
+/** Dew point in the given display unit: API value when present (already in the
+ *  requested unit), else the Magnus approximation from temperature + humidity. */
+export function resolveDewPoint(
+  current: { dewPoint?: number; temperature: number; humidity: number },
+  unit: TempUnit,
+): number | null {
+  if (current.dewPoint != null && Number.isFinite(current.dewPoint)) return current.dewPoint;
+  if (!Number.isFinite(current.temperature) || current.humidity <= 0) return null;
+  const tempC = unit === "fahrenheit" ? ((current.temperature - 32) * 5) / 9 : current.temperature;
+  const dpC = dewPoint(tempC, current.humidity);
+  return unit === "fahrenheit" ? (dpC * 9) / 5 + 32 : dpC;
+}
+
+/** Index of the first hourly point at or after now (0 when all are in the past). */
+export function findNowIndex(points: { time: string }[]): number {
+  const now = Date.now();
+  const idx = points.findIndex((p) => new Date(p.time).getTime() >= now);
+  return idx === -1 ? 0 : idx;
+}
+
 export function durationBetween(startIso: string, endIso: string): string {
   const ms = new Date(endIso).getTime() - new Date(startIso).getTime();
   const totalMin = Math.max(0, Math.round(ms / 60000));

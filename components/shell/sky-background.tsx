@@ -38,8 +38,11 @@ export function SkyBackground({ palette }: { palette?: PaletteKey }) {
   // Keep the previous photo underneath while the next one fades in.
   const [prevSrc, setPrevSrc] = useState<string | null>(null);
   const lastSrc = useRef<string | undefined>(src);
+  // Only the initial plate competes for LCP; later swaps load politely.
+  const firstPhoto = useRef(true);
   useEffect(() => {
     if (lastSrc.current === src) return;
+    firstPhoto.current = false;
     setPrevSrc(lastSrc.current ?? null);
     lastSrc.current = src;
   }, [src]);
@@ -60,7 +63,9 @@ export function SkyBackground({ palette }: { palette?: PaletteKey }) {
           className="object-cover opacity-[0.65]"
         />
       ) : null}
-      {src ? <SkyPhoto key={src} src={src} onSettled={clearPrev} /> : null}
+      {src ? (
+        <SkyPhoto key={src} src={src} priority={firstPhoto.current} onSettled={clearPrev} />
+      ) : null}
 
       {/* 3. Scrim: always painted above the photo. */}
       <div
@@ -74,7 +79,15 @@ export function SkyBackground({ palette }: { palette?: PaletteKey }) {
   );
 }
 
-function SkyPhoto({ src, onSettled }: { src: string; onSettled: () => void }) {
+function SkyPhoto({
+  src,
+  priority,
+  onSettled,
+}: {
+  src: string;
+  priority: boolean;
+  onSettled: () => void;
+}) {
   const [loaded, setLoaded] = useState(false);
 
   // Drop the previous plate once this one has fully faded in.
@@ -89,7 +102,7 @@ function SkyPhoto({ src, onSettled }: { src: string; onSettled: () => void }) {
       src={src}
       alt=""
       fill
-      priority
+      priority={priority}
       sizes="100vw"
       onLoad={() => setLoaded(true)}
       className={`object-cover transition-opacity duration-[600ms] ease-out ${

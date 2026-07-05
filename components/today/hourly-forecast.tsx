@@ -1,6 +1,7 @@
 "use client";
 
 import { HourlyCell } from "./hourly-cell";
+import { findNowIndex } from "@/lib/format";
 import type { Forecast, UnitPrefs } from "@/lib/api/types";
 
 type Props = {
@@ -11,9 +12,7 @@ type Props = {
 
 export function HourlyForecast({ forecast, units, format12h }: Props) {
   const points = forecast.hourly;
-  const now = Date.now();
-  let nowIndex = points.findIndex((p) => new Date(p.time).getTime() >= now);
-  if (nowIndex === -1) nowIndex = 0;
+  const nowIndex = findNowIndex(points);
 
   return (
     <section className="tint-card relative overflow-hidden p-5">

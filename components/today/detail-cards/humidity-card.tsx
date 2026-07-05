@@ -2,7 +2,7 @@
 
 import { Droplets } from "lucide-react";
 import { RailCard } from "./sunrise-sunset-card";
-import { dewPoint as computeDewPointC, formatTemp, tempUnitLabel } from "@/lib/format";
+import { formatTemp, resolveDewPoint, tempUnitLabel } from "@/lib/format";
 import type { CurrentConditions, TempUnit } from "@/lib/api/types";
 
 type Props = {
@@ -23,14 +23,4 @@ export function HumidityCard({ current, unit }: Props) {
       }
     />
   );
-}
-
-/** API dew point when present (already in the pref unit); else Magnus fallback. */
-function resolveDewPoint(current: CurrentConditions, unit: TempUnit): number | null {
-  if (current.dewPoint != null && Number.isFinite(current.dewPoint)) return current.dewPoint;
-  if (!Number.isFinite(current.temperature) || current.humidity <= 0) return null;
-  const tempC =
-    unit === "fahrenheit" ? ((current.temperature - 32) * 5) / 9 : current.temperature;
-  const dpC = computeDewPointC(tempC, current.humidity);
-  return unit === "fahrenheit" ? (dpC * 9) / 5 + 32 : dpC;
 }
