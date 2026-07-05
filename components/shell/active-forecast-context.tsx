@@ -13,6 +13,8 @@ import type { PaletteKey } from "@/lib/prefs";
 type ActiveForecastContextValue = ForecastResult & {
   place: Place | null;
   derivedPalette: PaletteKey | null;
+  /** Resolved sky key: weather-derived when `paletteMode` is auto, else the manual pref. */
+  paletteKey: PaletteKey;
   hydrated: boolean;
 };
 
@@ -29,6 +31,13 @@ export function ActiveForecastProvider({ children }: { children: React.ReactNode
     return paletteFromWeather(kind, result.data.current.isDay);
   }, [result.data]);
 
+  // Mirrors the palette sync below so consumers (e.g. SkyBackground) always agree
+  // with the `[data-palette]` variables painted on <html>.
+  const paletteKey = useMemo<PaletteKey>(() => {
+    if (prefs.paletteMode === "auto" && derivedPalette) return derivedPalette;
+    return prefs.palette;
+  }, [derivedPalette, prefs.paletteMode, prefs.palette]);
+
   useEffect(() => {
     if (!hydrated) return;
     if (prefs.paletteMode === "auto" && derivedPalette) {
@@ -38,7 +47,13 @@ export function ActiveForecastProvider({ children }: { children: React.ReactNode
     }
   }, [derivedPalette, prefs.palette, prefs.paletteMode, hydrated]);
 
-  const value: ActiveForecastContextValue = { ...result, place, derivedPalette, hydrated };
+  const value: ActiveForecastContextValue = {
+    ...result,
+    place,
+    derivedPalette,
+    paletteKey,
+    hydrated,
+  };
 
   return (
     <ActiveForecastContext.Provider value={value}>{children}</ActiveForecastContext.Provider>

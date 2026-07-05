@@ -1,10 +1,11 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import { usePrefs } from "@/hooks/use-prefs";
 
-function PaletteSync() {
+/** Paints the manual sky palette from prefs onto <html>. When paletteMode is
+ *  "auto" the ActiveForecastProvider overrides this with the weather-derived key. */
+function SkySync() {
   const [prefs, , hydrated] = usePrefs();
   useEffect(() => {
     if (!hydrated) return;
@@ -15,9 +16,9 @@ function PaletteSync() {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-      <PaletteSync />
+    <>
+      <SkySync />
       {children}
-    </ThemeProvider>
+    </>
   );
 }
