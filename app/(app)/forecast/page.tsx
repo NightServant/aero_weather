@@ -60,6 +60,8 @@ export default function ForecastPage() {
         )}
       </div>
 
+      <hr className="border-white/[0.08]" />
+
       <div className="stagger-5">
         <SummaryCards forecast={data} units={prefs.units} />
       </div>

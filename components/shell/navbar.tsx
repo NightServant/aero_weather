@@ -105,7 +105,7 @@ export function Navbar() {
             onClick={useMyLocation}
             icon={<MapPin className="size-4" strokeWidth={1.5} />}
           />
-          <SearchTrigger className="hidden w-[289px] lg:block" />
+          <SearchTrigger className="hidden w-[210px] md:block lg:w-[289px]" />
 
           {/* Mobile menu */}
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>

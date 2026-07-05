@@ -23,6 +23,20 @@ type Props = {
  * Figma hero column: dateline + almanac cards, then the big animated icon and
  * display temperature, then the condition / wind stat row.
  */
+const WIND_THRESHOLDS: Record<string, [number, number]> = {
+  kmh: [12, 29],
+  mph: [7, 18],
+  ms: [3, 8],
+};
+
+/** Figma copy pattern: "Clear with light winds". Thresholds per display unit. */
+function windWord(speed: number, unit: string): string {
+  const [light, moderate] = WIND_THRESHOLDS[unit] ?? WIND_THRESHOLDS.kmh;
+  if (speed < light) return "light";
+  if (speed < moderate) return "moderate";
+  return "strong";
+}
+
 export function CurrentConditions({ forecast, place, units }: Props) {
   const c = forecast.current;
   const today = forecast.daily[0];
@@ -72,7 +86,9 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         <div className="flex min-w-0 items-start gap-3">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
-            <h3 className="stat-title">{WEATHER_LABEL[kind]}</h3>
+            <h3 className="stat-title">
+              {WEATHER_LABEL[kind]} with {windWord(c.windSpeed, units.wind)} winds
+            </h3>
             <p className="caption tabular mt-0.5">
               High {formatTemp(today.tempMax, units.temperature)}
               {tempLabel} Low {formatTemp(today.tempMin, units.temperature)}

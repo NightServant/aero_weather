@@ -65,29 +65,29 @@ export function SearchTrigger({ className }: { className?: string }) {
 
   return (
     <div ref={wrapRef} className={cn("relative", className)}>
+      {/* Figma navbar search: compact pill, "Search location", trailing magnifier. */}
       <div
         className={cn(
-          "flex h-12 items-center gap-3 rounded-full border border-[var(--hairline)] bg-card px-5 transition",
-          "focus-within:border-[var(--hairline-strong)] hover:border-[var(--hairline-strong)]",
+          "glass-pill flex h-10 min-w-0 items-center gap-2 px-4 transition-colors duration-150",
+          "focus-within:border-white/35 hover:border-white/30",
         )}
       >
-        <Search className="size-4 shrink-0 text-foreground/55" strokeWidth={1.5} />
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
-          placeholder={
-            saved.length === 0
-              ? "No saved locations - add one from Locations"
-              : "Switch saved location…"
-          }
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/55 outline-none"
+          placeholder="Search location"
+          aria-label="Search saved locations"
+          aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
+          className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         />
-        <kbd className="hidden items-center gap-0.5 rounded-md border border-[var(--hairline)] bg-background px-1.5 py-0.5 text-[10px] font-semibold text-foreground/60 md:inline-flex">
-          {isMac ? "⌘" : "Ctrl"}K
-        </kbd>
+        <Search
+          className="size-4 shrink-0 text-foreground/55"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
       </div>
 
       {open && (

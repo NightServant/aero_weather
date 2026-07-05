@@ -61,6 +61,8 @@ export default function LocationsPage() {
         )}
       </div>
 
+      <hr className="border-white/[0.08]" />
+
       <AddCityDialog open={addOpen} onOpenChange={setAddOpen} />
     </div>
   );

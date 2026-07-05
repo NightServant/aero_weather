@@ -10,7 +10,9 @@ const SEED_IMAGES: Record<string, string> = {
   bamban: "/cities/bamban.webp",
   manila: "/cities/manila.webp",
   baguio: "/cities/baguio.webp",
+  baguiocity: "/cities/baguio.webp",
   mabalacat: "/cities/mabalacat.webp",
+  mabalacatcity: "/cities/mabalacat.webp",
 };
 
 type CacheEntry = { url: string | null; ts: number };
