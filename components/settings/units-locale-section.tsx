@@ -1,74 +1,117 @@
 "use client";
 
-import { SettingsSection, SettingRow } from "./settings-section";
-import { SegmentedControl } from "./segmented-control";
+import type { ReactNode } from "react";
+import { Calendar, Clock, Thermometer, Wind, type LucideIcon } from "lucide-react";
+import { GlassCard } from "@/components/aero/glass-card";
+import { TagToggleGroup } from "@/components/aero/tag-toggle-group";
 import { usePrefs } from "@/hooks/use-prefs";
+import type { TempUnit, WindUnit } from "@/lib/api/types";
+import type { FirstDayOfWeek, TimeFormat } from "@/lib/prefs";
+import { cn } from "@/lib/utils";
+
+type PrefCardProps = {
+  icon: LucideIcon;
+  label: string;
+  caption: string;
+  className?: string;
+  children: ReactNode;
+};
+
+/** One preference group (Figma settings card anatomy: icon 40px, chips, label, caption). */
+function PrefCard({ icon: Icon, label, caption, className, children }: PrefCardProps) {
+  return (
+    <GlassCard as="section" className={cn("flex flex-col items-start gap-4 p-5", className)}>
+      <Icon aria-hidden="true" className="size-10 text-foreground/80" strokeWidth={1.5} />
+      {children}
+      <div className="space-y-1">
+        <h3 className="stat-title">{label}</h3>
+        <p className="caption">{caption}</p>
+      </div>
+    </GlassCard>
+  );
+}
 
 export function UnitsLocaleSection() {
   const [prefs, setPrefs] = usePrefs();
 
   return (
-    <SettingsSection
-      title="Units & Locale"
-      description="How temperatures, wind and rainfall are displayed."
-    >
-      <SettingRow
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <h2 className="sr-only">Units and locale</h2>
+
+      <PrefCard
+        icon={Thermometer}
         label="Temperature"
-        description="Celsius or Fahrenheit."
-        control={
-          <SegmentedControl
-            value={prefs.units.temperature}
-            onChange={(temperature) => setPrefs({ units: { ...prefs.units, temperature } })}
-            options={[
-              { value: "celsius", label: "°C" },
-              { value: "fahrenheit", label: "°F" },
-            ]}
-          />
-        }
-      />
-      <SettingRow
+        caption="Celsius or Fahrenheit"
+        className="stagger-1"
+      >
+        <TagToggleGroup
+          ariaLabel="Temperature"
+          options={[
+            { value: "celsius", label: "°C" },
+            { value: "fahrenheit", label: "°F" },
+          ]}
+          value={prefs.units.temperature}
+          onValueChange={(v) =>
+            setPrefs((p) => ({ ...p, units: { ...p.units, temperature: v as TempUnit } }))
+          }
+        />
+      </PrefCard>
+
+      <PrefCard
+        icon={Wind}
         label="Wind speed"
-        description="Used across all forecasts."
-        control={
-          <SegmentedControl
-            value={prefs.units.wind}
-            onChange={(wind) => setPrefs({ units: { ...prefs.units, wind } })}
-            options={[
-              { value: "kmh", label: "km/h" },
-              { value: "mph", label: "mph" },
-              { value: "ms", label: "m/s" },
-            ]}
-          />
-        }
-      />
-      <SettingRow
-        label="Time format"
-        description="Affects hourly and sunrise/sunset."
-        control={
-          <SegmentedControl
-            value={prefs.timeFormat}
-            onChange={(timeFormat) => setPrefs({ timeFormat })}
-            options={[
-              { value: "12h", label: "12h" },
-              { value: "24h", label: "24h" },
-            ]}
-          />
-        }
-      />
-      <SettingRow
-        label="First day of week"
-        description="Used on the Daily view."
-        control={
-          <SegmentedControl
-            value={prefs.firstDayOfWeek}
-            onChange={(firstDayOfWeek) => setPrefs({ firstDayOfWeek })}
-            options={[
-              { value: "sun", label: "Sun" },
-              { value: "mon", label: "Mon" },
-            ]}
-          />
-        }
-      />
-    </SettingsSection>
+        caption="Used across all forecast"
+        className="stagger-2"
+      >
+        <TagToggleGroup
+          ariaLabel="Wind speed"
+          options={[
+            { value: "kmh", label: "km/h" },
+            { value: "mph", label: "mph" },
+            { value: "ms", label: "m/s" },
+          ]}
+          value={prefs.units.wind}
+          onValueChange={(v) =>
+            setPrefs((p) => ({ ...p, units: { ...p.units, wind: v as WindUnit } }))
+          }
+        />
+      </PrefCard>
+
+      <PrefCard
+        icon={Clock}
+        label="Time Format"
+        caption="Affects hourly & sunrise/sunset."
+        className="stagger-3"
+      >
+        <TagToggleGroup
+          ariaLabel="Time Format"
+          options={[
+            { value: "12h", label: "12h" },
+            { value: "24h", label: "24h" },
+          ]}
+          value={prefs.timeFormat}
+          onValueChange={(v) => setPrefs((p) => ({ ...p, timeFormat: v as TimeFormat }))}
+        />
+      </PrefCard>
+
+      <PrefCard
+        icon={Calendar}
+        label="First day of the week"
+        caption="Used for daily view."
+        className="stagger-4"
+      >
+        <TagToggleGroup
+          ariaLabel="First day of the week"
+          options={[
+            { value: "sun", label: "Sun" },
+            { value: "mon", label: "Mon" },
+          ]}
+          value={prefs.firstDayOfWeek}
+          onValueChange={(v) =>
+            setPrefs((p) => ({ ...p, firstDayOfWeek: v as FirstDayOfWeek }))
+          }
+        />
+      </PrefCard>
+    </div>
   );
 }

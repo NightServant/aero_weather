@@ -1,50 +1,33 @@
 "use client";
 
 import { Sun } from "lucide-react";
+import { RailCard } from "./sunrise-sunset-card";
 
+/** Right-rail UV card (Figma 10:11643): live index + category, meter, advice. */
 export function UvIndexCard({ uv }: { uv: number }) {
   const pct = Math.min(100, Math.max(0, (uv / 11) * 100));
-  const label = uv < 3 ? "Low" : uv < 6 ? "Moderate" : uv < 8 ? "High" : uv < 11 ? "Very high" : "Extreme";
+  const label =
+    uv < 3 ? "Low" : uv < 6 ? "Moderate" : uv < 8 ? "High" : uv < 11 ? "Very high" : "Extreme";
   const advice =
     uv < 3
-      ? "No protection needed."
+      ? "No protection needed"
       : uv < 6
-        ? "Sunglasses help on bright surfaces."
-        : "Sunscreen recommended between 11 AM and 3 PM.";
+        ? "Sunglasses help on bright surfaces"
+        : "Sunscreen recommended between 11 AM and 3 PM";
 
   return (
-    <DetailCard label="UV Index" icon={<Sun className="size-3.5" strokeWidth={1.5} />}>
-      <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-semibold tabular text-foreground">{Math.round(uv)}</span>
-        <span className="text-sm text-muted-foreground">{label}</span>
-      </div>
-      <div className="relative mt-3 h-1.5 overflow-hidden rounded-full uv-gradient">
+    <RailCard
+      icon={<Sun className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      label="UV Index"
+      value={`${Math.round(uv)} ${label}`}
+      caption={advice}
+    >
+      <div className="uv-gradient relative mt-3 h-1.5 overflow-hidden rounded-full" aria-hidden="true">
         <div
           className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow"
           style={{ left: `${pct}%` }}
         />
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{advice}</p>
-    </DetailCard>
-  );
-}
-
-function DetailCard({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="surface-card flex flex-col p-5">
-      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
-        {icon}
-        <span className="eyebrow">{label}</span>
-      </div>
-      <div className="flex-1">{children}</div>
-    </div>
+    </RailCard>
   );
 }

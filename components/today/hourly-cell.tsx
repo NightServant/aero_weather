@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { WeatherIcon } from "./weather-icon";
+import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import { weatherCodeToKind } from "@/lib/api/weather-code";
 import { formatHour, formatTemp } from "@/lib/format";
 import type { HourlyPoint } from "@/lib/api/types";
@@ -31,9 +31,7 @@ export function HourlyCell({ point, unit, format12h, isNow, timezone }: Props) {
       <div className={cn("text-xs font-medium", isNow ? "text-foreground" : "text-foreground/70")}>
         {label}
       </div>
-      <div className="text-[color:var(--scene-accent,var(--muted-foreground))]">
-        <WeatherIcon kind={kind} isDay={point.isDay} className="size-5" />
-      </div>
+      <AnimatedWeatherIcon kind={kind} isDay={point.isDay} size={20} animated={false} />
       <div className="text-sm font-semibold tabular text-foreground">
         {formatTemp(point.temperature, unit)}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { PrecipBar } from "./precip-bar";
-import { WeatherIcon } from "@/components/today/weather-icon";
+import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import { formatShortDate, formatTemp, formatWeekdayShort, tempUnitLabel } from "@/lib/format";
 import { weatherCodeToKind, WEATHER_LABEL } from "@/lib/api/weather-code";
 import type { DailyPoint, TempUnit } from "@/lib/api/types";
@@ -23,9 +23,7 @@ export function DailyRow({ point, unit, index, timezone }: Props) {
         <div className="text-sm font-semibold text-foreground">{dayLabel}</div>
         <div className="text-xs text-muted-foreground">{formatShortDate(point.date, timezone)}</div>
       </div>
-      <div className="text-[color:var(--scene-accent,var(--muted-foreground))]">
-        <WeatherIcon kind={kind} isDay className="size-7" />
-      </div>
+      <AnimatedWeatherIcon kind={kind} isDay size={28} animated={false} />
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="text-foreground/80">{WEATHER_LABEL[kind]}</span>

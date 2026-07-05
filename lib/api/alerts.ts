@@ -78,5 +78,5 @@ function formatWindow(startIso: string, endIso: string, tz?: string): string {
   const opts: Intl.DateTimeFormatOptions = { hour: "numeric", timeZone: tz };
   const s = new Intl.DateTimeFormat("en-US", opts).format(new Date(startIso));
   const e = new Intl.DateTimeFormat("en-US", opts).format(new Date(endIso));
-  return `${s}–${e}`;
+  return `${s} to ${e}`;
 }

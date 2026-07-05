@@ -1,25 +1,44 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState } from "react";
 import { GreetingHeader } from "@/components/today/greeting-header";
-import { ViewTabs, type TodayView } from "@/components/today/view-tabs";
 import { CurrentConditions } from "@/components/today/current-conditions";
-import { HourlyForecast } from "@/components/today/hourly-forecast";
 import { UvIndexCard } from "@/components/today/detail-cards/uv-index-card";
-import { SunriseSunsetCard } from "@/components/today/detail-cards/sunrise-sunset-card";
-import { VisibilityCard } from "@/components/today/detail-cards/visibility-card";
-import { PressureCard } from "@/components/today/detail-cards/pressure-card";
+import { SunriseCard, SunsetCard } from "@/components/today/detail-cards/sunrise-sunset-card";
+import { HumidityCard } from "@/components/today/detail-cards/humidity-card";
+import { AlertCard } from "@/components/shell/alert-card";
 import { useActiveForecast } from "@/components/shell/active-forecast-context";
 import { usePrefs } from "@/hooks/use-prefs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { summarizeToday } from "@/lib/forecast-summary";
 import { EmptyLocation } from "@/components/shell/empty-location";
 
+// Below-fold content loads on demand; skeletons match the final card shapes.
+const HourlyForecast = dynamic(
+  () => import("@/components/today/hourly-forecast").then((m) => ({ default: m.HourlyForecast })),
+  {
+    ssr: false,
+    loading: () => <Skeleton aria-hidden="true" className="h-40 w-full rounded-2xl" />,
+  },
+);
+const TodayExtras = dynamic(
+  () => import("@/components/today/today-extras").then((m) => ({ default: m.TodayExtras })),
+  {
+    ssr: false,
+    loading: () => (
+      <div aria-hidden="true" className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-36 rounded-2xl" />
+        ))}
+      </div>
+    ),
+  },
+);
+
 export default function TodayPage() {
   const { data, airQuality, loading, error, place, hydrated } = useActiveForecast();
   const [prefs] = usePrefs();
-  const [view, setView] = useState<TodayView>("today");
 
   if (!hydrated) return <PageSkeleton />;
   if (!place) return <EmptyLocation />;
@@ -27,79 +46,72 @@ export default function TodayPage() {
   if (error) return <ErrorState message={error.message} />;
   if (!data) return <PageSkeleton />;
 
-  const summary = summarizeToday(data);
-  const todayDate = data.daily[0]?.date ?? new Date().toISOString();
+  const today = data.daily[0];
+  const format12h = prefs.timeFormat === "12h";
 
   return (
     <div className="space-y-8 pt-2">
-      <div className="flex items-start justify-between gap-6">
-        <GreetingHeader isoDate={todayDate} timezone={data.place.timezone} summary={summary} />
-        <div className="stagger-3 pt-1">
-          <ViewTabs value={view} onChange={setView} />
-        </div>
+      <AlertCard />
+      <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
+
+      <hr className="border-white/[0.08]" />
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_338px]">
+        <CurrentConditions forecast={data} place={place} units={prefs.units} />
+
+        <aside aria-label="Today's details" className="grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-1">
+          <SunriseCard
+            sunriseIso={today.sunrise}
+            sunsetIso={today.sunset}
+            format12h={format12h}
+            timezone={data.place.timezone}
+          />
+          <SunsetCard
+            sunriseIso={today.sunrise}
+            sunsetIso={today.sunset}
+            format12h={format12h}
+            timezone={data.place.timezone}
+          />
+          <UvIndexCard uv={data.current.uvIndex} />
+          <HumidityCard current={data.current} unit={prefs.units.temperature} />
+        </aside>
       </div>
 
-      <div className="stagger-4">
-        <CurrentConditions forecast={data} airQuality={airQuality} place={place} units={prefs.units} />
-      </div>
+      <HourlyForecast forecast={data} units={prefs.units} format12h={format12h} />
 
-      <div className="stagger-5">
-        <HourlyForecast
-          forecast={data}
-          units={prefs.units}
-          format12h={prefs.timeFormat === "12h"}
-          view={view}
-        />
-      </div>
+      <TodayExtras forecast={data} airQuality={airQuality} />
 
-      <div className="stagger-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <UvIndexCard uv={data.current.uvIndex} />
-        <SunriseSunsetCard
-          sunriseIso={data.daily[0].sunrise}
-          sunsetIso={data.daily[0].sunset}
-          format12h={prefs.timeFormat === "12h"}
-          timezone={data.place.timezone}
-        />
-        <VisibilityCard meters={data.current.visibility} />
-        <PressureCard
-          current={data.current.pressure}
-          laterHours={data.hourly.slice(0, 6).map((h) => h.temperature)}
-        />
-      </div>
-
-      <div className="pt-4 text-sm text-muted-foreground">
-        <Link href="/forecast" className="underline-offset-4 hover:underline">
-          See the full seven-day outlook →
+      <p className="caption pt-2">
+        <Link href="/forecast" className="underline-offset-4 transition-colors hover:text-foreground hover:underline">
+          See the full 2-week outlook
         </Link>
-      </div>
+      </p>
     </div>
   );
 }
 
 function PageSkeleton() {
   return (
-    <div className="space-y-8 pt-2">
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-40" />
-        <Skeleton className="h-12 w-72" />
-        <Skeleton className="h-4 w-96" />
+    <div aria-busy="true" className="space-y-8 pt-2">
+      <Skeleton aria-hidden="true" className="h-32 w-full rounded-3xl" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_338px]">
+        <Skeleton aria-hidden="true" className="h-[420px] rounded-3xl" />
+        <div className="grid content-start gap-6">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} aria-hidden="true" className="h-[120px] rounded-3xl" />
+          ))}
+        </div>
       </div>
-      <Skeleton className="h-[340px] w-full rounded-3xl" />
-      <Skeleton className="h-32 w-full rounded-3xl" />
-      <div className="grid grid-cols-4 gap-3">
-        {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 rounded-3xl" />
-        ))}
-      </div>
+      <Skeleton aria-hidden="true" className="h-40 w-full rounded-2xl" />
     </div>
   );
 }
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="surface-card mx-auto mt-12 max-w-md p-8 text-center">
-      <h2 className="text-lg font-semibold">Couldn't load forecast</h2>
-      <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+    <div className="tint-card mx-auto mt-12 max-w-md p-8 text-center">
+      <h1 className="text-lg font-semibold">Couldn&apos;t load forecast</h1>
+      <p className="caption mt-2">{message}</p>
     </div>
   );
 }

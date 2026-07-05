@@ -1,49 +1,47 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { GlassCard } from "@/components/aero/glass-card";
+import { PillTabs } from "@/components/aero/pill-tabs";
 
 export type ForecastView = "hourly" | "daily" | "grid";
 
 type Props = {
   title: string;
   subtitle: string;
+  days: number;
   view: ForecastView;
   onChangeView: (v: ForecastView) => void;
 };
 
-const OPTIONS: { value: ForecastView; label: string }[] = [
+const TABS: { value: ForecastView; label: string }[] = [
   { value: "hourly", label: "Hourly" },
   { value: "daily", label: "Daily" },
   { value: "grid", label: "Grid" },
 ];
 
-export function ForecastHeader({ title, subtitle, view, onChangeView }: Props) {
+/** Figma header: kicker card left, Hourly/Daily/Grid tabs right, blue headline card below. */
+export function ForecastHeader({ title, subtitle, days, view, onChangeView }: Props) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4 pb-2">
-      <div className="space-y-2">
-        <div className="eyebrow stagger-1">7-Day Outlook</div>
-        <h1 className="stagger-2 text-[2.5rem] font-bold leading-tight tracking-tight text-foreground sm:text-[3rem]">
-          {title}
-        </h1>
-        <p className="stagger-3 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <GlassCard variant="glass" className="stagger-1 px-5 py-4">
+          <p className="kicker">2-Week Outlook</p>
+          <p className="caption mt-0.5">{days} days of forecast</p>
+        </GlassCard>
+        <PillTabs
+          tabs={TABS as { value: string; label: string }[]}
+          value={view}
+          onValueChange={(v) => onChangeView(v as ForecastView)}
+          ariaLabel="Forecast view"
+          panelIdPrefix="forecast-view"
+          className="stagger-2"
+        />
       </div>
-      <div className="stagger-3 inline-flex rounded-full border border-[var(--hairline)] bg-card p-1 text-sm">
-        {OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onChangeView(opt.value)}
-            className={cn(
-              "rounded-full px-4 py-1.5 font-medium transition-colors",
-              view === opt.value
-                ? "bg-foreground text-background"
-                : "text-foreground/60 hover:text-foreground",
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-    </header>
+
+      <GlassCard variant="glass" className="stagger-3 px-8 py-8">
+        <h1 className="text-headline">{title}</h1>
+        <p className="text-subtitle mt-2">{subtitle}</p>
+      </GlassCard>
+    </>
   );
 }

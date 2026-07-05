@@ -1,64 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Globe2, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Settings } from "lucide-react";
+import { GlassCard } from "@/components/aero/glass-card";
+import { PillTabs } from "@/components/aero/pill-tabs";
 import { UnitsLocaleSection } from "@/components/settings/units-locale-section";
 import { NotificationsSection } from "@/components/settings/notifications-section";
-import { AboutSection } from "@/components/settings/about-section";
 
-type TabKey = "units" | "notifications" | "about";
+type TabKey = "units" | "notifications";
 
-const TABS: { key: TabKey; label: string; icon: typeof Bell }[] = [
-  { key: "units", label: "Units & Locale", icon: Globe2 },
-  { key: "notifications", label: "Notifications", icon: Bell },
-  { key: "about", label: "About", icon: Info },
+const TABS: { value: TabKey; label: string }[] = [
+  { value: "units", label: "Units and locale" },
+  { value: "notifications", label: "Notifications" },
 ];
+
+const PANEL_PREFIX = "settings";
 
 export default function SettingsPage() {
   const [tab, setTab] = useState<TabKey>("units");
 
   return (
-    <div className="space-y-8 pt-2">
-      <header className="space-y-2">
-        <div className="eyebrow stagger-1">Settings</div>
-        <h1 className="stagger-2 text-[2.5rem] font-bold leading-tight tracking-tight text-foreground sm:text-[3rem]">
-          Preferences
-        </h1>
-        <p className="stagger-3 max-w-2xl text-sm text-muted-foreground">
-          Customize units, alerts, and how Aero behaves.
-        </p>
+    <div className="space-y-6 pt-2">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <GlassCard
+          variant="glass"
+          className="stagger-1 flex w-full max-w-[240px] flex-col items-start gap-3 p-6"
+        >
+          <Settings aria-hidden="true" className="size-8 text-foreground/80" strokeWidth={1.5} />
+          <p className="kicker">Settings</p>
+        </GlassCard>
+
+        <PillTabs
+          tabs={TABS}
+          value={tab}
+          onValueChange={(v) => setTab(v as TabKey)}
+          ariaLabel="Settings sections"
+          panelIdPrefix={PANEL_PREFIX}
+          className="stagger-2"
+        />
       </header>
 
-      <div className="stagger-4 grid gap-6 md:grid-cols-[220px_1fr]">
-        <nav className="flex flex-row gap-1 md:flex-col" aria-label="Settings sections">
-          {TABS.map(({ key, label, icon: Icon }) => {
-            const active = tab === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setTab(key)}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors text-left",
-                  active
-                    ? "bg-foreground/5 text-foreground border border-[var(--hairline-strong)]"
-                    : "text-foreground/65 hover:text-foreground hover:bg-foreground/[0.03] border border-transparent",
-                )}
-              >
-                <Icon className="size-4 shrink-0" strokeWidth={1.5} />
-                <span className="flex-1">{label}</span>
-              </button>
-            );
-          })}
-        </nav>
+      <GlassCard variant="glass" as="section" className="stagger-2 px-6 py-8 sm:px-10 sm:py-9">
+        <h1 className="text-headline">Preferences</h1>
+        <p className="text-subtitle mt-2 max-w-2xl">
+          Customize units, alerts, and how Aero behaves.
+        </p>
+      </GlassCard>
 
-        <div>
-          {tab === "units" && <UnitsLocaleSection />}
-          {tab === "notifications" && <NotificationsSection />}
-          {tab === "about" && <AboutSection />}
-        </div>
+      <hr className="stagger-3 border-border" />
+
+      <div
+        role="tabpanel"
+        id={`${PANEL_PREFIX}-${tab}`}
+        aria-labelledby={`${PANEL_PREFIX}-tab-${tab}`}
+      >
+        {tab === "units" ? <UnitsLocaleSection /> : <NotificationsSection />}
       </div>
     </div>
   );

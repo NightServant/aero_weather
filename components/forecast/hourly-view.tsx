@@ -16,7 +16,7 @@ export function HourlyView({ forecast, units, format12h }: Props) {
   if (nowIndex === -1) nowIndex = 0;
 
   return (
-    <div className="surface-card p-4">
+    <div className="tint-card p-4">
       <div className="flex flex-wrap gap-1">
         {points.map((p, i) => (
           <HourlyCell

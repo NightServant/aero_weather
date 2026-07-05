@@ -49,25 +49,25 @@ export function summarizeToday(forecast: Forecast): string {
     .reduce((max, h) => Math.max(max, h.precipitationProbability), 0);
 
   if (kind === "thunderstorm" || kind === "thunderstorm-hail") {
-    return "Severe weather is moving through — stay indoors when storms arrive.";
+    return "Severe weather is moving through - stay indoors when storms arrive.";
   }
   if (kind === "rain" || kind === "rain-showers" || kind === "drizzle") {
-    return "Rain through the day — a waterproof layer is the right call.";
+    return "Rain through the day - a waterproof layer is the right call.";
   }
   if (kind === "snow" || kind === "snow-showers") {
-    return "Snow is in the forecast — leave time for slower travel.";
+    return "Snow is in the forecast - leave time for slower travel.";
   }
   if (kind === "clear" || kind === "mainly-clear") {
     if (precipChance > 30) {
-      return "A bright window before evening showers — pack a light layer for the commute.";
+      return "A bright window before evening showers - pack a light layer for the commute.";
     }
-    return "A bright, settled day — good time to be outside.";
+    return "A bright, settled day - good time to be outside.";
   }
   if (kind === "partly-cloudy") {
-    return "Sun and cloud through the day — comfortable across the board.";
+    return "Sun and cloud through the day - comfortable across the board.";
   }
   if (kind === "fog") {
-    return "Fog is hanging on — visibility will improve through the morning.";
+    return "Fog is hanging on - visibility will improve through the morning.";
   }
-  return "A mixed day ahead — keep a layer handy.";
+  return "A mixed day ahead - keep a layer handy.";
 }

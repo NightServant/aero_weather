@@ -1,26 +1,19 @@
 "use client";
 
-import { formatDate, relativeGreeting } from "@/lib/format";
+import { GlassCard } from "@/components/aero/glass-card";
+import { relativeGreeting } from "@/lib/format";
 
 type Props = {
-  isoDate: string;
   timezone?: string;
-  summary?: string;
+  summary: string;
 };
 
-export function GreetingHeader({ isoDate, timezone, summary }: Props) {
-  const greeting = relativeGreeting(new Date(), timezone);
-  const date = formatDate(isoDate, timezone).toUpperCase();
-
+/** Page heading card: blue greeting h1 + live one-line summary (Figma 10:11415). */
+export function GreetingHeader({ timezone, summary }: Props) {
   return (
-    <header className="space-y-2">
-      <div className="eyebrow stagger-1">Today · {date.split(", ").slice(1).join(", ") || date}</div>
-      <h1 className="stagger-2 text-[2.75rem] font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl">
-        {greeting}
-      </h1>
-      {summary ? (
-        <p className="stagger-3 max-w-2xl text-sm text-muted-foreground">{summary}</p>
-      ) : null}
-    </header>
+    <GlassCard variant="glass" className="stagger-1 px-8 py-8">
+      <h1 className="text-headline">{relativeGreeting(new Date(), timezone)}!</h1>
+      <p className="text-subtitle mt-2">{summary}</p>
+    </GlassCard>
   );
 }

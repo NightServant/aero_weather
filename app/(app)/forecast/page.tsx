@@ -3,35 +3,46 @@
 import { useState } from "react";
 import { ForecastHeader, type ForecastView } from "@/components/forecast/forecast-header";
 import { DailyRow } from "@/components/forecast/daily-row";
+import { GridView } from "@/components/forecast/grid-view";
 import { SummaryCards } from "@/components/forecast/summary-cards";
 import { HourlyView } from "@/components/forecast/hourly-view";
-import { MonthlyView } from "@/components/forecast/monthly-view";
 import { useActiveForecast } from "@/components/shell/active-forecast-context";
 import { usePrefs } from "@/hooks/use-prefs";
-import { summarizeWeek } from "@/lib/forecast-summary";
+import { summarizeOutlook } from "@/components/forecast/outlook-summary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyLocation } from "@/components/shell/empty-location";
 
 export default function ForecastPage() {
   const { data, loading, error, hydrated, place } = useActiveForecast();
   const [prefs] = usePrefs();
-  const [view, setView] = useState<ForecastView>("daily");
+  const [view, setView] = useState<ForecastView>("grid");
 
   if (!hydrated) return <PageSkeleton />;
   if (!place) return <EmptyLocation />;
   if (loading && !data) return <PageSkeleton />;
-  if (error) return <p className="mt-12 text-center text-sm text-muted-foreground">{error.message}</p>;
+  if (error) return <ErrorState message={error.message} />;
   if (!data) return <PageSkeleton />;
 
-  const { title, subtitle } = summarizeWeek(data);
+  const { title, subtitle } = summarizeOutlook(data);
 
   return (
     <div className="space-y-8 pt-2">
-      <ForecastHeader title={title} subtitle={subtitle} view={view} onChangeView={setView} />
+      <ForecastHeader
+        title={title}
+        subtitle={subtitle}
+        days={data.daily.length}
+        view={view}
+        onChangeView={setView}
+      />
 
-      <div className="stagger-4">
+      <div
+        role="tabpanel"
+        id={`forecast-view-${view}`}
+        aria-labelledby={`forecast-view-tab-${view}`}
+        className="stagger-4"
+      >
         {view === "daily" ? (
-          <div className="surface-card divide-y divide-[var(--hairline)] px-5 py-3">
+          <div className="tint-card divide-y divide-white/[0.08] px-5 py-3">
             {data.daily.map((d, i) => (
               <DailyRow
                 key={d.date}
@@ -45,7 +56,7 @@ export default function ForecastPage() {
         ) : view === "hourly" ? (
           <HourlyView forecast={data} units={prefs.units} format12h={prefs.timeFormat === "12h"} />
         ) : (
-          <MonthlyView forecast={data} unit={prefs.units.temperature} />
+          <GridView daily={data.daily} unit={prefs.units.temperature} timezone={data.place.timezone} />
         )}
       </div>
 
@@ -58,14 +69,23 @@ export default function ForecastPage() {
 
 function PageSkeleton() {
   return (
-    <div className="space-y-8 pt-2">
-      <Skeleton className="h-16 w-72" />
-      <Skeleton className="h-[400px] w-full rounded-3xl" />
-      <div className="grid grid-cols-4 gap-3">
-        {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-32 rounded-3xl" />
+    <div aria-busy="true" className="space-y-8 pt-2">
+      <Skeleton aria-hidden="true" className="h-20 w-72 rounded-3xl" />
+      <Skeleton aria-hidden="true" className="h-32 w-full rounded-3xl" />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 8 }, (_, i) => (
+          <Skeleton key={i} aria-hidden="true" className="h-24 rounded-2xl" />
         ))}
       </div>
+    </div>
+  );
+}
+
+function ErrorState({ message }: { message: string }) {
+  return (
+    <div className="tint-card mx-auto mt-12 max-w-md p-8 text-center">
+      <h1 className="text-lg font-semibold">Couldn&apos;t load forecast</h1>
+      <p className="caption mt-2">{message}</p>
     </div>
   );
 }

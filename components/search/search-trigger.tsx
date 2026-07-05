@@ -80,7 +80,7 @@ export function SearchTrigger({ className }: { className?: string }) {
           onFocus={() => setOpen(true)}
           placeholder={
             saved.length === 0
-              ? "No saved locations — add one from Locations"
+              ? "No saved locations - add one from Locations"
               : "Switch saved location…"
           }
           className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/55 outline-none"

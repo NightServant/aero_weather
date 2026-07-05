@@ -2,85 +2,84 @@
 
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { WeatherIcon } from "@/components/today/weather-icon";
-import { formatTemp, tempUnitLabel, formatTime } from "@/lib/format";
+import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
+import { formatTemp, tempUnitLabel } from "@/lib/format";
 import { weatherCodeToKind, WEATHER_LABEL } from "@/lib/api/weather-code";
-import { paletteFromWeather } from "@/lib/theme";
 import { usePrefs } from "@/hooks/use-prefs";
+import { CityPhoto } from "./city-photo";
 import type { Forecast, Place, TempUnit } from "@/lib/api/types";
 
 type Props = {
   place: Place;
+  /** null = forecast request failed (loader shows a skeleton while loading). */
   forecast: Forecast | null;
   unit: TempUnit;
-  format12h: boolean;
   isActive: boolean;
 };
 
-export function CityCard({ place, forecast, unit, format12h, isActive }: Props) {
+/**
+ * Figma city card: 240px tint card, 16px padding, 208x247 photo (radius 12),
+ * name + region on 2 lines, then weather icon + temp + condition row.
+ * Clicking pins the place as the active location and returns to Today.
+ */
+export function CityCard({ place, forecast, unit, isActive }: Props) {
   const [, setPrefs] = usePrefs();
   const router = useRouter();
 
-  const palette = forecast
-    ? paletteFromWeather(weatherCodeToKind(forecast.current.weatherCode), forecast.current.isDay)
-    : "cloudy";
+  const kind = forecast ? weatherCodeToKind(forecast.current.weatherCode) : null;
+  const region = [place.admin1, place.country].filter(Boolean).join(", ");
 
   const onClick = () => {
     setPrefs({ activeLocationId: place.id });
     router.push("/today");
   };
 
-  const localTime = forecast ? formatTime(new Date().toISOString(), format12h, forecast.place.timezone) : "—";
-  const kind = forecast ? weatherCodeToKind(forecast.current.weatherCode) : "cloudy";
-
   return (
     <button
       type="button"
       onClick={onClick}
-      data-palette={palette}
-      style={{ color: "var(--hero-text)" }}
+      aria-current={isActive ? "true" : undefined}
       className={cn(
-        "group relative isolate overflow-hidden rounded-3xl p-5 text-left transition hero-gradient grain-overlay border border-[var(--hairline-strong)]",
-        "min-h-[180px]",
-        isActive && "ring-2 ring-[var(--palette-accent)]/70",
+        "tint-card card-interactive block w-full p-4 text-left",
+        isActive && "ring-2 ring-primary/60",
       )}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold tracking-tight">{place.name}</h3>
-            {isActive ? (
-              <span
-                style={{ backgroundColor: "color-mix(in oklch, var(--hero-text) 16%, transparent)" }}
-                className="rounded-md px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase backdrop-blur"
-              >
-                Home
-              </span>
-            ) : null}
-          </div>
-          <div className="text-xs opacity-75">{[place.admin1, place.country].filter(Boolean).join(", ")}</div>
-        </div>
-        <div className="opacity-90">
-          <WeatherIcon kind={kind} isDay={forecast?.current.isDay ?? true} className="size-7" />
-        </div>
-      </div>
-
-      <div className="absolute right-5 top-14 text-xs opacity-75 tabular">{localTime}</div>
-
-      <div className="mt-6 flex items-baseline gap-1">
-        <span className="font-display text-6xl font-extralight tracking-tighter tabular">
-          {forecast ? formatTemp(forecast.current.temperature, unit, false) : "—"}
-        </span>
-        <span className="pb-3 text-lg opacity-85">°</span>
-      </div>
-
-      <div className="mt-4 flex items-baseline justify-between text-xs opacity-90">
-        <span>{forecast ? WEATHER_LABEL[kind] : "Loading"}</span>
-        {forecast ? (
-          <span className="tabular">
-            H {formatTemp(forecast.daily[0].tempMax, unit)}{tempUnitLabel(unit)} · L {formatTemp(forecast.daily[0].tempMin, unit)}{tempUnitLabel(unit)}
+      <div className="relative">
+        <CityPhoto
+          place={place}
+          width={208}
+          height={247}
+          className="h-[247px] w-full rounded-[12px]"
+          initialClassName="text-6xl"
+        />
+        {isActive ? (
+          <span className="glass-pill absolute top-2 left-2 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-foreground">
+            Active
           </span>
         ) : null}
+      </div>
+
+      <div className="mt-3 min-w-0">
+        <h3 className="truncate text-[0.9375rem] leading-snug font-semibold text-text-strong">
+          {place.name}
+        </h3>
+        <p className="caption truncate">{region || place.countryCode}</p>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        {kind ? (
+          <AnimatedWeatherIcon kind={kind} isDay={forecast?.current.isDay ?? true} size={20} />
+        ) : (
+          <span aria-hidden="true" className="size-5 shrink-0 rounded-full bg-white/10" />
+        )}
+        <span className="stat-value whitespace-nowrap">
+          {forecast
+            ? `${formatTemp(forecast.current.temperature, unit)}${tempUnitLabel(unit)}`
+            : "--"}
+        </span>
+        <span className="caption ml-auto truncate text-right">
+          {kind ? WEATHER_LABEL[kind] : "Unavailable"}
+        </span>
       </div>
     </button>
   );

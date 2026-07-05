@@ -1,6 +1,7 @@
 "use client";
 
-import { Sunrise } from "lucide-react";
+import { Sunrise, Sunset } from "lucide-react";
+import { GlassCard } from "@/components/aero/glass-card";
 import { durationBetween, formatTime } from "@/lib/format";
 
 type Props = {
@@ -10,45 +11,50 @@ type Props = {
   timezone?: string;
 };
 
-export function SunriseSunsetCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
-  const sunrise = formatTime(sunriseIso, format12h, timezone);
-  const sunset = formatTime(sunsetIso, format12h, timezone);
-  const daylight = durationBetween(sunriseIso, sunsetIso);
-
-  const now = new Date();
-  const start = new Date(sunriseIso).getTime();
-  const end = new Date(sunsetIso).getTime();
-  const ratio = Math.min(1, Math.max(0, (now.getTime() - start) / Math.max(1, end - start)));
-  const cx = 10 + ratio * 80;
-  const cy = 40 - Math.sin(ratio * Math.PI) * 28;
-
+/** Right-rail pair (Figma 10:11580 / 10:11613): icon, label, live time, daylight caption. */
+export function SunriseCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
   return (
-    <div className="surface-card flex flex-col p-5">
-      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
-        <Sunrise className="size-3.5" strokeWidth={1.5} />
-        <span className="eyebrow">Sunrise &amp; Sunset</span>
-      </div>
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-        <svg viewBox="0 0 100 50" className="h-14 w-full">
-          <path
-            d="M5 42 A 45 30 0 0 1 95 42"
-            fill="none"
-            stroke="var(--scene-accent, var(--accent))"
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-          <circle cx={cx} cy={cy} r={3.5} fill="var(--scene-accent, var(--accent))" />
-        </svg>
-        <div className="flex flex-col gap-1 text-sm tabular">
-          <span className="flex items-center gap-1.5 text-foreground">
-            <span className="text-foreground/50">↑</span> {sunrise}
-          </span>
-          <span className="flex items-center gap-1.5 text-foreground">
-            <span className="text-foreground/50">↓</span> {sunset}
-          </span>
-        </div>
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">{daylight} daylight</p>
-    </div>
+    <RailCard
+      icon={<Sunrise className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      label="Sunrise"
+      value={formatTime(sunriseIso, format12h, timezone)}
+      caption={`${durationBetween(sunriseIso, sunsetIso)} of daylight`}
+    />
+  );
+}
+
+export function SunsetCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
+  return (
+    <RailCard
+      icon={<Sunset className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      label="Sunset"
+      value={formatTime(sunsetIso, format12h, timezone)}
+      caption={`${durationBetween(sunriseIso, sunsetIso)} of daylight`}
+    />
+  );
+}
+
+export function RailCard({
+  icon,
+  label,
+  value,
+  caption,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  caption?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <GlassCard variant="glass" className="px-6 py-6" data-animate="">
+      {icon}
+      <h3 className="stat-title mt-4">
+        {label} <span className="tabular">{value}</span>
+      </h3>
+      {caption ? <p className="caption mt-0.5">{caption}</p> : null}
+      {children}
+    </GlassCard>
   );
 }
