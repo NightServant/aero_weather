@@ -183,8 +183,14 @@ function Layer({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  // Callers that pass a style own the full placement; `inset: 0` must not
+  // leak a `top: 0` that would override their `bottom` anchoring.
   return (
-    <span aria-hidden="true" className={cn("absolute inset-0", className)} style={style}>
+    <span
+      aria-hidden="true"
+      className={cn("absolute", className)}
+      style={style ?? { inset: 0 }}
+    >
       {children}
     </span>
   );
