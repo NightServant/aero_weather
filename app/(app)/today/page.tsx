@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { GreetingHeader } from "@/components/today/greeting-header";
 import { CurrentConditions } from "@/components/today/current-conditions";
@@ -14,30 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { summarizeToday } from "@/lib/forecast-summary";
 import { EmptyLocation } from "@/components/shell/empty-location";
 
-// Below-fold content loads on demand; skeletons match the final card shapes.
-const HourlyForecast = dynamic(
-  () => import("@/components/today/hourly-forecast").then((m) => ({ default: m.HourlyForecast })),
-  {
-    ssr: false,
-    loading: () => <Skeleton aria-hidden="true" className="h-40 w-full rounded-2xl" />,
-  },
-);
-const TodayExtras = dynamic(
-  () => import("@/components/today/today-extras").then((m) => ({ default: m.TodayExtras })),
-  {
-    ssr: false,
-    loading: () => (
-      <div aria-hidden="true" className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-36 rounded-2xl" />
-        ))}
-      </div>
-    ),
-  },
-);
-
 export default function TodayPage() {
-  const { data, airQuality, loading, error, place, hydrated } = useActiveForecast();
+  const { data, loading, error, place, hydrated } = useActiveForecast();
   const [prefs] = usePrefs();
 
   if (!hydrated) return <PageSkeleton />;
@@ -51,6 +28,9 @@ export default function TodayPage() {
 
   return (
     <div className="space-y-8 pt-2">
+      {/* Weather-safety banner: renders only when an alert is derived. */}
+      <AlertCard />
+
       <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
 
       <hr className="border-white/[0.08]" />
@@ -76,12 +56,6 @@ export default function TodayPage() {
         </aside>
       </div>
 
-      <AlertCard />
-
-      <HourlyForecast forecast={data} units={prefs.units} format12h={format12h} />
-
-      <TodayExtras forecast={data} airQuality={airQuality} />
-
       <p className="caption pt-2">
         <Link href="/forecast" className="underline-offset-4 transition-colors hover:text-foreground hover:underline">
           See the full 2-week outlook
@@ -95,7 +69,7 @@ function PageSkeleton() {
   return (
     <div aria-busy="true" className="space-y-8 pt-2">
       <Skeleton aria-hidden="true" className="h-32 w-full rounded-3xl" />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_338px]">
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_338px]">
         <Skeleton aria-hidden="true" className="h-[420px] rounded-3xl" />
         <div className="grid content-start gap-6">
           {[0, 1, 2, 3].map((i) => (
@@ -103,7 +77,6 @@ function PageSkeleton() {
           ))}
         </div>
       </div>
-      <Skeleton aria-hidden="true" className="h-40 w-full rounded-2xl" />
     </div>
   );
 }
