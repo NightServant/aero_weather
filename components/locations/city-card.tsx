@@ -31,7 +31,7 @@ export function CityCard({ place, forecast, unit, isActive }: Props) {
 
   const onClick = () => {
     setPrefs({ activeLocationId: place.id });
-    router.push("/today");
+    router.push("/#today");
   };
 
   return (

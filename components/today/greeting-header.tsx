@@ -12,7 +12,7 @@ type Props = {
 export function GreetingHeader({ timezone, summary }: Props) {
   return (
     <GlassCard variant="glass" className="stagger-1 px-8 py-8">
-      <h1 className="text-headline">{relativeGreeting(new Date(), timezone)}!</h1>
+      <h1 id="today-h" className="text-headline">{relativeGreeting(new Date(), timezone)}!</h1>
       <p className="text-subtitle mt-2">{summary}</p>
     </GlassCard>
   );

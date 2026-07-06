@@ -186,6 +186,13 @@
   html {
     font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   }
+  /* Anchor-nav smooth scroll for the single-page layout (reduced-motion kill
+     switch below forces `scroll-behavior: auto`). */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   body {
     @apply bg-background text-foreground;
     font-weight: 400;
@@ -272,14 +279,6 @@
     letter-spacing: 0.01em;
     color: var(--muted-foreground);
   }
-  /* Legacy alias used by pre-redesign pages; matches the kicker voice. */
-  .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-  }
 }
 
 /* ---- Glass system (spec 2) ---- */
@@ -327,19 +326,6 @@
   }
   .card-interactive:active {
     transform: translateY(-1px) scale(0.99);
-  }
-
-  /* Legacy aliases so pre-redesign pages stay legible until each is rebuilt. */
-  .surface-card {
-    background: oklch(0.25 0.03 240 / 0.55);
-    border: 1px solid rgb(255 255 255 / 0.12);
-    border-radius: 16px;
-  }
-  .surface-card-elevated {
-    background: color-mix(in oklch, white 11%, transparent);
-    border: 1px solid color-mix(in oklch, white 18%, transparent);
-    border-radius: 24px;
-    box-shadow: var(--shadow-card);
   }
 }
 

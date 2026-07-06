@@ -1,29 +1,39 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 type Props = {
   label: string;
   description?: string;
+  icon?: ReactNode;
   checked: boolean;
   onChange: (v: boolean) => void;
   className?: string;
 };
 
-/** Notifications toggle row: `.tint-card` shell, 44px switch touch target (spec 7). */
-export function ToggleRow({ label, description, checked, onChange, className }: Props) {
+/** Notification card: `.tint-card` with icon + switch on top, label + caption below.
+ *  Matches the Units-and-locale card grammar (spec: 2x2 grid). 44px switch hit-slop. */
+export function ToggleRow({ label, description, icon, checked, onChange, className }: Props) {
   const id = useId();
   const descriptionId = description ? `${id}-description` : undefined;
 
   return (
-    <div
-      className={cn(
-        "tint-card flex min-h-[44px] items-center justify-between gap-4 px-5 py-4",
-        className,
-      )}
-    >
+    <div className={cn("tint-card flex flex-col gap-3 p-5", className)}>
+      <div className="flex items-start justify-between gap-4">
+        <span aria-hidden="true" className="text-foreground/80">
+          {icon}
+        </span>
+        <Switch
+          id={id}
+          checked={checked}
+          onCheckedChange={onChange}
+          aria-describedby={descriptionId}
+          aria-label={label}
+          className="shrink-0 after:-inset-x-3.5 after:-inset-y-3.5"
+        />
+      </div>
       <div className="min-w-0">
         <label
           htmlFor={id}
@@ -37,13 +47,6 @@ export function ToggleRow({ label, description, checked, onChange, className }: 
           </p>
         ) : null}
       </div>
-      <Switch
-        id={id}
-        checked={checked}
-        onCheckedChange={onChange}
-        aria-describedby={descriptionId}
-        className="shrink-0 after:-inset-x-3.5 after:-inset-y-3.5"
-      />
     </div>
   );
 }

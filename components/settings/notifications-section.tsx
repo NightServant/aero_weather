@@ -1,5 +1,6 @@
 "use client";
 
+import { Bell, CloudLightning, Sunrise, CloudRain } from "lucide-react";
 import { ToggleRow } from "./toggle-row";
 import { usePrefs } from "@/hooks/use-prefs";
 import { toast } from "sonner";
@@ -23,32 +24,34 @@ export function NotificationsSection() {
     setKey("push", value);
   };
 
+  const iconClass = "size-5" as const;
+
   return (
-    <div className="grid gap-4">
-      <h2 className="sr-only">Notifications</h2>
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <h3 className="sr-only">Notifications</h3>
       <ToggleRow
-        className="stagger-1"
+        icon={<Bell className={iconClass} strokeWidth={1.5} />}
         label="Push notifications"
         description="Required for the alerts below."
         checked={n.push}
         onChange={onPushToggle}
       />
       <ToggleRow
-        className="stagger-2"
+        icon={<CloudLightning className={iconClass} strokeWidth={1.5} />}
         label="Severe weather alerts"
         description="Watches and warnings in your area."
         checked={n.severeWeather}
         onChange={(v) => setKey("severeWeather", v)}
       />
       <ToggleRow
-        className="stagger-3"
+        icon={<Sunrise className={iconClass} strokeWidth={1.5} />}
         label="Daily morning briefing"
         description="7:00 AM summary of the day ahead."
         checked={n.dailyBriefing}
         onChange={(v) => setKey("dailyBriefing", v)}
       />
       <ToggleRow
-        className="stagger-4"
+        icon={<CloudRain className={iconClass} strokeWidth={1.5} />}
         label="Rain starting soon"
         description="30-minute heads-up before precipitation."
         checked={n.rainStartingSoon}

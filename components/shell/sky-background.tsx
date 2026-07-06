@@ -14,9 +14,12 @@ import type { PaletteKey } from "@/lib/prefs";
  */
 
 const SKY_PHOTOS: Partial<Record<PaletteKey, string>> = {
+  sunny: "/skies/sunny.jpg",
   sunset: "/skies/sunset.webp",
+  rainy: "/skies/rainy.jpg",
   stormy: "/skies/stormy.webp",
   cloudy: "/skies/cloudy.webp",
+  snowy: "/skies/snowy.jpg",
   night: "/skies/night.webp",
 };
 
@@ -24,8 +27,12 @@ const GRADIENT =
   "radial-gradient(120% 80% at 75% 25%, var(--hero-glow), transparent 60%), " +
   "linear-gradient(160deg, var(--hero-from) 0%, var(--hero-via) 55%, var(--hero-to) 100%)";
 
+// Two layers: a vertical gradient (dark top + bottom vignette) plus a flat neutral wash
+// that knocks down chroma everywhere — so warm palette glows (sunny/sunset) can't bleed
+// through as an olive band and every sky composites into one dark, hue-neutral surface.
 const SCRIM =
-  "linear-gradient(180deg, oklch(0.13 0.02 250 / 0.55) 0%, oklch(0.13 0.02 250 / 0.25) 35%, oklch(0.10 0.02 250 / 0.60) 100%)";
+  "linear-gradient(180deg, oklch(0.13 0.02 250 / 0.58) 0%, oklch(0.13 0.02 250 / 0.44) 45%, oklch(0.10 0.02 250 / 0.70) 100%), " +
+  "linear-gradient(0deg, oklch(0.15 0.018 250 / 0.32), oklch(0.15 0.018 250 / 0.32))";
 
 // The cloudy plate is the brightest photo; spec adds a top band on top of the standard scrim.
 const CLOUDY_TOP_BAND = "linear-gradient(180deg, oklch(0.10 0.02 250 / 0.15) 0%, transparent 30%)";
@@ -88,14 +95,15 @@ function SkyPhoto({
   priority: boolean;
   onSettled: () => void;
 }) {
-  const [loaded, setLoaded] = useState(false);
-
-  // Drop the previous plate once this one has fully faded in.
+  // Visibility is NOT gated on JS load state: next/image doesn't forward a ref
+  // and a cached plate can complete before `onLoad` attaches, which used to leave
+  // the photo stuck invisible. The plate renders at its target opacity (gently
+  // faded in by CSS on mount) so it can never get trapped at 0. We only use a
+  // mount timer to drop the previous plate after the cross-fade.
   useEffect(() => {
-    if (!loaded) return;
     const t = window.setTimeout(onSettled, 700);
     return () => window.clearTimeout(t);
-  }, [loaded, onSettled]);
+  }, [onSettled]);
 
   return (
     <Image
@@ -104,10 +112,7 @@ function SkyPhoto({
       fill
       priority={priority}
       sizes="100vw"
-      onLoad={() => setLoaded(true)}
-      className={`object-cover transition-opacity duration-[600ms] ease-out ${
-        loaded ? "opacity-[0.65]" : "opacity-0"
-      }`}
+      className="object-cover opacity-[0.65]"
     />
   );
 }

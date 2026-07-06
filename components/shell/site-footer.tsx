@@ -9,18 +9,18 @@ const COLUMNS: {
   {
     heading: "Weather",
     links: [
-      { label: "Today", href: "/today" },
-      { label: "2-week outlook", href: "/forecast" },
-      { label: "Locations", href: "/locations" },
-      { label: "Settings", href: "/settings" },
+      { label: "Today", href: "#today" },
+      { label: "2-week outlook", href: "#forecast" },
+      { label: "Locations", href: "#locations" },
+      { label: "Settings", href: "#settings" },
     ],
   },
   {
     heading: "Features",
     links: [
-      { label: "Search cities", href: "/locations" },
-      { label: "Use my location", href: "/today" },
-      { label: "Weather alerts", href: "/today" },
+      { label: "Search cities", href: "#locations" },
+      { label: "Use my location", href: "#today" },
+      { label: "Weather alerts", href: "#today" },
     ],
   },
   {
@@ -30,8 +30,8 @@ const COLUMNS: {
       { label: "Reverse geocoding by BigDataCloud", href: "https://www.bigdatacloud.com/", external: true },
       { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true },
       { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true },
-      { label: "About Aero", href: "/settings" },
-      { label: "Privacy", href: "/settings" },
+      { label: "About Aero", href: "#settings" },
+      { label: "Privacy", href: "#settings" },
     ],
   },
 ];
@@ -96,7 +96,16 @@ export function SiteFooter() {
               >
                 Wikimedia Commons
               </a>{" "}
-              (sky photos: W.carter CC0; Basile Morin, GerritR CC BY-SA 4.0)
+              (W.carter CC0; Basile Morin, GerritR CC BY-SA 4.0) and{" "}
+              <a
+                href="https://stocksnap.io/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline-offset-2 transition-colors duration-150 hover:text-foreground hover:underline"
+              >
+                StockSnap
+              </a>{" "}
+              (CC0)
             </p>
           </div>
         </div>

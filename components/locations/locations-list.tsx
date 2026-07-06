@@ -47,7 +47,7 @@ function CityListRow({
 
   const onClick = () => {
     setPrefs({ activeLocationId: place.id });
-    router.push("/today");
+    router.push("/#today");
   };
 
   return (

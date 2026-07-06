@@ -60,7 +60,7 @@ export function SearchTrigger({ className }: { className?: string }) {
     setQuery("");
     setOpen(false);
     inputRef.current?.blur();
-    router.push("/today");
+    router.push("/#today");
   };
 
   return (

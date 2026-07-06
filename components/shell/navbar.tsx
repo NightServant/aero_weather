@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { MapPin, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,19 +20,35 @@ import { addPlace } from "@/lib/prefs";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/today", label: "Today" },
-  { href: "/forecast", label: "2-week" },
-  { href: "/locations", label: "Locations" },
-  { href: "/settings", label: "Settings" },
+  { id: "today", href: "#today", label: "Today" },
+  { id: "forecast", href: "#forecast", label: "2-week" },
+  { id: "locations", href: "#locations", label: "Locations" },
+  { id: "settings", href: "#settings", label: "Settings" },
 ] as const;
 
 export function Navbar() {
-  const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeId, setActiveId] = useState<string>("today");
   const [, setPrefs] = usePrefs();
 
-  // Close the mobile drawer after navigation.
-  useEffect(() => setDrawerOpen(false), [pathname]);
+  // Scroll-spy: highlight the nav pill for the section currently in view.
+  useEffect(() => {
+    const sections = NAV_ITEMS.map((i) => document.getElementById(i.id)).filter(
+      (el): el is HTMLElement => el !== null,
+    );
+    if (sections.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveId(visible.target.id);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] },
+    );
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const useMyLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -69,7 +84,7 @@ export function Navbar() {
         aria-label="Main"
         className="glass-navbar mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
       >
-        <Link href="/today" className="flex items-center gap-2.5 rounded-full">
+        <Link href="#today" className="flex items-center gap-2.5 rounded-full">
           <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
           <span className="text-[17px] font-semibold tracking-tight">
             <span className="text-primary">Aero</span>
@@ -80,7 +95,7 @@ export function Navbar() {
         {/* Desktop nav pills */}
         <div className="ml-auto hidden items-center gap-1 md:flex">
           {NAV_ITEMS.map((item) => {
-            const active = pathname.startsWith(item.href);
+            const active = activeId === item.id;
             return (
               <Link
                 key={item.href}
@@ -121,11 +136,12 @@ export function Navbar() {
               <div className="space-y-1 px-4 pb-8">
                 <SearchTrigger className="mb-3" />
                 {NAV_ITEMS.map((item) => {
-                  const active = pathname.startsWith(item.href);
+                  const active = activeId === item.id;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={() => setDrawerOpen(false)}
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "flex h-12 items-center rounded-xl px-4 text-[15px] transition-colors",
