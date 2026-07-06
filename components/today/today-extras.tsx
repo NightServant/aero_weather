@@ -5,7 +5,6 @@ import { DetailTile } from "./detail-cards/detail-tile";
 import { PressureCard } from "./detail-cards/pressure-card";
 import { VisibilityCard } from "./detail-cards/visibility-card";
 import { aqiCategory } from "@/lib/api/air-quality";
-import { useInView } from "@/hooks/use-in-view";
 import type { AirQuality, Forecast } from "@/lib/api/types";
 
 type Props = {
@@ -13,11 +12,12 @@ type Props = {
   airQuality: AirQuality | null;
 };
 
-/** Below-the-fold detail row: pressure, visibility, air quality (lazy-loaded). */
+/** Below-the-fold detail row: pressure, visibility, air quality (lazy-loaded).
+ *  Each DetailTile carries its own `data-animate`; the global RevealObserver
+ *  reveals them as they scroll into view. */
 export function TodayExtras({ forecast, airQuality }: Props) {
-  const { ref } = useInView<HTMLDivElement>();
   return (
-    <div ref={ref} data-animate="" className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
       <PressureCard current={forecast.current.pressure} />
       <VisibilityCard meters={forecast.current.visibility} />
       <AirQualityCard airQuality={airQuality} />

@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
-import { useInView } from "@/hooks/use-in-view";
 import { formatShortDate, formatTemp, formatWeekdayShort, tempUnitLabel } from "@/lib/format";
 import { weatherCodeToKind, WEATHER_LABEL } from "@/lib/api/weather-code";
 import type { DailyPoint, TempUnit } from "@/lib/api/types";
@@ -14,12 +13,8 @@ type Props = {
 
 /** Figma grid view: 14 real-data day cards in a 4-column grid (spec: 4 -> 2 -> 1). */
 export function GridView({ daily, unit, timezone }: Props) {
-  const { ref } = useInView<HTMLUListElement>();
   return (
-    <ul
-      ref={ref}
-      className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4"
-    >
+    <ul className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
       {daily.map((point, i) => (
         <GridCard key={point.date} point={point} index={i} unit={unit} timezone={timezone} />
       ))}

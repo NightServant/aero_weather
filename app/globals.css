@@ -399,19 +399,21 @@
   .stagger-6 { animation: aero-rise 480ms var(--ease-out-quart) 400ms both; }
 }
 
-/* Scroll reveal: content is visible by default (SSR / no-JS safe). Only once
-   JS has tagged <html class="js"> does the hidden initial state apply, and
-   `data-inview` (set by hooks/use-in-view.ts) plays the entrance. */
-html.js [data-animate]:not([data-inview]) {
-  opacity: 0;
-}
-html.js [data-animate][data-inview] {
+/* Entrance reveal: a pure render-time CSS animation (same mechanism as the
+   stagger utilities). Content is visible by default without JS; when JS has
+   tagged <html class="js"> the element plays `aero-rise` as it first paints and
+   settles fully opaque (fill-mode both). No IntersectionObserver gate, so
+   content can never be trapped invisible if an observer fails to fire. */
+html.js [data-animate] {
   animation: aero-rise 480ms var(--ease-out-quart) both;
 }
 
+/* Transform-only so content is ALWAYS visible: the resting (and any stalled /
+   reduced-motion / non-animating) state is opacity 1. Real browsers get the
+   slide-up entrance; nothing can be trapped invisible by a frozen opacity fade. */
 @keyframes aero-rise {
-  from { opacity: 0; transform: translateY(12px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  from { transform: translateY(14px); }
+  to   { transform: translateY(0); }
 }
 
 @keyframes aero-ray-spin {

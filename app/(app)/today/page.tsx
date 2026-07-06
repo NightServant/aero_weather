@@ -51,15 +51,14 @@ export default function TodayPage() {
 
   return (
     <div className="space-y-8 pt-2">
-      <AlertCard />
       <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
 
       <hr className="border-white/[0.08]" />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_338px]">
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_338px]">
         <CurrentConditions forecast={data} place={place} units={prefs.units} />
 
-        <aside aria-label="Today's details" className="grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-1">
+        <aside aria-label="Today's details" className="grid content-start gap-6 sm:grid-cols-2 md:grid-cols-1">
           <SunriseCard
             sunriseIso={today.sunrise}
             sunsetIso={today.sunset}
@@ -76,6 +75,8 @@ export default function TodayPage() {
           <HumidityCard current={data.current} unit={prefs.units.temperature} />
         </aside>
       </div>
+
+      <AlertCard />
 
       <HourlyForecast forecast={data} units={prefs.units} format12h={format12h} />
 
