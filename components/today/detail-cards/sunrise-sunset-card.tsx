@@ -2,7 +2,13 @@
 
 import { Sunrise, Sunset } from "lucide-react";
 import { GlassCard } from "@/components/aero/glass-card";
-import { durationBetween, formatTime } from "@/lib/format";
+import { durationBetween, formatMinutes, formatTime } from "@/lib/format";
+
+/** Night length for the day = 24h minus the daylight window. */
+function nightLength(sunriseIso: string, sunsetIso: string): string {
+  const dayMs = new Date(sunsetIso).getTime() - new Date(sunriseIso).getTime();
+  return formatMinutes((86_400_000 - dayMs) / 60000);
+}
 
 type Props = {
   sunriseIso: string;
@@ -29,7 +35,7 @@ export function SunsetCard({ sunriseIso, sunsetIso, format12h, timezone }: Props
       icon={<Sunset className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
       label="Sunset"
       value={formatTime(sunsetIso, format12h, timezone)}
-      caption={`${durationBetween(sunriseIso, sunsetIso)} of daylight`}
+      caption={`${nightLength(sunriseIso, sunsetIso)} of night ahead`}
     />
   );
 }

@@ -103,12 +103,16 @@ export function findNowIndex(points: { time: string }[]): number {
   return idx === -1 ? 0 : idx;
 }
 
+export function formatMinutes(totalMin: number): string {
+  const safe = Math.max(0, Math.round(totalMin));
+  const h = Math.floor(safe / 60);
+  const m = safe % 60;
+  return `${h}h ${m}m`;
+}
+
 export function durationBetween(startIso: string, endIso: string): string {
   const ms = new Date(endIso).getTime() - new Date(startIso).getTime();
-  const totalMin = Math.max(0, Math.round(ms / 60000));
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return `${h}h ${m}m`;
+  return formatMinutes(ms / 60000);
 }
 
 export function windDirectionLabel(deg: number): string {

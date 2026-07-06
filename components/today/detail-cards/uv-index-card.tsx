@@ -1,10 +1,10 @@
 "use client";
 
-import { Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { RailCard } from "./sunrise-sunset-card";
 
 /** Right-rail UV card (Figma 10:11643): live index + category, meter, advice. */
-export function UvIndexCard({ uv }: { uv: number }) {
+export function UvIndexCard({ uv, isDay = true }: { uv: number; isDay?: boolean }) {
   const pct = Math.min(100, Math.max(0, (uv / 11) * 100));
   const label =
     uv < 3 ? "Low" : uv < 6 ? "Moderate" : uv < 8 ? "High" : uv < 11 ? "Very high" : "Extreme";
@@ -17,7 +17,13 @@ export function UvIndexCard({ uv }: { uv: number }) {
 
   return (
     <RailCard
-      icon={<Sun className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      icon={
+        isDay ? (
+          <Sun className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />
+        ) : (
+          <Moon className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />
+        )
+      }
       label="UV Index"
       value={`${Math.round(uv)} ${label}`}
       caption={advice}

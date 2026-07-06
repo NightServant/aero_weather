@@ -35,11 +35,11 @@ export function TodaySection() {
           <CurrentConditions forecast={data} place={place} units={prefs.units} />
         </div>
 
-        <aside aria-label="Today's details" className="grid gap-6 content-start sm:grid-cols-2 lg:grid-cols-1 w-full lg:col-span-1">
+        <aside aria-label="Today's details" className="grid gap-6 content-start sm:grid-cols-2 lg:grid-cols-1 lg:mt-8 w-full lg:col-span-1">
           <SunriseCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
           <SunsetCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
           <HumidityCard current={data.current} unit={prefs.units.temperature} />
-          <UvIndexCard uv={data.current.uvIndex} />
+          <UvIndexCard uv={data.current.uvIndex} isDay={data.current.isDay} />
         </aside>
       </div>
     </div>
