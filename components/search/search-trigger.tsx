@@ -91,7 +91,7 @@ export function SearchTrigger({ className }: { className?: string }) {
       </div>
 
       {open && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[60vh] overflow-y-auto rounded-2xl border border-[var(--hairline-strong)] bg-card text-popover-foreground p-2 text-sm shadow-xl">
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[60vh] overflow-y-auto overscroll-contain rounded-2xl border border-[var(--hairline-strong)] bg-card text-popover-foreground p-2 text-sm shadow-xl">
           {saved.length === 0 ? (
             <div className="px-3 py-3 text-foreground/55">
               No saved locations yet. Go to <span className="font-semibold text-foreground">Locations</span> and tap <span className="font-semibold text-foreground">Add city</span>.
@@ -137,17 +137,17 @@ function ResultRow({
       onMouseDown={(e) => e.preventDefault()}
       onClick={() => onSelect(place)}
       className={cn(
-        "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-foreground/5",
+        "flex w-full items-baseline gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-foreground/5",
         active && "bg-foreground/[0.04]",
       )}
     >
-      <MapPin className="size-3.5 shrink-0 opacity-60" strokeWidth={1.5} />
-      <span className="text-foreground">{place.name}</span>
-      <span className="ml-2 truncate text-xs text-muted-foreground">
+      <MapPin className="size-3.5 shrink-0 translate-y-0.5 opacity-60" strokeWidth={1.5} />
+      <span className="min-w-0 shrink truncate text-foreground">{place.name}</span>
+      <span className="min-w-0 shrink truncate text-xs text-muted-foreground">
         {[place.admin1, place.country].filter(Boolean).join(", ")}
       </span>
       {active ? (
-        <span className="ml-auto text-[10px] font-semibold tracking-wider uppercase text-foreground/60">
+        <span className="ml-auto shrink-0 pl-2 text-[10px] font-semibold tracking-wider uppercase text-foreground/60">
           Active
         </span>
       ) : null}

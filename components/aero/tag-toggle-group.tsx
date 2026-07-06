@@ -24,15 +24,15 @@ export function TagToggleGroup({ options, value, onValueChange, ariaLabel, class
         if (v) onValueChange(v);
       }}
       aria-label={ariaLabel}
-      className={cn("flex flex-wrap items-center gap-2", className)}
+      className={cn("flex flex-nowrap items-center gap-1.5", className)}
     >
       {options.map((opt) => (
         <ToggleGroupPrimitive.Item
           key={opt.value}
           value={opt.value}
           className={cn(
-            // 32px chip with hit-slop to 44px (spec 7).
-            "-my-1.5 rounded-full border px-3 py-2.5 text-[13px] font-medium transition-colors duration-150 active:scale-[0.98]",
+            // Compact chip with hit-slop preserved via negative margin (spec 7).
+            "-my-1.5 whitespace-nowrap rounded-full border px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-150 active:scale-[0.98]",
             "border-white/[0.14] bg-white/[0.06] text-muted-foreground hover:text-foreground",
             "data-[state=on]:border-primary/60 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
           )}

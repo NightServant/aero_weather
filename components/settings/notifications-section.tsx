@@ -24,10 +24,10 @@ export function NotificationsSection() {
     setKey("push", value);
   };
 
-  const iconClass = "size-5" as const;
+  const iconClass = "size-10" as const;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
       <h3 className="sr-only">Notifications</h3>
       <ToggleRow
         icon={<Bell className={iconClass} strokeWidth={1.5} />}

@@ -90,7 +90,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
           />
         </div>
 
-        <div className="max-h-[55vh] overflow-y-auto">
+        <div className="max-h-[55vh] overflow-y-auto overscroll-contain">
           {query.trim().length < 2 ? (
             <p className="px-3 py-2 text-sm text-foreground/55">
               Type at least two characters to search.
@@ -119,7 +119,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
                         </div>
                       </div>
                       {already ? (
-                        <span className="text-[10px] font-semibold tracking-wider uppercase text-foreground/55">
+                        <span className="shrink-0 pl-2 text-[10px] font-semibold tracking-wider uppercase text-foreground/55">
                           Saved
                         </span>
                       ) : null}

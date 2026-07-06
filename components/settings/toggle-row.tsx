@@ -20,8 +20,8 @@ export function ToggleRow({ label, description, icon, checked, onChange, classNa
   const descriptionId = description ? `${id}-description` : undefined;
 
   return (
-    <div className={cn("tint-card flex flex-col gap-3 p-5 backdrop-blur", className)}>
-      <div className="flex items-start justify-between gap-4">
+    <div className={cn("tint-card flex flex-col gap-4 p-5 backdrop-blur", className)}>
+      <div className="flex items-center justify-between gap-4">
         <span aria-hidden="true" className="text-foreground/80">
           {icon}
         </span>

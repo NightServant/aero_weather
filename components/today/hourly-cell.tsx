@@ -22,22 +22,22 @@ export function HourlyCell({ point, unit, format12h, isNow, timezone }: Props) {
   return (
     <div
       className={cn(
-        "flex w-[68px] shrink-0 flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center transition",
+        "flex w-[74px] shrink-0 flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center transition",
         isNow
           ? "now-ring border border-[color:var(--palette-accent,var(--accent))] bg-card"
           : "border border-transparent",
       )}
     >
-      <div className={cn("text-xs font-medium", isNow ? "text-foreground" : "text-foreground/70")}>
+      <div className={cn("text-[13px] font-medium", isNow ? "text-foreground" : "text-foreground/70")}>
         {label}
       </div>
-      <AnimatedWeatherIcon kind={kind} isDay={point.isDay} size={20} animated={false} />
-      <div className="text-sm font-semibold tabular text-foreground">
+      <AnimatedWeatherIcon kind={kind} isDay={point.isDay} size={22} animated={false} />
+      <div className="text-base font-semibold tabular text-foreground">
         {formatTemp(point.temperature, unit)}
       </div>
       <div
         className={cn(
-          "text-[10px] font-semibold tabular",
+          "text-[11px] font-semibold tabular",
           point.precipitationProbability > 0
             ? "text-[color:var(--palette-accent,var(--accent))]"
             : "text-foreground/30",
