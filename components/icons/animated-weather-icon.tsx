@@ -137,15 +137,15 @@ function Scene({ kind, isDay, size, animated }: Required<Omit<Props, "className"
           <Layer
             className={animated ? "animate-flash" : undefined}
             style={{
-              width: "40%",
-              height: "44%",
-              bottom: 0,
-              left: "30%",
-              opacity: animated ? undefined : 0.9,
+              width: "50%",
+              height: "54%",
+              bottom: "-2%",
+              left: "27%",
+              opacity: 1,
             }}
           >
             <Zap
-              className="size-full text-[var(--scene-accent)]"
+              className="size-full text-accent-sun drop-shadow-[0_0_3px_var(--accent-sun)]"
               strokeWidth={stroke}
               fill="currentColor"
             />
@@ -165,7 +165,7 @@ function Scene({ kind, isDay, size, animated }: Required<Omit<Props, "className"
           </Layer>
           <Layer
             className={animated ? "animate-droplet" : undefined}
-            style={{ width: "26%", height: "26%", bottom: "2%", left: "38%" }}
+            style={{ width: "34%", height: "34%", bottom: "0%", left: "34%" }}
           >
             <Snowflake className="size-full text-[var(--scene-accent)]" strokeWidth={stroke} />
           </Layer>
@@ -197,19 +197,19 @@ function Layer({
 }
 
 function RainDrops({ size, animated, count }: { size: number; animated: boolean; count: number }) {
-  const dropWidth = Math.max(1.5, size * 0.04);
+  const dropWidth = Math.max(2, size * 0.055);
   return (
-    <span aria-hidden="true" className="absolute inset-x-[22%] bottom-0 h-[30%]">
+    <span aria-hidden="true" className="absolute inset-x-[20%] bottom-0 h-[34%]">
       {Array.from({ length: count }, (_, i) => (
         <span
           key={i}
           className={cn("absolute rounded-full bg-accent-droplet", animated && "animate-rain-fall")}
           style={{
             width: dropWidth,
-            height: size * 0.14,
+            height: size * 0.19,
             left: `${(i + 0.5) * (100 / count)}%`,
             animationDelay: `${i * 0.15}s`,
-            opacity: animated ? undefined : 0.8,
+            opacity: 1,
           }}
         />
       ))}

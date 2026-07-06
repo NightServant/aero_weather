@@ -32,7 +32,7 @@ export function ForecastSection() {
 
       <div className="space-y-3">
         <p className="card-subtitle-caps">14-day forecast</p>
-        <GridView daily={data.daily} unit={prefs.units.temperature} timezone={data.place.timezone} />
+        <GridView daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
       </div>
 
       <hr className="border-white/[0.08]" />

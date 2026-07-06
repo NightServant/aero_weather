@@ -13,7 +13,7 @@ export function SectionHeader({
   subtitle?: string;
 }) {
   return (
-    <div>
+    <div className="pt-8">
       <p className="kicker">{kicker}</p>
       <h2 id={id} className="text-headline mt-3">
         {title}

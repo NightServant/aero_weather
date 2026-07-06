@@ -70,6 +70,7 @@ export function HourlyView({ forecast, units, format12h }: Props) {
                 format12h={format12h}
                 isNow={i === 0}
                 timezone={forecast.place.timezone}
+                current={i === 0 ? forecast.current : undefined}
               />
             </li>
           ))}
