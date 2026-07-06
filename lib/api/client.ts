@@ -13,10 +13,14 @@ export async function getJSON<T>(
     if (v === undefined) continue;
     qs.set(k, Array.isArray(v) ? v.join(",") : String(v));
   }
+  const started = performance.now();
   const res = await fetch(`${url}?${qs.toString()}`, {
     signal: opts.signal,
     next: { revalidate: opts.revalidate ?? 600 },
   });
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[fetch ${Math.round(performance.now() - started)}ms] ${url}`);
+  }
   if (!res.ok) {
     throw new Error(`Request failed ${res.status}: ${await res.text()}`);
   }
