@@ -70,7 +70,7 @@ export function LocationsCarousel({ places, units, activeId }: Props) {
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${places.length}`}
-              className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6"
+              className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6 backdrop-blur"
             >
               <CityCardLoader place={place} units={units} isActive={place.id === activeId} />
             </div>

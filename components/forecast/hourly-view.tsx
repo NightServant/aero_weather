@@ -16,7 +16,7 @@ export function HourlyView({ forecast, units, format12h }: Props) {
   const points = forecast.hourly.slice(nowIndex, nowIndex + 24);
 
   return (
-    <div className="tint-card p-3">
+    <div className="tint-card p-3 backdrop-blur">
       <ul
         className="flex snap-x snap-mandatory gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Hourly forecast, next 24 hours"

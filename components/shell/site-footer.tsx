@@ -38,7 +38,7 @@ const COLUMNS: {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-white/[0.08] bg-[oklch(0.25_0.03_240/0.6)]">
+    <footer className="mt-16 border-t border-white/[0.08] bg-[oklch(0.25_0.03_240/0.6)] backdrop-blur">
       <div className="mx-auto grid max-w-[1188px] gap-10 px-6 py-12 md:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))]">
         <div>
           <div className="flex items-center gap-2.5">
@@ -81,7 +81,7 @@ export function SiteFooter() {
         ))}
       </div>
 
-      <div className="bg-white/[0.06]">
+      <div className="bg-white/[0.06] backdrop-blur">
         <div className="mx-auto flex max-w-[1188px] flex-col gap-1 px-6 py-3 text-[13px] text-text-mid sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 Aero · v1.0.0</p>
           <div className="sm:text-right">

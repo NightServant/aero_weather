@@ -39,7 +39,7 @@ function GridCard({
 
   return (
     <li
-      className={`tint-card card-interactive flex items-center gap-4 p-4 ${index < 6 ? `stagger-${index + 1}` : ""}`}
+      className={`tint-card card-interactive flex items-center gap-4 p-4 backdrop-blur ${index < 6 ? `stagger-${index + 1}` : ""}`}
     >
       <AnimatedWeatherIcon kind={kind} isDay size={48} />
       <div className="min-w-0">

@@ -82,7 +82,7 @@ export function Navbar() {
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
       <nav
         aria-label="Main"
-        className="glass-navbar mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
+        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
       >
         <Link href="#today" className="flex items-center gap-2.5 rounded-full">
           <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
@@ -93,7 +93,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav pills */}
-        <div className="ml-auto hidden items-center gap-1 md:flex">
+        <div className="ml-auto hidden items-center justify-between lg:flex">
           {NAV_ITEMS.map((item) => {
             const active = activeId === item.id;
             return (
@@ -114,18 +114,18 @@ export function Navbar() {
           })}
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:ml-3">
+        <div className="ml-auto flex items-center gap-2 lg:ml-3">
           <IconCircleButton
             label="Use my location"
             onClick={useMyLocation}
             icon={<MapPin className="size-4" strokeWidth={1.5} />}
           />
-          <SearchTrigger className="hidden w-[210px] md:block lg:w-[289px]" />
+          <SearchTrigger className="hidden w-[210px] lg:block lg:w-[289px]" />
 
           {/* Mobile menu */}
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
-              <span className="md:hidden">
+              <span className="lg:hidden">
                 <IconCircleButton label="Menu" icon={<Menu className="size-4" strokeWidth={1.5} />} />
               </span>
             </DrawerTrigger>

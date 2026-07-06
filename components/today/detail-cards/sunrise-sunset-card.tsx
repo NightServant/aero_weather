@@ -48,7 +48,7 @@ export function RailCard({
   children?: React.ReactNode;
 }) {
   return (
-    <GlassCard variant="glass" className="px-6 py-6" data-animate="">
+    <GlassCard variant="tint" className="px-6 py-6 backdrop-blur" data-animate="">
       {icon}
       <h3 className="stat-title mt-4">
         {label} <span className="tabular">{value}</span>

@@ -22,7 +22,7 @@ export function SummaryCards({ forecast, units }: Props) {
   const alerts = deriveAlerts(forecast);
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4 backdrop-blur">
       <SummaryCard
         label="Rain total"
         icon={<CloudRain className="size-4" strokeWidth={1.5} aria-hidden="true" />}

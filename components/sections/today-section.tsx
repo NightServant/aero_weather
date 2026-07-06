@@ -28,20 +28,18 @@ export function TodaySection() {
 
   return (
     <div className="space-y-8">
-      <AlertCard />
+      <div className="grid gap-6 lg:grid-cols-3 md:mx-auto md:my-auto">
+        <div className="grid gap-6 grid-cols-1 w-full lg:col-span-2">
+          <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
+           <AlertCard />
+          <CurrentConditions forecast={data} place={place} units={prefs.units} />
+        </div>
 
-      <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
-
-      <hr className="border-white/[0.08]" />
-
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_338px]">
-        <CurrentConditions forecast={data} place={place} units={prefs.units} />
-
-        <aside aria-label="Today's details" className="grid content-start gap-6 sm:grid-cols-2 md:grid-cols-1">
+        <aside aria-label="Today's details" className="grid gap-6 content-start sm:grid-cols-2 lg:grid-cols-1 w-full lg:col-span-1">
           <SunriseCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
           <SunsetCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
-          <UvIndexCard uv={data.current.uvIndex} />
           <HumidityCard current={data.current} unit={prefs.units.temperature} />
+          <UvIndexCard uv={data.current.uvIndex} />
         </aside>
       </div>
     </div>

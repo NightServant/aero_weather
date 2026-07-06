@@ -67,7 +67,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg tint-card backdrop-blur">
         <DialogHeader>
           <DialogTitle>Add a city</DialogTitle>
           <DialogDescription>
@@ -75,7 +75,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-11 items-center gap-3 rounded-full border border-[var(--hairline-strong)] bg-card px-4">
+        <div className="flex h-11 items-center gap-3 rounded-full border border-[var(--hairline-strong)] px-4">
           <Search className="size-4 shrink-0 text-foreground/55" strokeWidth={1.5} />
           <input
             ref={inputRef}
@@ -83,7 +83,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search cities, ZIP codes, or coordinates…"
-            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/55 outline-none"
+            className="flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none"
           />
         </div>
 

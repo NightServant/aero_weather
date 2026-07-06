@@ -11,7 +11,7 @@ export function AlertCard() {
   if (!alert) return null;
 
   return (
-    <div role="status" className="tint-card p-4">
+    <div role="status" className="hidden lg:block lg:w-1/2">
       <div className="flex items-center gap-2 text-foreground">
         <Bell className="size-3.5 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />
         <span className="text-sm font-semibold">{alert.title}</span>

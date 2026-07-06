@@ -7,7 +7,7 @@ import { AddCityDialog } from "@/components/locations/add-city-dialog";
 export function EmptyLocation() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="glass-card mx-auto mt-16 max-w-xl px-8 py-12 text-center">
+    <div className="tint-card mx-auto mt-16 max-w-xl px-8 py-12 text-center">
       <p className="kicker">Welcome to Aero</p>
       <h1 className="text-headline mt-3">Pick a place to begin</h1>
       <p className="text-subtitle mt-3">

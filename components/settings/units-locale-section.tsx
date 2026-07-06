@@ -20,7 +20,7 @@ type PrefCardProps = {
 /** One preference group (Figma settings card anatomy: icon 40px, chips, label, caption). */
 function PrefCard({ icon: Icon, label, caption, className, children }: PrefCardProps) {
   return (
-    <GlassCard as="section" className={cn("flex flex-col items-start gap-4 p-5", className)}>
+    <GlassCard as="section" className={cn("flex flex-col items-start gap-4 p-5 backdrop-blur", className)}>
       <Icon aria-hidden="true" className="size-10 text-foreground/80" strokeWidth={1.5} />
       {children}
       <div className="space-y-1">

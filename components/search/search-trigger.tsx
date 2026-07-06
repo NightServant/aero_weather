@@ -91,7 +91,7 @@ export function SearchTrigger({ className }: { className?: string }) {
       </div>
 
       {open && (
-        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[60vh] overflow-y-auto rounded-2xl border border-[var(--hairline-strong)] bg-popover text-popover-foreground p-2 text-sm shadow-xl">
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-[60vh] overflow-y-auto rounded-2xl border border-[var(--hairline-strong)] bg-card text-popover-foreground p-2 text-sm shadow-xl">
           {saved.length === 0 ? (
             <div className="px-3 py-3 text-foreground/55">
               No saved locations yet. Go to <span className="font-semibold text-foreground">Locations</span> and tap <span className="font-semibold text-foreground">Add city</span>.

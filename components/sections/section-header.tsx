@@ -13,12 +13,12 @@ export function SectionHeader({
   subtitle?: string;
 }) {
   return (
-    <GlassCard variant="glass" as="header" className="px-6 py-7 sm:px-10 sm:py-8">
+    <div>
       <p className="kicker">{kicker}</p>
       <h2 id={id} className="text-headline mt-3">
         {title}
       </h2>
       {subtitle ? <p className="text-subtitle mt-2 max-w-2xl">{subtitle}</p> : null}
-    </GlassCard>
+    </div>
   );
 }

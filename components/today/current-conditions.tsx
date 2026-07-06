@@ -1,7 +1,6 @@
 "use client";
 
-import { Wind } from "lucide-react";
-import { GlassCard } from "@/components/aero/glass-card";
+import { Wind, Calendar, BookOpen } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import {
   compassToWord,
@@ -54,19 +53,23 @@ export function CurrentConditions({ forecast, place, units }: Props) {
   const location = [place.name, place.country].filter(Boolean).join(", ").toUpperCase();
 
   return (
-    <section aria-label="Current conditions" className="space-y-6">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <GlassCard variant="glass" className="stagger-2 px-6 py-5">
-          <h2 className="card-title-caps">Today - {dateline}</h2>
-          <p className="card-subtitle-caps mt-1">{location}</p>
-        </GlassCard>
-        <GlassCard variant="glass" className="stagger-3 px-6 py-5">
-          <h2 className="card-title-caps">Aero Almanac</h2>
-          <p className="mt-1 text-sm text-foreground/85">{WEATHER_LABEL[kind]}</p>
-          <p className="caption mt-0.5">Data by Open-Meteo</p>
-        </GlassCard>
+    <section aria-label="Current conditions" className="space-y-6 mx-auto my-auto lg:mx-0 lg:my-0">
+      <div className="stagger-5 flex flex-wrap gap-6">
+        <div className="flex min-w-0 items-start gap-3">
+          <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
+          <div>
+            <h2 className="card-title-caps">Today - {dateline}</h2>
+            <p className="card-subtitle-caps mt-1">{location}</p>
+          </div>
+        </div>
+        <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+          <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
+          <div>
+            <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
+            <p className="caption mt-0.5">Data by Open-Meteo</p>
+          </div>
+        </div>
       </div>
-
       <div className="stagger-4 flex flex-wrap items-center gap-6 py-4 sm:gap-10">
         <span className="animate-float">
           <AnimatedWeatherIcon
@@ -97,7 +100,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         </div>
 
-        <div className="flex min-w-0 items-start gap-3 border-l border-white/12 pl-6">
+        <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <Wind className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
           <div>
             <h3 className="stat-title tabular">
