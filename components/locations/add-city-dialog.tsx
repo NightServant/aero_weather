@@ -67,7 +67,10 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg tint-card backdrop-blur">
+      <DialogContent
+        className="sm:max-w-lg tint-card backdrop-blur"
+        style={{ background: "oklch(0.2 0.025 245 / 0.77)" }}
+      >
         <DialogHeader>
           <DialogTitle>Add a city</DialogTitle>
           <DialogDescription>
@@ -83,7 +86,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search cities, ZIP codes, or coordinates…"
-            className="flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none"
+            className="flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
           />
         </div>
 

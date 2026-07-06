@@ -81,7 +81,7 @@ export function SearchTrigger({ className }: { className?: string }) {
           placeholder="Search location"
           aria-label="Search saved locations"
           aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
-          className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+          className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:outline-none focus-visible:shadow-none"
         />
         <Search
           className="size-4 shrink-0 text-foreground/55"

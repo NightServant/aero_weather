@@ -44,7 +44,7 @@ export function CityPhoto({ place, width, height, className, initialClassName }:
           alt=""
           width={width}
           height={height}
-          className="size-full object-cover"
+          className="size-full object-cover opacity-80"
         />
       )}
     </div>
