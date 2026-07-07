@@ -13,38 +13,59 @@ type Props = {
   current?: CurrentConditions;
 };
 
-/** Figma grid view: 14 real-data day cards in a 4-column grid (spec: 4 -> 2 -> 1). */
-export function GridView({ daily, unit, timezone, current }: Props) {
+/**
+ * 14 real-data day cards on an infinite horizontal marquee (grid removed).
+ * The track holds two identical copies and slides 0 -> -50%, so copy #2 lands
+ * exactly where copy #1 began — a seamless loop. Pauses on hover/focus, and
+ * degrades to a plain horizontal scroller under prefers-reduced-motion.
+ */
+export function MarqueeView({ daily, unit, timezone, current }: Props) {
   return (
-    <ul className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-      {daily.map((point, i) => (
-        <GridCard
-          key={point.date}
-          point={point}
-          index={i}
-          unit={unit}
-          timezone={timezone}
-          current={i === 0 ? current : undefined}
-        />
-      ))}
-    </ul>
+    <div className="marquee group">
+      <ul className="marquee-track list-none" aria-label="14-day forecast">
+        {daily.map((point, i) => (
+          <MarqueeCard
+            key={point.date}
+            point={point}
+            index={i}
+            unit={unit}
+            timezone={timezone}
+            current={i === 0 ? current : undefined}
+          />
+        ))}
+        {/* Duplicate set drives the seamless loop; hidden from the a11y tree. */}
+        {daily.map((point, i) => (
+          <MarqueeCard
+            key={`dup-${point.date}`}
+            point={point}
+            index={i}
+            unit={unit}
+            timezone={timezone}
+            current={i === 0 ? current : undefined}
+            duplicate
+          />
+        ))}
+      </ul>
+    </div>
   );
 }
 
-function GridCard({
+function MarqueeCard({
   point,
   index,
   unit,
   timezone,
   current,
+  duplicate = false,
 }: {
   point: DailyPoint;
   index: number;
   unit: TempUnit;
   timezone?: string;
   current?: CurrentConditions;
+  duplicate?: boolean;
 }) {
-  // For "Today", follow live conditions so the grid never contradicts the hero.
+  // For "Today", follow live conditions so the marquee never contradicts the hero.
   const kind = weatherCodeToKind(current?.weatherCode ?? point.weatherCode);
   const isDay = current?.isDay ?? true;
   const dayLabel = index === 0 ? "Today" : formatWeekdayShort(point.date, timezone);
@@ -52,7 +73,8 @@ function GridCard({
 
   return (
     <li
-      className={`tint-card card-interactive flex items-center gap-4 p-4 backdrop-blur ${index < 6 ? `stagger-${index + 1}` : ""}`}
+      aria-hidden={duplicate || undefined}
+      className={`tint-card card-interactive flex w-64 shrink-0 items-center gap-4 p-4 backdrop-blur ${duplicate ? "marquee-dup" : ""}`}
     >
       <AnimatedWeatherIcon kind={kind} isDay={isDay} size={48} />
       <div className="min-w-0">

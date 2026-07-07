@@ -21,7 +21,7 @@ type Props = {
 export function SunriseCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
   return (
     <RailCard
-      icon={<Sunrise className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      icon={<Sunrise className="size-9 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
       label="Sunrise"
       value={formatTime(sunriseIso, format12h, timezone)}
       caption={`${durationBetween(sunriseIso, sunsetIso)} of daylight`}
@@ -32,7 +32,7 @@ export function SunriseCard({ sunriseIso, sunsetIso, format12h, timezone }: Prop
 export function SunsetCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
   return (
     <RailCard
-      icon={<Sunset className="size-10 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />}
+      icon={<Sunset className="size-9 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
       label="Sunset"
       value={formatTime(sunsetIso, format12h, timezone)}
       caption={`${nightLength(sunriseIso, sunsetIso)} of night ahead`}
@@ -46,21 +46,38 @@ export function RailCard({
   value,
   caption,
   children,
+  side,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   caption?: string;
   children?: React.ReactNode;
+  /** Optional element pinned to the right of the text, vertically centered. */
+  side?: React.ReactNode;
 }) {
-  return (
-    <GlassCard variant="tint" className="px-6 py-6 backdrop-blur" data-animate="">
+  const body = (
+    <>
       {icon}
-      <h3 className="stat-title mt-4">
-        {label} <span className="tabular">{value}</span>
+      <h3 className="stat-title mt-3 sm:mt-4">
+        {label} <span className="tabular whitespace-nowrap">{value}</span>
       </h3>
       {caption ? <p className="caption mt-0.5">{caption}</p> : null}
       {children}
+    </>
+  );
+  return (
+    <GlassCard variant="tint" className="h-full p-5 backdrop-blur sm:px-6 sm:py-6" data-animate="">
+      {side ? (
+        // Text left, side element right, vertically centered. The one-card carousel
+        // and the sm+ grid both give the card enough width for this side by side.
+        <div className="flex h-full items-center gap-4">
+          <div className="min-w-0 flex-1">{body}</div>
+          <div className="shrink-0">{side}</div>
+        </div>
+      ) : (
+        body
+      )}
     </GlassCard>
   );
 }

@@ -366,15 +366,6 @@
       oklch(0.45 0.15 250) 100%
     );
   }
-  .uv-gradient {
-    background: linear-gradient(
-      90deg,
-      oklch(0.92 0.02 240) 0%,
-      oklch(0.78 0.08 245) 35%,
-      oklch(0.6 0.14 250) 70%,
-      oklch(0.4 0.12 255) 100%
-    );
-  }
 }
 
 /* ---- Motion (spec 4) ---- */
@@ -452,6 +443,34 @@ html.js [data-animate] {
 .animate-float { animation: aero-float 6s ease-in-out infinite alternate; }
 .animate-droplet { animation: aero-droplet 1.6s ease-in infinite; }
 
+/* Infinite horizontal marquee for the 14-day forecast. The track holds two
+   identical copies of the cards and slides 0 -> -50%; because every card carries
+   the same trailing margin (including the last), -50% lands copy #2 exactly on
+   copy #1's origin for a seamless, gapless loop. Pauses on hover/focus. */
+.marquee {
+  overflow: hidden;
+  /* fade the leading/trailing edges so cards enter and exit gracefully */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: aero-marquee 60s linear infinite;
+}
+.marquee-track > li {
+  margin-right: 1.5rem;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes aero-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* Global kill switch (spec 4, mandatory). */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -461,5 +480,17 @@ html.js [data-animate] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Marquee: stop the motion, drop the duplicate copy, and let users scroll it
+     by hand instead. animation-name:none makes the forced 0.01ms duration moot. */
+  .marquee {
+    overflow-x: auto;
+  }
+  .marquee-track {
+    animation: none;
+  }
+  .marquee-dup {
+    display: none;
   }
 }

@@ -19,7 +19,7 @@ type PrefCardProps = {
 /** One preference group (Figma settings card anatomy: icon 40px, chips, label, caption). */
 function PrefCard({ icon: Icon, label, caption, className, children }: PrefCardProps) {
   return (
-    <section className={cn("flex flex-col gap-4 p-5 md:border-l md:border-white/12", className)}>
+    <section className={cn("flex flex-col gap-4 p-5 border-b border-white/12 md:border-b-0 md:border-l", className)}>
       <div className="flex items-center justify-between gap-3">
         <Icon aria-hidden="true" className="size-10 shrink-0 text-foreground/80" strokeWidth={1.5} />
         <div className="flex min-w-0 flex-1 justify-end">{children}</div>

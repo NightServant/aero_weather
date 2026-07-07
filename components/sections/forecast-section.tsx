@@ -1,7 +1,7 @@
 "use client";
 
 import { SectionHeader } from "./section-header";
-import { GridView } from "@/components/forecast/grid-view";
+import { MarqueeView } from "@/components/forecast/marquee-view";
 import { HourlyView } from "@/components/forecast/hourly-view";
 import { SummaryCards } from "@/components/forecast/summary-cards";
 import { useActiveForecast } from "@/components/shell/active-forecast-context";
@@ -24,15 +24,15 @@ export function ForecastSection() {
     <div className="space-y-8">
       <SectionHeader id="forecast-h" kicker="2-week outlook" title={title} subtitle={subtitle} />
       <SummaryCards forecast={data} units={prefs.units} />
+      
+      <div className="space-y-3">
+        <p className="card-subtitle-caps">14-day forecast</p>
+        <MarqueeView daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
+      </div>
 
       <div className="space-y-3">
         <p className="card-subtitle-caps">Next 24 hours</p>
         <HourlyView forecast={data} units={prefs.units} format12h={prefs.timeFormat === "12h"} />
-      </div>
-
-      <div className="space-y-3">
-        <p className="card-subtitle-caps">14-day forecast</p>
-        <GridView daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
       </div>
     </div>
   );

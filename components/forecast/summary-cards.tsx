@@ -86,7 +86,7 @@ function SummaryCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col p-5 md:border-l md:border-white/12" data-animate="">
+    <div className="flex flex-col p-5 border-b border-white/12 md:border-b-0 md:border-l" data-animate="">
       <div className="mb-3 flex items-center gap-2 text-muted-foreground">
         {icon}
         <h3 className="card-subtitle-caps">{label}</h3>

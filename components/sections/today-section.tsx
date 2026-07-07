@@ -27,18 +27,38 @@ export function TodaySection() {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-6 lg:grid-cols-3 md:mx-auto md:my-auto">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 md:mx-auto md:my-auto">
         <div className="grid gap-6 grid-cols-1 w-full lg:col-span-2">
           <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
            <AlertCard />
           <CurrentConditions forecast={data} place={place} units={prefs.units} />
         </div>
 
-        <aside aria-label="Today's details" className="grid gap-6 content-start sm:grid-cols-2 lg:grid-cols-1 lg:mt-8 w-full lg:col-span-1">
-          <SunriseCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
-          <SunsetCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
-          <HumidityCard current={data.current} unit={prefs.units.temperature} />
-          <UvIndexCard uv={data.current.uvIndex} isDay={data.current.isDay} />
+        {/* Detail rail: horizontal snap-scroll carousel on smartphones (< sm),
+            reverting to the 2-col / vertical rail grid from sm upward. */}
+        <aside aria-label="Today's details" className="w-full lg:col-span-1 lg:mt-8">
+          <ul
+            role="list"
+            className="
+              -mx-4 flex list-none snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2
+              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+              sm:mx-0 sm:grid sm:snap-none sm:content-start sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0
+              sm:auto-rows-fr sm:grid-cols-2 lg:grid-cols-1
+            "
+          >
+            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+              <SunriseCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
+            </li>
+            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+              <SunsetCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
+            </li>
+            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+              <HumidityCard current={data.current} unit={prefs.units.temperature} />
+            </li>
+            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+              <UvIndexCard uv={data.current.uvIndex} isDay={data.current.isDay} />
+            </li>
+          </ul>
         </aside>
       </div>
     </div>

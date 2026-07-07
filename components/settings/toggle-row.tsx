@@ -20,7 +20,7 @@ export function ToggleRow({ label, description, icon, checked, onChange, classNa
   const descriptionId = description ? `${id}-description` : undefined;
 
   return (
-    <div className={cn("flex flex-col gap-4 p-5 md:border-l md:border-white/12", className)}>
+    <div className={cn("flex flex-col gap-4 p-5 border-b border-white/12 md:border-b-0 md:border-l", className)}>
       <div className="flex items-center justify-between gap-4">
         <span aria-hidden="true" className="text-foreground/80">
           {icon}

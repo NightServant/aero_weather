@@ -49,7 +49,7 @@ export function HourlyView({ forecast, units, format12h }: Props) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Hourly forecast, next 24 hours"
-      className="flex items-center gap-2 p-3 md:border-b md:border-white/12"
+      className="flex items-center gap-2 p-3"
     >
       <IconCircleButton
         icon={<ChevronLeft className="size-5" strokeWidth={1.5} aria-hidden="true" />}

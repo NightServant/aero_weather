@@ -15,7 +15,7 @@ export function HumidityCard({ current, unit }: Props) {
   const dp = resolveDewPoint(current, unit);
   return (
     <RailCard
-      icon={<Droplets className="size-10 text-accent-droplet" strokeWidth={1.5} aria-hidden="true" />}
+      icon={<Droplets className="size-9 text-accent-droplet sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
       label="Humidity"
       value={`${Math.round(current.humidity)}%`}
       caption={

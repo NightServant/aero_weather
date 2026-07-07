@@ -54,7 +54,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
 
   return (
     <section aria-label="Current conditions" className="space-y-6 mx-auto my-auto lg:mx-0 lg:my-0">
-      <div className="stagger-5 flex flex-wrap gap-6">
+      <div className="stagger-5 flex flex-wrap gap-6 md:border-l md:border-white/12 md:pl-6">
         <div className="flex min-w-0 items-start gap-3">
           <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
           <div>
@@ -86,7 +86,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
       </div>
 
       <div className="stagger-5 flex flex-wrap gap-6">
-        <div className="flex min-w-0 items-start gap-3">
+        <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
             <h3 className="stat-title">
