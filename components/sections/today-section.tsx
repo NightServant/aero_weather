@@ -10,7 +10,6 @@ import { useActiveForecast } from "@/components/shell/active-forecast-context";
 import { usePrefs } from "@/hooks/use-prefs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { summarizeToday } from "@/lib/forecast-summary";
-import { EmptyLocation } from "@/components/shell/empty-location";
 
 /** Today section of the single-page scroll. Owns the page's only <h1>. */
 export function TodaySection() {
@@ -18,7 +17,7 @@ export function TodaySection() {
   const [prefs] = usePrefs();
 
   if (!hydrated) return <TodaySkeleton />;
-  if (!place) return <EmptyLocation />;
+  if (!place) return null; // empty state handled once by <AppSections/>
   if (loading && !data) return <TodaySkeleton />;
   if (error) return <ErrorState message={error.message} />;
   if (!data) return <TodaySkeleton />;

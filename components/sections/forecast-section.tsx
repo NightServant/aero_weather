@@ -8,7 +8,6 @@ import { useActiveForecast } from "@/components/shell/active-forecast-context";
 import { usePrefs } from "@/hooks/use-prefs";
 import { summarizeOutlook } from "@/components/forecast/outlook-summary";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EmptyLocation } from "@/components/shell/empty-location";
 
 /** 2-Week section: no tab switcher (purer scroll) — hourly rail + 14-day grid + summary. */
 export function ForecastSection() {
@@ -16,7 +15,7 @@ export function ForecastSection() {
   const [prefs] = usePrefs();
 
   if (!hydrated || (loading && !data)) return <ForecastSkeleton />;
-  if (!place) return <EmptyLocation />;
+  if (!place) return null; // empty state handled once by <AppSections/>
   if (error || !data) return null;
 
   const { title, subtitle } = summarizeOutlook(data);

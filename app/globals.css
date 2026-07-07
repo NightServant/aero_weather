@@ -215,7 +215,9 @@
 /* ---- Typography scale (spec 3) ---- */
 @layer utilities {
   .text-display-temp {
-    font-size: clamp(4rem, 9vw, 6.5rem);
+    /* Fluid on phones: the old 4rem floor never shrank below 64px, which forced
+       the icon + temperature row to wrap on narrow screens. */
+    font-size: clamp(3rem, 15vw, 6.5rem);
     line-height: 1;
     font-weight: 600;
     letter-spacing: -0.02em;

@@ -8,7 +8,6 @@ import { AddCityDialog } from "@/components/locations/add-city-dialog";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
 import { Plus } from "lucide-react";
 import { usePrefs } from "@/hooks/use-prefs";
-import { EmptyLocation } from "@/components/shell/empty-location";
 
 const LocationsCarousel = dynamic(
   () => import("@/components/locations/locations-carousel").then((m) => ({ default: m.LocationsCarousel })),
@@ -32,7 +31,7 @@ export function LocationsSection() {
   const [addOpen, setAddOpen] = useState(false);
 
   if (!hydrated) return null;
-  if (prefs.locations.length === 0) return <EmptyLocation />;
+  if (prefs.locations.length === 0) return null; // empty state handled once by <AppSections/>
 
   const activeId = prefs.activeLocationId ?? prefs.locations[0]?.id;
 

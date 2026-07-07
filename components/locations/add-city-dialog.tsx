@@ -86,7 +86,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search cities, ZIP codes, or coordinates…"
-            className="flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
+            className="w-full min-w-0 flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
           />
         </div>
 

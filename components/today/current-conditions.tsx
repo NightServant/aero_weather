@@ -70,16 +70,16 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         </div>
       </div>
-      <div className="stagger-4 flex flex-wrap items-center gap-6 py-4 sm:gap-10">
-        <span className="animate-float">
+      <div className="stagger-4 flex flex-nowrap items-center gap-4 py-4 sm:gap-10">
+        <span className="animate-float shrink-0">
           <AnimatedWeatherIcon
             kind={kind}
             isDay={c.isDay}
             size={220}
-            className="max-sm:!h-[140px] max-sm:!w-[140px]"
+            className="max-sm:!h-[112px] max-sm:!w-[112px]"
           />
         </span>
-        <p aria-live="polite" className="text-display-temp">
+        <p aria-live="polite" className="text-display-temp min-w-0 whitespace-nowrap">
           {formatTemp(c.temperature, units.temperature)}
           {tempLabel}
         </p>
