@@ -22,7 +22,7 @@ export function SummaryCards({ forecast, units }: Props) {
   const alerts = deriveAlerts(forecast);
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4 backdrop-blur">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
       <SummaryCard
         label="Rain total"
         icon={<CloudRain className="size-4" strokeWidth={1.5} aria-hidden="true" />}
@@ -86,7 +86,7 @@ function SummaryCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="tint-card flex flex-col p-5" data-animate="">
+    <div className="flex flex-col p-5 md:border-l md:border-white/12 md:pl-6" data-animate="">
       <div className="mb-3 flex items-center gap-2 text-muted-foreground">
         {icon}
         <h3 className="card-subtitle-caps">{label}</h3>

@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { Calendar, Clock, Thermometer, Wind, type LucideIcon } from "lucide-react";
-import { GlassCard } from "@/components/aero/glass-card";
 import { TagToggleGroup } from "@/components/aero/tag-toggle-group";
 import { usePrefs } from "@/hooks/use-prefs";
 import type { TempUnit, WindUnit } from "@/lib/api/types";
@@ -20,7 +19,7 @@ type PrefCardProps = {
 /** One preference group (Figma settings card anatomy: icon 40px, chips, label, caption). */
 function PrefCard({ icon: Icon, label, caption, className, children }: PrefCardProps) {
   return (
-    <GlassCard as="section" className={cn("flex flex-col gap-4 p-5 backdrop-blur", className)}>
+    <section className={cn("flex flex-col gap-4 p-5 md:border-l md:border-white/12", className)}>
       <div className="flex items-center justify-between gap-3">
         <Icon aria-hidden="true" className="size-10 shrink-0 text-foreground/80" strokeWidth={1.5} />
         <div className="flex min-w-0 flex-1 justify-end">{children}</div>
@@ -29,7 +28,7 @@ function PrefCard({ icon: Icon, label, caption, className, children }: PrefCardP
         <h3 className="text-[0.9375rem] font-semibold leading-normal text-foreground">{label}</h3>
         <p className="caption">{caption}</p>
       </div>
-    </GlassCard>
+    </section>
   );
 }
 

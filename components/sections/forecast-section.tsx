@@ -23,6 +23,7 @@ export function ForecastSection() {
   return (
     <div className="space-y-8">
       <SectionHeader id="forecast-h" kicker="2-week outlook" title={title} subtitle={subtitle} />
+      <SummaryCards forecast={data} units={prefs.units} />
 
       <div className="space-y-3">
         <p className="card-subtitle-caps">Next 24 hours</p>
@@ -33,10 +34,6 @@ export function ForecastSection() {
         <p className="card-subtitle-caps">14-day forecast</p>
         <GridView daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
       </div>
-
-      <hr className="border-white/[0.08]" />
-
-      <SummaryCards forecast={data} units={prefs.units} />
     </div>
   );
 }
