@@ -39,7 +39,7 @@ function SuggestedLocationCardBase({ place, units, onOpenDetails, onSave }: Prop
       style={saving ? { opacity: 0, transform: "scale(0.94)" } : undefined}
     >
       <div className="relative overflow-hidden rounded-[12px]">
-        <CityPhoto place={place} width={208} height={247} className="h-[247px] w-full rounded-[12px]" initialClassName="text-6xl" />
+        <CityPhoto place={place} width={208} height={160} className="h-[160px] w-full rounded-[12px]" initialClassName="text-5xl" />
       </div>
 
       <button

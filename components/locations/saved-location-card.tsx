@@ -35,9 +35,9 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
         <CityPhoto
           place={place}
           width={208}
-          height={247}
-          className="h-[247px] w-full rounded-[12px]"
-          initialClassName="text-6xl"
+          height={160}
+          className="h-[160px] w-full rounded-[12px]"
+          initialClassName="text-5xl"
         />
       </div>
 
