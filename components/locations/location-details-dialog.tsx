@@ -44,6 +44,7 @@ export function LocationDetailsDialog({
   onViewForecast, onRemove, onSave,
 }: Props) {
   const [description, setDescription] = useState<string | null | undefined>(undefined);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     if (!open || !place) return;
@@ -69,6 +70,8 @@ export function LocationDetailsDialog({
       <DialogContent
         className="max-w-[calc(100%-2rem)] gap-0 overflow-hidden border-white/12 p-0 backdrop-blur sm:max-w-3xl"
         style={{ background: "oklch(0.2 0.025 245 / 0.77)" }}
+        onEscapeKeyDown={(e) => lightboxOpen && e.preventDefault()}
+        onInteractOutside={(e) => lightboxOpen && e.preventDefault()}
       >
         <div className="max-h-[85vh] overflow-y-auto overscroll-contain">
           {/* Header */}
@@ -113,7 +116,7 @@ export function LocationDetailsDialog({
               </section>
               <section>
                 <h4 className="card-subtitle-caps mb-2">Photos</h4>
-                <LocationGallery place={place} />
+                <LocationGallery place={place} onLightboxOpenChange={setLightboxOpen} />
               </section>
             </div>
 

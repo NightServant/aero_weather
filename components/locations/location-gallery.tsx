@@ -10,7 +10,15 @@ import type { Place } from "@/lib/api/types";
 /** Responsive Wikimedia image grid: skeletons → fade-in tiles → click-to-enlarge
  *  lightbox. Navigate with ←/→ or by clicking the image; dismiss with the ✕,
  *  the backdrop, or Escape. */
-export function LocationGallery({ place }: { place: Place }) {
+export function LocationGallery({
+  place,
+  onLightboxOpenChange,
+}: {
+  place: Place;
+  /** Notifies the parent dialog when the fullscreen lightbox opens/closes, so it
+   *  can refuse to close on the lightbox's outside clicks / Escape. */
+  onLightboxOpenChange?: (open: boolean) => void;
+}) {
   const [urls, setUrls] = useState<string[] | undefined>(undefined);
   const [index, setIndex] = useState<number | null>(null);
 
@@ -33,31 +41,20 @@ export function LocationGallery({ place }: { place: Place }) {
     [urls],
   );
 
-  // The lightbox is portaled to <body>, i.e. outside the Radix dialog, so its
-  // clicks/keys would otherwise register as "outside" interactions and close the
-  // whole details dialog. Swallow them in the capture phase so only the lightbox
-  // reacts: the ✕/backdrop close the image, and Escape/←/→ stay local.
+  // Keep the parent dialog informed so it can guard against its own dismissal.
+  useEffect(() => {
+    onLightboxOpenChange?.(index !== null);
+  }, [index, onLightboxOpenChange]);
+
   useEffect(() => {
     if (index === null) return;
-    const stopPointer = (e: Event) => e.stopPropagation();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        close();
-      } else if (e.key === "ArrowLeft") {
-        e.stopPropagation();
-        step(-1);
-      } else if (e.key === "ArrowRight") {
-        e.stopPropagation();
-        step(1);
-      }
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
     };
-    document.addEventListener("pointerdown", stopPointer, true);
-    document.addEventListener("keydown", onKey, true);
-    return () => {
-      document.removeEventListener("pointerdown", stopPointer, true);
-      document.removeEventListener("keydown", onKey, true);
-    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [index, close, step]);
 
   if (urls === undefined) {
