@@ -3,20 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import { getCityGallery } from "@/lib/api/city-details";
 import type { Place } from "@/lib/api/types";
 
 /** Responsive Wikimedia image grid: skeletons → fade-in tiles → click-to-enlarge
- *  lightbox with prev/next navigation, a close button, and keyboard controls. */
+ *  lightbox with a close button, backdrop click, and Escape to dismiss. */
 export function LocationGallery({ place }: { place: Place }) {
   const [urls, setUrls] = useState<string[] | undefined>(undefined);
-  const [index, setIndex] = useState<number | null>(null);
+  const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setUrls(undefined);
-    setIndex(null);
+    setActive(null);
     getCityGallery(place).then((r) => {
       if (!cancelled) setUrls(r);
     });
@@ -25,23 +25,14 @@ export function LocationGallery({ place }: { place: Place }) {
     };
   }, [place]);
 
-  const close = useCallback(() => setIndex(null), []);
-  const step = useCallback(
-    (dir: number) =>
-      setIndex((i) => (i === null || !urls ? i : (i + dir + urls.length) % urls.length)),
-    [urls],
-  );
+  const close = useCallback(() => setActive(null), []);
 
   useEffect(() => {
-    if (index === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowLeft") step(-1);
-      else if (e.key === "ArrowRight") step(1);
-    };
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [index, close, step]);
+  }, [active, close]);
 
   if (urls === undefined) {
     return (
@@ -56,8 +47,6 @@ export function LocationGallery({ place }: { place: Place }) {
     return <p className="caption">No photos available for this place yet.</p>;
   }
 
-  const hasMany = urls.length > 1;
-
   return (
     <>
       <ul className="grid grid-cols-3 gap-2">
@@ -65,7 +54,7 @@ export function LocationGallery({ place }: { place: Place }) {
           <li key={url}>
             <button
               type="button"
-              onClick={() => setIndex(i)}
+              onClick={() => setActive(url)}
               className="group relative block aspect-square w-full overflow-hidden rounded-lg"
               aria-label={`Enlarge photo ${i + 1} of ${urls.length}`}
             >
@@ -83,14 +72,14 @@ export function LocationGallery({ place }: { place: Place }) {
         ))}
       </ul>
 
-      {index !== null && typeof document !== "undefined"
+      {active && typeof document !== "undefined"
         ? createPortal(
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={`Photo ${index + 1} of ${urls.length}`}
+              aria-label="Enlarged photo"
               onClick={close}
-              className="fixed inset-0 z-[1000] flex items-center justify-center gap-2 bg-black/80 p-4 backdrop-blur-sm sm:gap-4 sm:p-6"
+              className="fixed inset-0 z-[1000] grid place-items-center bg-black/80 p-4 backdrop-blur-sm sm:p-6"
             >
               <button
                 type="button"
@@ -101,44 +90,13 @@ export function LocationGallery({ place }: { place: Place }) {
                 <X className="size-5" strokeWidth={1.5} aria-hidden="true" />
               </button>
 
-              {/* Everything inside this wrapper swallows the click so only the
-                  backdrop or the ✕ dismisses; the arrows navigate. */}
-              <div className="flex max-w-full items-center gap-2 sm:gap-4" onClick={(e) => e.stopPropagation()}>
-                {hasMany ? (
-                  <button
-                    type="button"
-                    onClick={() => step(-1)}
-                    aria-label="Previous photo"
-                    className="grid size-11 shrink-0 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
-                  >
-                    <ChevronLeft className="size-6" strokeWidth={1.5} aria-hidden="true" />
-                  </button>
-                ) : null}
-
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={urls[index]}
-                  alt=""
-                  className="max-h-[85vh] min-w-0 rounded-xl object-contain"
-                />
-
-                {hasMany ? (
-                  <button
-                    type="button"
-                    onClick={() => step(1)}
-                    aria-label="Next photo"
-                    className="grid size-11 shrink-0 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
-                  >
-                    <ChevronRight className="size-6" strokeWidth={1.5} aria-hidden="true" />
-                  </button>
-                ) : null}
-              </div>
-
-              {hasMany ? (
-                <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/20">
-                  {index + 1} / {urls.length}
-                </span>
-              ) : null}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={active}
+                alt=""
+                onClick={(e) => e.stopPropagation()}
+                className="max-h-[85vh] max-w-full rounded-xl object-contain"
+              />
             </div>,
             document.body,
           )
