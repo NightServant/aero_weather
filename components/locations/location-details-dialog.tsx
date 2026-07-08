@@ -103,7 +103,9 @@ export function LocationDetailsDialog({
                   </div>
                 ) : (
                   <p className="text-sm leading-relaxed text-foreground/80">
-                    {description ?? `${place.name} is one of your tracked locations. A description isn't available yet.`}
+                    {description
+                      ? summarize(description)
+                      : `${place.name} is one of your tracked locations. A description isn't available yet.`}
                   </p>
                 )}
               </section>
@@ -152,6 +154,18 @@ export function LocationDetailsDialog({
       </DialogContent>
     </Dialog>
   );
+}
+
+/** Trim a long extract to its essential lead: whole sentences up to ~220 chars,
+ *  falling back to a word-boundary cut with an ellipsis. */
+function summarize(text: string, maxChars = 220): string {
+  const clean = text.trim();
+  if (clean.length <= maxChars) return clean;
+  const slice = clean.slice(0, maxChars);
+  const lastStop = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf("! "), slice.lastIndexOf("? "));
+  if (lastStop >= 80) return slice.slice(0, lastStop + 1);
+  const lastSpace = slice.lastIndexOf(" ");
+  return `${slice.slice(0, lastSpace > 0 ? lastSpace : maxChars).trimEnd()}…`;
 }
 
 function Meta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

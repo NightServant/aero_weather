@@ -69,3 +69,19 @@ describe("getCityImage — Wikipedia lookup", () => {
     expect(await getCityImage(place({ id: 104, name: "Nowhere" }))).toBeNull();
   });
 });
+
+describe("getCityImage — country places", () => {
+  it("returns null (gradient fallback) instead of fetching a country's flag", async () => {
+    const fetchFn = stubFetch(() => ({ ok: true, body: { thumbnail: { source: "https://img/flag.svg" } } }));
+    const p = place({ id: 682, name: "Saudi Arabia", country: "Saudi Arabia" });
+    expect(await getCityImage(p)).toBeNull();
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("still fetches for a city that shares no name with its country", async () => {
+    const fetchFn = stubFetch(() => ({ ok: true, body: { thumbnail: { source: "https://img/city.jpg" } } }));
+    const p = place({ id: 683, name: "Riyadh", admin1: "Riyadh Province", country: "Saudi Arabia" });
+    expect(await getCityImage(p)).toBe("https://img/city.jpg");
+    expect(fetchFn).toHaveBeenCalled();
+  });
+});
