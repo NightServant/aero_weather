@@ -33,15 +33,31 @@ export function LocationGallery({ place }: { place: Place }) {
     [urls],
   );
 
+  // The lightbox is portaled to <body>, i.e. outside the Radix dialog, so its
+  // clicks/keys would otherwise register as "outside" interactions and close the
+  // whole details dialog. Swallow them in the capture phase so only the lightbox
+  // reacts: the ✕/backdrop close the image, and Escape/←/→ stay local.
   useEffect(() => {
     if (index === null) return;
+    const stopPointer = (e: Event) => e.stopPropagation();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowLeft") step(-1);
-      else if (e.key === "ArrowRight") step(1);
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        close();
+      } else if (e.key === "ArrowLeft") {
+        e.stopPropagation();
+        step(-1);
+      } else if (e.key === "ArrowRight") {
+        e.stopPropagation();
+        step(1);
+      }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", stopPointer, true);
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("pointerdown", stopPointer, true);
+      document.removeEventListener("keydown", onKey, true);
+    };
   }, [index, close, step]);
 
   if (urls === undefined) {

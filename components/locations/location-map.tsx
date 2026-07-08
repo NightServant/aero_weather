@@ -12,7 +12,7 @@ const SAT_URL =
 
 export default function LocationMap({ lat, lon, name }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [satellite, setSatellite] = useState(false);
+  const [satellite, setSatellite] = useState(true);
   // Hold Leaflet map + the two tile layers across renders.
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const layersRef = useRef<{ street: import("leaflet").TileLayer; sat: import("leaflet").TileLayer } | null>(null);
@@ -29,7 +29,7 @@ export default function LocationMap({ lat, lon, name }: Props) {
       const street = L.tileLayer(OSM_URL, { maxZoom: 19, attribution: "© OpenStreetMap" });
       const sat = L.tileLayer(SAT_URL, { maxZoom: 19, attribution: "© Esri" });
       layersRef.current = { street, sat };
-      street.addTo(map);
+      sat.addTo(map);
 
       const icon = L.divIcon({
         className: "",
