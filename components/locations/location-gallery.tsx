@@ -8,15 +8,16 @@ import { getCityGallery } from "@/lib/api/city-details";
 import type { Place } from "@/lib/api/types";
 
 /** Responsive Wikimedia image grid: skeletons → fade-in tiles → click-to-enlarge
- *  lightbox with a close button, backdrop click, and Escape to dismiss. */
+ *  lightbox. Navigate with ←/→ or by clicking the image; dismiss with the ✕,
+ *  the backdrop, or Escape. */
 export function LocationGallery({ place }: { place: Place }) {
   const [urls, setUrls] = useState<string[] | undefined>(undefined);
-  const [active, setActive] = useState<string | null>(null);
+  const [index, setIndex] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setUrls(undefined);
-    setActive(null);
+    setIndex(null);
     getCityGallery(place).then((r) => {
       if (!cancelled) setUrls(r);
     });
@@ -25,14 +26,23 @@ export function LocationGallery({ place }: { place: Place }) {
     };
   }, [place]);
 
-  const close = useCallback(() => setActive(null), []);
+  const close = useCallback(() => setIndex(null), []);
+  const step = useCallback(
+    (dir: number) =>
+      setIndex((i) => (i === null || !urls ? i : (i + dir + urls.length) % urls.length)),
+    [urls],
+  );
 
   useEffect(() => {
-    if (!active) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    if (index === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, close]);
+  }, [index, close, step]);
 
   if (urls === undefined) {
     return (
@@ -47,6 +57,8 @@ export function LocationGallery({ place }: { place: Place }) {
     return <p className="caption">No photos available for this place yet.</p>;
   }
 
+  const hasMany = urls.length > 1;
+
   return (
     <>
       <ul className="grid grid-cols-3 gap-2">
@@ -54,7 +66,7 @@ export function LocationGallery({ place }: { place: Place }) {
           <li key={url}>
             <button
               type="button"
-              onClick={() => setActive(url)}
+              onClick={() => setIndex(i)}
               className="group relative block aspect-square w-full overflow-hidden rounded-lg"
               aria-label={`Enlarge photo ${i + 1} of ${urls.length}`}
             >
@@ -72,12 +84,12 @@ export function LocationGallery({ place }: { place: Place }) {
         ))}
       </ul>
 
-      {active && typeof document !== "undefined"
+      {index !== null && typeof document !== "undefined"
         ? createPortal(
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Enlarged photo"
+              aria-label={`Photo ${index + 1} of ${urls.length}`}
               onClick={close}
               className="fixed inset-0 z-[1000] grid place-items-center bg-black/80 p-4 backdrop-blur-sm sm:p-6"
             >
@@ -92,11 +104,20 @@ export function LocationGallery({ place }: { place: Place }) {
 
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={active}
+                src={urls[index]}
                 alt=""
-                onClick={(e) => e.stopPropagation()}
-                className="max-h-[85vh] max-w-full rounded-xl object-contain"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasMany) step(1);
+                }}
+                className={hasMany ? "max-h-[85vh] max-w-full cursor-pointer rounded-xl object-contain" : "max-h-[85vh] max-w-full rounded-xl object-contain"}
               />
+
+              {hasMany ? (
+                <span className="pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/20">
+                  {index + 1} / {urls.length}
+                </span>
+              ) : null}
             </div>,
             document.body,
           )
