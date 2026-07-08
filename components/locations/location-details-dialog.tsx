@@ -66,7 +66,10 @@ export function LocationDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] gap-0 overflow-hidden p-0 sm:max-w-3xl">
+      <DialogContent
+        className="max-w-[calc(100%-2rem)] gap-0 overflow-hidden border-white/12 p-0 sm:max-w-3xl"
+        style={{ background: "oklch(0.17 0.02 245 / 0.96)" }}
+      >
         <div className="max-h-[85vh] overflow-y-auto overscroll-contain">
           {/* Header */}
           <DialogHeader className="relative gap-0 p-0">

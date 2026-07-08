@@ -64,7 +64,7 @@ export default function LocationMap({ lat, lon, name }: Props) {
   }, [satellite]);
 
   return (
-    <div className="relative">
+    <div className="relative isolate">
       <div
         ref={containerRef}
         className="h-56 w-full overflow-hidden rounded-xl border border-white/12 sm:h-64"

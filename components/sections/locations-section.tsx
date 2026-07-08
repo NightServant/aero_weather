@@ -12,6 +12,7 @@ import { SuggestedLocationsCarousel } from "@/components/locations/suggested-loc
 import { LocationDetailsDialog, type DetailsMode } from "@/components/locations/location-details-dialog";
 import { useLocationForecasts } from "@/components/locations/use-location-forecasts";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
+import { PillTabs } from "@/components/aero/pill-tabs";
 import { Plus } from "lucide-react";
 import { usePrefs } from "@/hooks/use-prefs";
 import { getSuggestedLocations } from "@/lib/suggested-locations";
@@ -38,6 +39,7 @@ export function LocationsSection() {
   const [prefs, setPrefs, hydrated] = usePrefs();
   const [addOpen, setAddOpen] = useState(false);
   const [details, setDetails] = useState<{ place: Place; mode: DetailsMode } | null>(null);
+  const [tab, setTab] = useState<"saved" | "suggested">("saved");
   const router = useRouter();
 
   const forecasts = useLocationForecasts(prefs.locations, prefs.units);
@@ -47,6 +49,7 @@ export function LocationsSection() {
   if (prefs.locations.length === 0) return null; // empty state handled by <AppSections/>
 
   const activeId = prefs.activeLocationId ?? prefs.locations[0]?.id ?? null;
+  const activeTab = tab === "suggested" && suggested.length === 0 ? "saved" : tab;
 
   const openSaved = (place: Place) => setDetails({ place, mode: "saved" });
   const openSuggested = (place: Place) => setDetails({ place, mode: "suggested" });
@@ -90,14 +93,31 @@ export function LocationsSection() {
 
       <SummaryCardsSection places={prefs.locations} forecasts={forecasts} activeId={activeId} units={prefs.units} />
 
-      <LocationsCarousel places={prefs.locations} units={prefs.units} forecasts={forecasts} onOpenDetails={openSaved} />
-
       {suggested.length > 0 ? (
-        <div className="space-y-4">
-          <p className="card-subtitle-caps">Suggested places</p>
-          <SuggestedLocationsCarousel places={suggested} units={prefs.units} onOpenDetails={openSuggested} onSave={saveLocation} />
+        <div className="space-y-6">
+          <PillTabs
+            tabs={[
+              { value: "saved", label: `Saved · ${prefs.locations.length}` },
+              { value: "suggested", label: `Suggested · ${suggested.length}` },
+            ]}
+            value={activeTab}
+            onValueChange={(v) => setTab(v as "saved" | "suggested")}
+            ariaLabel="Location lists"
+            panelIdPrefix="locations-panel"
+          />
+          {activeTab === "saved" ? (
+            <div id="locations-panel-saved" role="tabpanel" aria-labelledby="locations-panel-tab-saved">
+              <LocationsCarousel places={prefs.locations} units={prefs.units} forecasts={forecasts} onOpenDetails={openSaved} />
+            </div>
+          ) : (
+            <div id="locations-panel-suggested" role="tabpanel" aria-labelledby="locations-panel-tab-suggested">
+              <SuggestedLocationsCarousel places={suggested} units={prefs.units} onOpenDetails={openSuggested} onSave={saveLocation} />
+            </div>
+          )}
         </div>
-      ) : null}
+      ) : (
+        <LocationsCarousel places={prefs.locations} units={prefs.units} forecasts={forecasts} onOpenDetails={openSaved} />
+      )}
 
       <AddCityDialog open={addOpen} onOpenChange={setAddOpen} />
 

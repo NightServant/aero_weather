@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCityGallery } from "@/lib/api/city-details";
 import type { Place } from "@/lib/api/types";
@@ -56,9 +57,9 @@ export function LocationGallery({ place }: { place: Place }) {
                 src={url}
                 alt=""
                 fill
-                loading="lazy"
+                unoptimized
                 sizes="(max-width: 640px) 30vw, 160px"
-                className="object-cover opacity-0 transition-opacity duration-500 group-hover:scale-105 data-[loaded=true]:opacity-100"
+                className="object-cover opacity-0 transition-opacity duration-300 group-hover:scale-105 data-[loaded=true]:opacity-100"
                 onLoad={(e) => e.currentTarget.setAttribute("data-loaded", "true")}
               />
             </button>
@@ -66,18 +67,21 @@ export function LocationGallery({ place }: { place: Place }) {
         ))}
       </ul>
 
-      {active ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Enlarged photo"
-          onClick={() => setActive(null)}
-          className="fixed inset-0 z-[60] grid place-items-center bg-black/70 p-6 backdrop-blur-sm"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={active} alt="" className="max-h-[85vh] max-w-full rounded-xl object-contain" />
-        </div>
-      ) : null}
+      {active && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Enlarged photo"
+              onClick={() => setActive(null)}
+              className="fixed inset-0 z-[1000] grid place-items-center bg-black/80 p-6 backdrop-blur-sm"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={active} alt="" className="max-h-[85vh] max-w-full rounded-xl object-contain" />
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

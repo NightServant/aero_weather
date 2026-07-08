@@ -45,7 +45,7 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
         type="button"
         onClick={() => onOpenDetails(place)}
         aria-label={`Details for ${place.name}`}
-        className="glass-pill absolute top-6 right-6 grid size-9 place-items-center text-foreground/80 transition-colors duration-150 hover:bg-white/[0.14] hover:text-foreground focus-visible:text-foreground"
+        className="absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 hover:bg-black/60 focus-visible:bg-black/60"
       >
         <Info className="size-4" strokeWidth={1.5} aria-hidden="true" />
       </button>
