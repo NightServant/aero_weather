@@ -90,46 +90,49 @@ export function LocationGallery({ place }: { place: Place }) {
               aria-modal="true"
               aria-label={`Photo ${index + 1} of ${urls.length}`}
               onClick={close}
-              className="fixed inset-0 z-[1000] grid place-items-center bg-black/80 p-6 backdrop-blur-sm"
+              className="fixed inset-0 z-[1000] flex items-center justify-center gap-2 bg-black/80 p-4 backdrop-blur-sm sm:gap-4 sm:p-6"
             >
               <button
                 type="button"
                 onClick={close}
                 aria-label="Close"
-                className="absolute top-4 right-4 grid size-11 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
+                className="absolute top-4 right-4 z-10 grid size-11 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
               >
                 <X className="size-5" strokeWidth={1.5} aria-hidden="true" />
               </button>
 
-              {hasMany ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); step(-1); }}
-                  aria-label="Previous photo"
-                  className="absolute left-3 sm:left-6 grid size-11 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
-                >
-                  <ChevronLeft className="size-6" strokeWidth={1.5} aria-hidden="true" />
-                </button>
-              ) : null}
+              {/* Everything inside this wrapper swallows the click so only the
+                  backdrop or the ✕ dismisses; the arrows navigate. */}
+              <div className="flex max-w-full items-center gap-2 sm:gap-4" onClick={(e) => e.stopPropagation()}>
+                {hasMany ? (
+                  <button
+                    type="button"
+                    onClick={() => step(-1)}
+                    aria-label="Previous photo"
+                    className="grid size-11 shrink-0 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
+                  >
+                    <ChevronLeft className="size-6" strokeWidth={1.5} aria-hidden="true" />
+                  </button>
+                ) : null}
 
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={urls[index]}
-                alt=""
-                onClick={(e) => e.stopPropagation()}
-                className="max-h-[85vh] max-w-full rounded-xl object-contain"
-              />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={urls[index]}
+                  alt=""
+                  className="max-h-[85vh] min-w-0 rounded-xl object-contain"
+                />
 
-              {hasMany ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); step(1); }}
-                  aria-label="Next photo"
-                  className="absolute right-3 sm:right-6 grid size-11 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
-                >
-                  <ChevronRight className="size-6" strokeWidth={1.5} aria-hidden="true" />
-                </button>
-              ) : null}
+                {hasMany ? (
+                  <button
+                    type="button"
+                    onClick={() => step(1)}
+                    aria-label="Next photo"
+                    className="grid size-11 shrink-0 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/25 transition-colors hover:bg-black/65"
+                  >
+                    <ChevronRight className="size-6" strokeWidth={1.5} aria-hidden="true" />
+                  </button>
+                ) : null}
+              </div>
 
               {hasMany ? (
                 <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/20">

@@ -1,10 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { InfoDialog, type InfoTopic } from "./info-dialog";
 
 /** Footer inventory is fixed by DESIGN-SPEC section 8. */
 const COLUMNS: {
   heading: string;
-  links: { label: string; href: string; external?: boolean }[];
+  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic }[];
 }[] = [
   {
     heading: "Weather",
@@ -30,13 +34,15 @@ const COLUMNS: {
       { label: "Reverse geocoding by BigDataCloud", href: "https://www.bigdatacloud.com/", external: true },
       { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true },
       { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true },
-      { label: "About Aero", href: "#settings" },
-      { label: "Privacy", href: "#settings" },
+      { label: "About Aero", dialog: "about" },
+      { label: "Privacy", dialog: "privacy" },
     ],
   },
 ];
 
 export function SiteFooter() {
+  const [topic, setTopic] = useState<InfoTopic | null>(null);
+
   return (
     <footer className="mt-16 border-t border-white/[0.08] bg-[oklch(0.25_0.03_240/0.6)] backdrop-blur">
       <div className="mx-auto grid max-w-[1188px] gap-10 px-6 py-12 md:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))]">
@@ -57,7 +63,15 @@ export function SiteFooter() {
             <ul className="mt-3">
               {col.links.map((link) => (
                 <li key={link.label} className="leading-[34px]">
-                  {link.external ? (
+                  {link.dialog ? (
+                    <button
+                      type="button"
+                      onClick={() => setTopic(link.dialog!)}
+                      className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
+                    >
+                      {link.label}
+                    </button>
+                  ) : link.external ? (
                     <a
                       href={link.href}
                       target="_blank"
@@ -68,7 +82,7 @@ export function SiteFooter() {
                     </a>
                   ) : (
                     <Link
-                      href={link.href}
+                      href={link.href!}
                       className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
                     >
                       {link.label}
@@ -110,6 +124,8 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
+
+      <InfoDialog topic={topic} onOpenChange={(open) => !open && setTopic(null)} />
     </footer>
   );
 }

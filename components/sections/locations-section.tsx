@@ -104,6 +104,7 @@ export function LocationsSection() {
             onValueChange={(v) => setTab(v as "saved" | "suggested")}
             ariaLabel="Location lists"
             panelIdPrefix="locations-panel"
+            surface="tint"
           />
           {activeTab === "saved" ? (
             <div id="locations-panel-saved" role="tabpanel" aria-labelledby="locations-panel-tab-saved">

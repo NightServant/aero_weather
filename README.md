@@ -14,7 +14,7 @@ The interface is one continuously scrolling page composed of four anchor-linked 
 
 - **Today** — current conditions plus detail cards (UV index, sunrise, sunset, humidity/dew point) for the active city.
 - **2-Week** — a "Next 24 hours" hourly rail, a 14-day forecast grid, and summary cards.
-- **Locations** — a carousel of saved cities, each card tinted by its live weather.
+- **Locations** — summary cards, tabbed Saved / Suggested carousels, and a per-place details dialog with description, photo gallery, and interactive map.
 - **Settings** — units, time format, and notification toggles.
 
 AeroWeather is designed to be free for everyone — no sign-up, no rate limits surfaced to the user, no premium tier.
@@ -37,9 +37,11 @@ A single scrolling section (no layout switcher):
 - **Summary cards** — cumulative rain total, peak wind, temperature range over the period, and any active weather alerts.
 
 ### Locations
-- A carousel of saved cities. Each card is tinted by its live weather (sunny, rainy, stormy, snowy, night, …) and shows local time, current temp, condition, and high/low.
-- Tap a card to make it the active location across the app and jump back to Today.
-- The active city is highlighted with a ring and an **Active** badge.
+- **Summary cards** — at-a-glance metrics across your saved places: total saved, active location, average temperature, and how many are seeing rain right now. Left accent border on desktop, bottom accent on mobile (matching the 2-Week and Settings sections).
+- **Saved / Suggested tabs** — a tabbed pair of carousels. *Saved* holds your places; *Suggested* offers a curated set of popular cities, filtered to hide anything you already track.
+- Each card shows a hero photo, name, region, live weather icon, temperature, and condition, with an **info** button in the top-right corner. Country-level places fall back to a gradient tile instead of a flag.
+- **Location details dialog** — opens from any card's info button. A hero header with a current-weather badge, a short overview (Wikipedia), a photo gallery (Wikimedia Commons) with a full-screen lightbox (prev/next + keyboard nav), an interactive **OpenStreetMap / Leaflet** map with a satellite toggle and an "Open in Google Maps" link, and metadata (coordinates, elevation, time zone, sunrise, sunset). The map, gallery, and description load only when the dialog opens.
+- From a saved place's dialog you can **View forecast** (makes it the active location and jumps to Today) or **Remove** it. From a suggested place you can **Save** it — which animates it into your saved list and updates the summary cards instantly.
 - Add new cities via the **+** button (opens a search dialog) or via the top-bar search.
 
 ### Weather-driven palettes

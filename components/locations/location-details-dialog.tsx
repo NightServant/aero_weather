@@ -81,10 +81,12 @@ export function LocationDetailsDialog({
                 <DialogDescription className="text-sm text-white/80">{region}</DialogDescription>
               </div>
               {kind ? (
-                <span className="glass-pill absolute top-3 left-4 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-foreground">
-                  <AnimatedWeatherIcon kind={kind} isDay={forecast?.current.isDay ?? true} size={16} />
-                  {forecast ? `${formatTemp(forecast.current.temperature, units.temperature)}${tempUnitLabel(units.temperature)}` : "--"}
-                  <span className="text-foreground/70">· {WEATHER_LABEL[kind]}</span>
+                <span className="absolute top-3 left-4 inline-flex items-center gap-2 rounded-full bg-black/50 py-1.5 pr-3.5 pl-2.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">
+                  <AnimatedWeatherIcon kind={kind} isDay={forecast?.current.isDay ?? true} size={18} />
+                  <span className="tabular-nums">
+                    {forecast ? `${formatTemp(forecast.current.temperature, units.temperature)}${tempUnitLabel(units.temperature)}` : "--"}
+                  </span>
+                  <span className="font-normal text-white/70">· {WEATHER_LABEL[kind]}</span>
                 </span>
               ) : null}
             </div>
