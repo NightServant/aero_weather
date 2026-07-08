@@ -4,13 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
-import { CityCardLoader } from "./city-card-loader";
-import type { Place, UnitPrefs } from "@/lib/api/types";
+import { SavedLocationCard } from "./saved-location-card";
+import type { Forecast, Place, UnitPrefs } from "@/lib/api/types";
 
 type Props = {
   places: Place[];
   units: UnitPrefs;
-  activeId: number | undefined;
+  forecasts: Record<number, Forecast | null | undefined>;
+  onOpenDetails: (place: Place) => void;
 };
 
 /**
@@ -18,7 +19,7 @@ type Props = {
  * desktop plus 48px round prev/next buttons at the row's sides; below md the
  * arrows hide and slides snap-center at ~78vw via embla's touch drag.
  */
-export function LocationsCarousel({ places, units, activeId }: Props) {
+export function LocationsCarousel({ places, units, forecasts, onOpenDetails }: Props) {
   const [viewportRef, api] = useEmblaCarousel({
     align: "center",
     containScroll: "trimSnaps",
@@ -72,7 +73,12 @@ export function LocationsCarousel({ places, units, activeId }: Props) {
               aria-label={`${i + 1} of ${places.length}`}
               className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6 backdrop-blur"
             >
-              <CityCardLoader place={place} units={units} isActive={place.id === activeId} />
+              <SavedLocationCard
+                place={place}
+                forecast={forecasts[place.id]}
+                unit={units.temperature}
+                onOpenDetails={onOpenDetails}
+              />
             </div>
           ))}
         </div>
