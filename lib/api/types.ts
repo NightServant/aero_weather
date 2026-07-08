@@ -63,6 +63,8 @@ export type DailyPoint = {
 
 export type Forecast = {
   place: Pick<Place, "latitude" | "longitude" | "timezone">;
+  /** Metres above sea level, from Open-Meteo. Undefined if the API omits it. */
+  elevation?: number;
   current: CurrentConditions;
   hourly: HourlyPoint[];
   daily: DailyPoint[];

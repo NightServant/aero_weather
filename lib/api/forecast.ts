@@ -42,6 +42,7 @@ const DAILY_FIELDS = [
 type RawForecast = {
   latitude: number;
   longitude: number;
+  elevation?: number;
   timezone: string;
   current: Record<string, number | string | null>;
   hourly: Record<string, (number | string | null)[]>;
@@ -80,6 +81,7 @@ export async function getForecast(
 
   return {
     place: { latitude: raw.latitude, longitude: raw.longitude, timezone: raw.timezone },
+    elevation: raw.elevation,
     current: {
       time: String(raw.current.time),
       temperature: Number(raw.current.temperature_2m),

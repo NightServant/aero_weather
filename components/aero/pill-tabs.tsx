@@ -13,6 +13,8 @@ type Props = {
   /** When set, tabs get `aria-controls="{panelIdPrefix}-{value}"`; give the
    *  matching panel `id` + `role="tabpanel"` + `aria-labelledby="{panelIdPrefix}-tab-{value}"`. */
   panelIdPrefix?: string;
+  /** Track surface: translucent `glass` (default) or the more opaque, readable `tint`. */
+  surface?: "glass" | "tint";
   className?: string;
 };
 
@@ -21,7 +23,7 @@ type Props = {
  * tab semantics). Full tablist keyboard support: Left/Right/Home/End with
  * roving tabindex; selection follows focus.
  */
-export function PillTabs({ tabs, value, onValueChange, ariaLabel, panelIdPrefix, className }: Props) {
+export function PillTabs({ tabs, value, onValueChange, ariaLabel, panelIdPrefix, surface = "glass", className }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
   const [thumb, setThumb] = useState<{ left: number; width: number } | null>(null);
 
@@ -60,7 +62,11 @@ export function PillTabs({ tabs, value, onValueChange, ariaLabel, panelIdPrefix,
       role="tablist"
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
-      className={cn("glass-pill relative inline-flex items-center p-1", className)}
+      className={cn(
+        "relative inline-flex items-center rounded-full p-1",
+        surface === "tint" ? "tint-card !rounded-full" : "glass-pill",
+        className,
+      )}
     >
       {/* Sliding thumb (presentational). */}
       {thumb ? (

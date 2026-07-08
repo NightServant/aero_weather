@@ -4,28 +4,21 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
-import { SavedLocationCard } from "./saved-location-card";
-import type { Forecast, Place, UnitPrefs } from "@/lib/api/types";
+import { SuggestedLocationCard } from "./suggested-location-card";
+import type { Place, UnitPrefs } from "@/lib/api/types";
 
 type Props = {
   places: Place[];
   units: UnitPrefs;
-  forecasts: Record<number, Forecast | null | undefined>;
   onOpenDetails: (place: Place) => void;
+  onSave: (place: Place) => void;
 };
 
-/**
- * Saved-locations carousel (spec 6/7): embla track with 240px cards on
- * desktop plus 48px round prev/next buttons at the row's sides; below md the
- * arrows hide and slides snap-center at ~78vw via embla's touch drag.
- */
-export function LocationsCarousel({ places, units, forecasts, onOpenDetails }: Props) {
+export function SuggestedLocationsCarousel({ places, units, onOpenDetails, onSave }: Props) {
   const [viewportRef, api] = useEmblaCarousel({
     align: "center",
     containScroll: "trimSnaps",
-    breakpoints: {
-      "(min-width: 768px)": { align: "start" },
-    },
+    breakpoints: { "(min-width: 768px)": { align: "start" } },
   });
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
@@ -47,16 +40,13 @@ export function LocationsCarousel({ places, units, forecasts, onOpenDetails }: P
     };
   }, [api, onSelect]);
 
+  if (places.length === 0) return null;
+
   return (
-    <div
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Saved locations"
-      className="flex items-center gap-4"
-    >
+    <div role="region" aria-roledescription="carousel" aria-label="Suggested locations" className="flex items-center gap-4">
       <IconCircleButton
         icon={<ChevronLeft className="size-5" strokeWidth={1.5} aria-hidden="true" />}
-        label="Previous locations"
+        label="Previous suggestions"
         size={48}
         disabled={!canPrev}
         onClick={() => api?.scrollPrev()}
@@ -73,12 +63,7 @@ export function LocationsCarousel({ places, units, forecasts, onOpenDetails }: P
               aria-label={`${i + 1} of ${places.length}`}
               className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6 backdrop-blur"
             >
-              <SavedLocationCard
-                place={place}
-                forecast={forecasts[place.id]}
-                unit={units.temperature}
-                onOpenDetails={onOpenDetails}
-              />
+              <SuggestedLocationCard place={place} units={units} onOpenDetails={onOpenDetails} onSave={onSave} />
             </div>
           ))}
         </div>
@@ -86,7 +71,7 @@ export function LocationsCarousel({ places, units, forecasts, onOpenDetails }: P
 
       <IconCircleButton
         icon={<ChevronRight className="size-5" strokeWidth={1.5} aria-hidden="true" />}
-        label="Next locations"
+        label="Next suggestions"
         size={48}
         disabled={!canNext}
         onClick={() => api?.scrollNext()}

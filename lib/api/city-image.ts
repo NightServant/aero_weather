@@ -34,6 +34,10 @@ export async function getCityImage(place: Place): Promise<string | null> {
   const seed = SEED_IMAGES[normalize(place.name)];
   if (seed) return seed;
 
+  // Country-level places resolve to a flag on Wikipedia, which reads poorly as a
+  // hero photo. Fall back to the gradient+initial instead of fetching the flag.
+  if (isCountryPlace(place)) return null;
+
   const key = placeKey(place);
 
   if (memoryCache.has(key)) return memoryCache.get(key) ?? null;
@@ -84,6 +88,12 @@ async function fetchSummaryImage(title: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/** A place that is a whole country (e.g. "Saudi Arabia"), not a city within one.
+ *  Such places have no sub-region and their name equals their country. */
+export function isCountryPlace(place: Place): boolean {
+  return !place.admin1 && normalize(place.name) === normalize(place.country);
 }
 
 /** Lowercase, strip diacritics and whitespace: "São Paulo" → "saopaulo". */
