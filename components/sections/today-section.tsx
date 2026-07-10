@@ -65,15 +65,38 @@ export function TodaySection() {
   );
 }
 
+/** Shape-matched to the real Today layout: hero column (greeting + big icon/temp
+ *  + stat rows) spanning 2/3, and the 4-card detail rail in the last column. */
 function TodaySkeleton() {
   return (
     <div aria-busy="true" className="space-y-8">
-      <Skeleton aria-hidden="true" className="h-32 w-full rounded-3xl" />
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_338px]">
-        <Skeleton aria-hidden="true" className="h-[420px] rounded-3xl" />
-        <div className="grid content-start gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Hero column */}
+        <div className="grid content-start gap-8 lg:col-span-2">
+          <div className="mt-8 space-y-3 text-center lg:text-left">
+            <Skeleton aria-hidden="true" className="mx-auto h-10 w-64 max-w-full rounded-2xl lg:mx-0" />
+            <Skeleton aria-hidden="true" className="mx-auto h-5 w-80 max-w-full rounded-lg lg:mx-0" />
+          </div>
+          <div className="space-y-8">
+            <div className="flex items-center justify-center gap-6 py-4 sm:gap-10 lg:justify-start">
+              <Skeleton aria-hidden="true" className="size-28 shrink-0 rounded-full sm:size-[180px]" />
+              <Skeleton aria-hidden="true" className="h-16 w-40 rounded-3xl sm:h-24 sm:w-56" />
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 lg:justify-start">
+              <Skeleton aria-hidden="true" className="h-14 w-56 max-w-full rounded-2xl" />
+              <Skeleton aria-hidden="true" className="h-14 w-44 max-w-full rounded-2xl" />
+            </div>
+          </div>
+        </div>
+
+        {/* Detail rail: horizontal on phones, 2-up on sm, stacked on lg. */}
+        <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:px-0 lg:col-span-1 lg:mt-8 lg:grid-cols-1">
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} aria-hidden="true" className="h-[120px] rounded-3xl" />
+            <Skeleton
+              key={i}
+              aria-hidden="true"
+              className="h-[132px] w-[78vw] shrink-0 rounded-2xl sm:w-auto"
+            />
           ))}
         </div>
       </div>

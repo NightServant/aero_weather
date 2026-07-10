@@ -38,15 +38,47 @@ export function ForecastSection() {
   );
 }
 
+/** Shape-matched to the real 2-Week layout: text header, 4 summary columns,
+ *  the 14-day marquee row, then the 24-hour rail. */
 function ForecastSkeleton() {
   return (
     <div aria-busy="true" className="space-y-8">
-      <Skeleton aria-hidden="true" className="h-32 w-full rounded-3xl" />
-      <Skeleton aria-hidden="true" className="h-28 w-full rounded-2xl" />
+      {/* Section header (kicker + title + subtitle) */}
+      <div className="space-y-3 pt-8">
+        <Skeleton aria-hidden="true" className="h-4 w-32 rounded" />
+        <Skeleton aria-hidden="true" className="h-9 w-72 max-w-full rounded-2xl" />
+        <Skeleton aria-hidden="true" className="h-5 w-96 max-w-full rounded-lg" />
+      </div>
+
+      {/* Summary columns */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 8 }, (_, i) => (
-          <Skeleton key={i} aria-hidden="true" className="h-24 rounded-2xl" />
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="flex flex-col gap-3 p-5">
+            <Skeleton aria-hidden="true" className="h-4 w-24 rounded" />
+            <Skeleton aria-hidden="true" className="h-8 w-20 rounded-lg" />
+            <Skeleton aria-hidden="true" className="h-3.5 w-full max-w-[12rem] rounded" />
+          </div>
         ))}
+      </div>
+
+      {/* 14-day forecast marquee */}
+      <div className="space-y-3">
+        <Skeleton aria-hidden="true" className="h-3 w-28 rounded" />
+        <div className="flex gap-6 overflow-hidden">
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} aria-hidden="true" className="h-[92px] w-64 shrink-0 rounded-2xl" />
+          ))}
+        </div>
+      </div>
+
+      {/* Next 24 hours */}
+      <div className="space-y-3">
+        <Skeleton aria-hidden="true" className="h-3 w-28 rounded" />
+        <div className="flex gap-2 overflow-hidden p-3">
+          {Array.from({ length: 12 }, (_, i) => (
+            <Skeleton key={i} aria-hidden="true" className="h-[104px] w-[74px] shrink-0 rounded-2xl" />
+          ))}
+        </div>
       </div>
     </div>
   );

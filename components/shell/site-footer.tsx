@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowUpRight, Info, ShieldCheck } from "lucide-react";
 import { InfoDialog, type InfoTopic } from "./info-dialog";
 
 /** Footer inventory is fixed by DESIGN-SPEC section 8. */
 const COLUMNS: {
   heading: string;
-  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic }[];
+  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic; icon?: React.ReactNode }[];
 }[] = [
   {
     heading: "Weather",
@@ -30,12 +31,12 @@ const COLUMNS: {
   {
     heading: "Resources",
     links: [
-      { label: "Weather Data by Open-Meteo", href: "https://open-meteo.com/", external: true },
-      { label: "Reverse geocoding by BigDataCloud", href: "https://www.bigdatacloud.com/", external: true },
-      { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true },
-      { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true },
-      { label: "About Aero", dialog: "about" },
-      { label: "Privacy", dialog: "privacy" },
+      { label: "Weather Data by Open-Meteo", href: "https://open-meteo.com/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "Reverse geocoding by BigDataCloud", href: "https://www.bigdatacloud.com/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "About Aero", dialog: "about", icon: <Info className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "Privacy", dialog: "privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
     ],
   },
 ];
@@ -61,35 +62,35 @@ export function SiteFooter() {
           <nav key={col.heading} aria-label={col.heading}>
             <h2 className="text-[15px] font-semibold text-foreground">{col.heading}</h2>
             <ul className="mt-3">
-              {col.links.map((link) => (
-                <li key={link.label} className="leading-[34px]">
-                  {link.dialog ? (
-                    <button
-                      type="button"
-                      onClick={() => setTopic(link.dialog!)}
-                      className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
-                    >
-                      {link.label}
-                    </button>
-                  ) : link.external ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      href={link.href!}
-                      className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
+              {col.links.map((link) => {
+                const cls =
+                  "group inline-flex items-center gap-1.5 text-sm text-text-mid transition-colors duration-150 hover:text-foreground";
+                const iconWrap = link.icon ? (
+                  <span className="text-text-mid/60 transition-colors duration-150 group-hover:text-foreground">
+                    {link.icon}
+                  </span>
+                ) : null;
+                return (
+                  <li key={link.label} className="leading-[34px]">
+                    {link.dialog ? (
+                      <button type="button" onClick={() => setTopic(link.dialog!)} className={cls}>
+                        {link.label}
+                        {iconWrap}
+                      </button>
+                    ) : link.external ? (
+                      <a href={link.href} target="_blank" rel="noreferrer" className={cls}>
+                        {link.label}
+                        {iconWrap}
+                      </a>
+                    ) : (
+                      <Link href={link.href!} className={cls}>
+                        {link.label}
+                        {iconWrap}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         ))}
