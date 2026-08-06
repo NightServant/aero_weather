@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="app/icon.svg" alt="AeroWeather logo" width="96" height="96" />
+  <img src="public/brand/aero-logo.svg" alt="AeroWeather logo" width="96" height="96" />
 </p>
 
 # AeroWeather
@@ -19,7 +19,41 @@ The interface is one continuously scrolling page composed of four anchor-linked 
 
 AeroWeather is designed to be free for everyone — no sign-up, no rate limits surfaced to the user, no premium tier.
 
-## 2. Features
+## 2. Brand
+
+### Icon
+
+The AeroWeather mark is a white cloud with three rain strokes on a rounded square filled with the brand gradient (`#3b82f6` → `#6366f1`, top-left to bottom-right, 11px corner radius at 40×40).
+
+| Asset | Purpose |
+|---|---|
+| [`public/brand/aero-logo.svg`](public/brand/aero-logo.svg) | Canonical brand mark — use this in docs and external material |
+| [`app/icon.svg`](app/icon.svg) | The same mark wired into Next.js as the favicon / app icon |
+
+The mark is a single SVG and scales to any size; don't recolor the gradient or remove the rain strokes.
+
+### Color palette
+
+<p align="center">
+  <img src="public/brand/brand-palette-dark.svg" alt="AeroWeather brand palette: aero blue #3b82f6, dusk indigo #6366f1, sky base #16222e, sun #ff8d28, droplet #03e9f2, pin red #dd0202, cloud white #ffffff, mist gray #cccfd1" width="820" />
+</p>
+
+AeroWeather is dark-only. Tokens are authored in OKLch in [`app/globals.css`](app/globals.css); the hex values below are the sampled equivalents recorded in [`DESIGN-SPEC.md`](DESIGN-SPEC.md) (the binding design contract).
+
+| Token | Hex | OKLch | Used for |
+|---|---|---|---|
+| `--primary` | `#3b82f6` | `oklch(0.623 0.188 259.8)` | The one accent blue: hero temperature, headlines, active tab/nav |
+| brand gradient end | `#6366f1` | — | Second stop of the logo-mark gradient only |
+| `--background` | `#16222e` | `oklch(0.22 0.025 250)` | Sky-base page color behind the photo layer |
+| `--accent-sun` | `#ff8d28` | `oklch(0.753 0.172 55.7)` | Sun icon fill/stroke, day forecast icons |
+| `--accent-droplet` | `#03e9f2` | `oklch(0.849 0.144 199.8)` | Humidity/dew droplet strokes, precipitation |
+| `--accent-pin` | `#dd0202` | `oklch(0.564 0.231 29.2)` | Map-pin icon stroke only — never text |
+| `--text-strong` | `#ffffff` | `oklch(1 0 0)` | Stat values and card titles (large text only) |
+| `--text-mid` | `#cccfd1` | `oklch(0.853 0.004 236.5)` | Secondary values, footer links |
+
+Beyond these fixed brand colors, the hero surface carries one of seven weather-driven **sky palettes** (sunny, sunset, rainy, stormy, cloudy, snowy, night), defined as `[data-palette="…"]` gradient tokens in `app/globals.css` and selected automatically from the active city's conditions. Full token definitions, spacing, and typography live in `DESIGN-SPEC.md`.
+
+## 3. Features
 
 ### Inline location search
 The top-bar search field is a real input, not a button. Typing immediately runs a debounced geocoding query against Open-Meteo's geocoding API and renders results in an opaque dropdown directly under the input. Saved cities appear in the dropdown when the query is empty. `⌘K` / `Ctrl+K` focuses the field from anywhere.
@@ -65,7 +99,7 @@ Toggle rows for push permission, severe-weather alerts, daily morning briefing, 
 ### Local-first preferences
 Every preference — units, time format, notifications, saved cities, active city — is stored in `localStorage` under the key `aero.prefs.v1`. Changes are broadcast to all open tabs via the `storage` event. Clearing site data wipes the app's state.
 
-## 3. Localhost Installation
+## 4. Localhost Installation
 
 AeroWeather requires **Node.js 20.9+** (Node 20 LTS or newer recommended, per Next.js 16) and **npm**.
 
@@ -89,7 +123,7 @@ npm run lint    # eslint
 
 No environment variables, API keys, or external services need to be configured. Open-Meteo's APIs are key-less and open.
 
-## 4. Limitations
+## 5. Limitations
 
 - **Forecast horizon** — daily forecasts are capped at 16 days by Open-Meteo, and the 2-Week section shows 14 of them. There is no true "monthly" outlook.
 - **No backend / no account** — preferences and saved cities live in `localStorage` only. Clearing site data, switching browsers, or using private/incognito windows resets the app.
