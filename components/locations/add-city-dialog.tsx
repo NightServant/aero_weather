@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MapPin, Search } from "lucide-react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [prefs, setPrefs] = usePrefs();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +33,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
       setQuery("");
       setResults([]);
       setLoading(false);
+      setFailed(false);
       return;
     }
     const t = setTimeout(() => inputRef.current?.focus(), 60);
@@ -41,15 +44,27 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
     if (query.trim().length < 2) {
       setResults([]);
       setLoading(false);
+      setFailed(false);
       return;
     }
     const controller = new AbortController();
     setLoading(true);
     const t = setTimeout(() => {
       searchPlaces(query, controller.signal)
-        .then((r) => setResults(r))
-        .catch(() => setResults([]))
-        .finally(() => setLoading(false));
+        .then((r) => {
+          setResults(r);
+          setFailed(false);
+        })
+        .catch((err) => {
+          // An aborted request is the cleanup path for a superseded keystroke,
+          // not a failure the user should be told about.
+          if (controller.signal.aborted || (err as Error)?.name === "AbortError") return;
+          setResults([]);
+          setFailed(true);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setLoading(false);
+        });
     }, 220);
     return () => {
       controller.abort();
@@ -62,6 +77,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
       const { list } = addPlace(p.locations, place);
       return { ...p, locations: list };
     });
+    toast.success(`Added ${place.name}.`);
     onOpenChange(false);
   };
 
@@ -85,6 +101,7 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search cities, ZIP codes, or coordinates"
             placeholder="Search cities, ZIP codes, or coordinates…"
             className="w-full min-w-0 flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
           />
@@ -97,6 +114,10 @@ export function AddCityDialog({ open, onOpenChange }: Props) {
             </p>
           ) : loading ? (
             <p className="px-3 py-2 text-sm text-foreground/55">Searching…</p>
+          ) : failed ? (
+            <p className="px-3 py-2 text-sm text-destructive" role="alert">
+              Couldn&apos;t reach the city search. Check your connection and try again.
+            </p>
           ) : results.length === 0 ? (
             <p className="px-3 py-2 text-sm text-foreground/55">No matches.</p>
           ) : (

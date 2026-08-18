@@ -17,6 +17,7 @@ import {
 import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
+import { visibleSectionIds } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -29,7 +30,13 @@ const NAV_ITEMS = [
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("today");
-  const [, setPrefs] = usePrefs();
+  const [prefs, setPrefs, hydrated] = usePrefs();
+
+  // Mirrors the AppSections branch: pre-hydration it renders every section
+  // (as skeletons), so only an empty state that has actually hydrated trims
+  // the nav. Linking to a section AppSections skipped scrolls nowhere.
+  const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
+  const navItems = NAV_ITEMS.filter((item) => visibleIds.includes(item.id));
 
   // Scroll-spy: highlight the nav pill for the section currently in view.
   useEffect(() => {
@@ -94,7 +101,7 @@ export function Navbar() {
 
         {/* Desktop nav pills */}
         <div className="ml-auto hidden items-center justify-between lg:flex">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = activeId === item.id;
             return (
               <Link
@@ -135,7 +142,7 @@ export function Navbar() {
               </DrawerHeader>
               <div className="space-y-1 px-4 pb-8">
                 <SearchTrigger className="mb-3" />
-                {NAV_ITEMS.map((item) => {
+                {navItems.map((item) => {
                   const active = activeId === item.id;
                   return (
                     <Link
