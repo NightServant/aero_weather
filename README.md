@@ -8,12 +8,12 @@ A modern weather web app built with Next.js 16 (App Router, Turbopack) and React
 
 ## 1. App Overview
 
-AeroWeather is a single-page weather dashboard that runs entirely in the browser. There is no account, no backend, no analytics. All preferences (saved cities, units, time format) live in `localStorage` on the device. Weather, air quality, and geocoding data are fetched on demand from Open-Meteo's three public, key-less endpoints (Forecast, Geocoding, Air Quality).
+AeroWeather is a single-page weather dashboard that runs entirely in the browser. There is no account and no backend of its own. All preferences (saved cities, units, time format) live in `localStorage` on the device. Anonymous, cookieless page counts are collected; Google Analytics is opt-in and stays off until you allow it (see [Privacy and analytics](#6-privacy-and-analytics)). Weather, air quality, and geocoding data are fetched on demand from Open-Meteo's three public, key-less endpoints (Forecast, Geocoding, Air Quality).
 
-The interface is one continuously scrolling page composed of four anchor-linked sections. A sticky top navbar links to each section and highlights the one currently in view (scroll-spy); on small screens the links collapse into a slide-up drawer menu:
+The interface is one continuously scrolling page composed of four anchor-linked sections, followed by an FAQ. A sticky top navbar links to each section plus the privacy page, and highlights the section currently in view; on small screens the links collapse into a slide-up drawer menu:
 
-- **Today** — current conditions plus detail cards (UV index, sunrise, sunset, humidity/dew point) for the active city.
-- **2-Week** — a "Next 24 hours" hourly rail, a 14-day forecast grid, and summary cards.
+- **Today** — current conditions plus detail cards (air quality, UV index, sunrise, sunset, humidity/dew point) for the active city.
+- **2-Week** — a "Next 24 hours" hourly rail, the 14-day outlook, and summary cards.
 - **Locations** — summary cards, tabbed Saved / Suggested carousels, and a per-place details dialog with description, photo gallery, and interactive map.
 - **Settings** — units, time format, and notification toggles.
 
@@ -62,12 +62,13 @@ The top-bar search field is a real input, not a button. Typing immediately runs 
 - Greeting header with a plain-language summary of the day for the active city.
 - Any active weather alert surfaces in an alert card at the top.
 - Hero block with the temperature, weather summary, "feels like / high / low" line, and a weather-driven gradient scene (animated sun, clouds, rain droplets, snowflakes, lightning, or moon depending on conditions).
-- Detail cards: UV Index (with a gradient scale), Sunrise and Sunset (with day-arc visualization), and Humidity (with dew point) — all timezone-correct for the selected city.
+- Detail cards: **Air Quality** (US AQI with a banded dial), UV Index, Sunrise and Sunset, and Humidity (with dew point) — all timezone-correct for the selected city.
+- The cards are a grid at every width (two up on phones, no horizontal scroller), and the temperature is the largest element on the page rather than the greeting.
 
 ### 2-Week Outlook
 A single scrolling section (no layout switcher):
 - **Next 24 hours** — an hourly rail of temperature and conditions.
-- **14-day forecast** — a grid of daily cards with weekday, weather icon, condition, precipitation probability, and high/low. (Open-Meteo provides up to 16 days of daily forecast.)
+- **14-day outlook** — one row per day on phones and tablets (weekday, date, condition, precipitation chance, high/low), so nine or ten days are readable at once; from `lg` the same data becomes a carousel you drive with prev/next buttons. (Open-Meteo provides up to 16 days of daily forecast.)
 - **Summary cards** — cumulative rain total, peak wind, temperature range over the period, and any active weather alerts.
 
 ### Locations
@@ -77,6 +78,13 @@ A single scrolling section (no layout switcher):
 - **Location details dialog** — opens from any card's info button. A hero header with a current-weather badge, a short overview (Wikipedia), a photo gallery (Wikimedia Commons) with a full-screen lightbox (prev/next + keyboard nav), an interactive **OpenStreetMap / Leaflet** map with a satellite toggle and an "Open in Google Maps" link, and metadata (coordinates, elevation, time zone, sunrise, sunset). The map, gallery, and description load only when the dialog opens.
 - From a saved place's dialog you can **View forecast** (makes it the active location and jumps to Today) or **Remove** it. From a suggested place you can **Save** it — which animates it into your saved list and updates the summary cards instantly.
 - Add new cities via the **+** button (opens a search dialog) or via the top-bar search.
+
+### FAQ, privacy page, and SEO
+Five questions answer the things people actually ask (accounts, data sources, the
+14-day horizon, where saved cities live, geolocation accuracy). A real `/privacy`
+page names every third party that receives a request from your browser. The app
+also ships `robots.txt`, `sitemap.xml`, a generated Open Graph image, and a custom
+404 page.
 
 ### Weather-driven palettes
 Seven palettes — sunny, sunset, rainy, stormy, cloudy, snowy, night — each with weather-appropriate gradient hues, scene accent colors, and a `--hero-text` token that auto-selects a readable foreground. Palettes are tuned in chroma and lightness for the dark interface so hero cards sit quietly against the dark surface instead of glowing. The active palette is derived from the current conditions of the selected city.
@@ -116,14 +124,49 @@ The dev server (Turbopack) starts at <http://localhost:3000>. Open it and you'll
 Other scripts:
 
 ```bash
-npm run build   # production build
-npm start       # serve the production build
-npm run lint    # eslint
+npm run build          # production build
+npm start              # serve the production build
+npm run lint           # eslint
+npm test               # vitest, single run
+npm run test:watch     # vitest, watch mode
+npm run test:coverage  # vitest with a V8 coverage report
 ```
 
-No environment variables, API keys, or external services need to be configured. Open-Meteo's APIs are key-less and open.
+Tests cover the pure logic in `lib/` (formatting, preferences, forecast summaries,
+AQI bands, section and outlook helpers). Date and time formatting is timezone
+sensitive, so run those under a non-UTC zone when changing them — the bug they guard
+against is invisible when the machine's zone matches the city's:
 
-## 5. Limitations
+```bash
+TZ=Asia/Manila npm test
+```
+
+Open-Meteo's APIs are key-less and open, so the app runs with no configuration at all.
+Two optional variables affect deployment only — see below.
+
+## 5. Configuration
+
+Both are optional; the app runs without them.
+
+| Variable | Effect when unset |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `robots.txt`, `sitemap.xml`, and the Open Graph tags fall back to `https://aeroweather.app`. Set this to your real origin before deploying. |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics stays dormant and the consent prompt never appears. Set a `G-XXXXXXXXXX` measurement id to enable the opt-in flow. |
+
+**Deploying:** Vercel is the better fit. The build is fully static (every route
+prerendered, no server rendering, no database), and the Next.js 16 metadata routes
+this app uses — `opengraph-image`, `robots`, `sitemap` — are first-party there rather
+than going through a compatibility layer.
+
+## 6. Privacy and analytics
+
+- Preferences and saved cities are stored in one `localStorage` key and never leave the device.
+- **Vercel Analytics** records anonymous page views. It sets no cookies and assigns no identifier, so it runs without a prompt.
+- **Google Analytics is opt-in.** Nothing from Google loads unless you press Allow, and declining keeps it off permanently on that device.
+- Weather, geocoding, and imagery requests go straight from your browser to Open-Meteo, BigDataCloud, and Wikimedia, so each of those necessarily sees your IP address. The [`/privacy`](app/(app)/privacy/page.tsx) page names what reaches whom.
+- No AI is used to generate, personalise, or process anything in the app.
+
+## 7. Limitations
 
 - **Forecast horizon** — daily forecasts are capped at 16 days by Open-Meteo, and the 2-Week section shows 14 of them. There is no true "monthly" outlook.
 - **No backend / no account** — preferences and saved cities live in `localStorage` only. Clearing site data, switching browsers, or using private/incognito windows resets the app.
@@ -131,7 +174,7 @@ No environment variables, API keys, or external services need to be configured. 
 - **Geolocation accuracy** — "Use my location" uses the browser's coarse geolocation with an 8-second timeout. Indoor or VPN-affected positions can resolve to a nearby city rather than your exact spot.
 - **Network-dependent** — data is fetched from Open-Meteo on load and on city change. Offline use is not supported; there is no cache layer beyond the browser's HTTP cache.
 - **Rate limits** — Open-Meteo's free tier is generous but not infinite. Rapidly switching cities or hammering search may temporarily return HTTP 429.
-- **Air-quality coverage** — air-quality data is fetched from the Open-Meteo air-quality endpoint (which has uneven coverage outside major regions) but is not currently surfaced in a dedicated card.
-- **Time zones** — display uses the selected city's IANA timezone returned by the geocoder. Cities without a confident timezone fall back to UTC.
-- **Accessibility** — keyboard navigation works for primary controls (search input, nav links, toggles), but a full screen-reader pass has not been done. Reduced-motion preferences are not yet wired into the gradient animations.
+- **Air-quality coverage** — the US AQI card reads from Open-Meteo's air-quality endpoint, whose coverage is uneven outside major regions. The card is hidden when no reading is returned.
+- **Time zones** — display uses the selected city's IANA timezone. Open-Meteo returns times already localised to that city and without an offset, so they are formatted as wall-clock readings rather than re-converted; see `resolveInstant` in [`lib/format.ts`](lib/format.ts). Cities without a confident timezone fall back to UTC.
+- **Accessibility** — keyboard navigation works for primary controls (search input, nav links, toggles), but a full screen-reader pass has not been done. `prefers-reduced-motion` and `prefers-reduced-transparency` are both honoured in `globals.css`.
 - **Browser support** — `backdrop-filter` (used for glassmorphism) requires a recent Chromium, Safari 15+, or Firefox 103+. Older browsers will render the cards as opaque surfaces.
