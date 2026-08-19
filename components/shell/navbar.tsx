@@ -18,7 +18,7 @@ import {
 import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
-import { visibleSectionIds } from "@/lib/sections";
+import { pickActiveSection, visibleSectionIds, type SectionBox } from "@/lib/sections";
 import { USE_LOCATION_EVENT } from "@/lib/ui-events";
 import { cn } from "@/lib/utils";
 
@@ -60,24 +60,50 @@ export function Navbar() {
     })),
   ];
 
-  // Scroll-spy: highlight the nav pill for the section currently in view.
+  // Scroll-spy. An IntersectionObserver over a thin mid-viewport band used to
+  // drive this, but it only fired while crossing the band: the highlight
+  // lagged a beat behind the scroll, and a final section shorter than the
+  // remaining scroll never reached the band at all, so Settings could never
+  // light up. Measuring on scroll is deterministic and always current.
   useEffect(() => {
-    const sections = NAV_ITEMS.map((i) => document.getElementById(i.id)).filter(
-      (el): el is HTMLElement => el !== null,
-    );
-    if (sections.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActiveId(visible.target.id);
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] },
-    );
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    if (!onHome) return;
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const boxes: SectionBox[] = [];
+      for (const item of NAV_ITEMS) {
+        const el = document.getElementById(item.id);
+        if (el) boxes.push({ id: item.id, top: el.getBoundingClientRect().top + window.scrollY });
+      }
+      const next = pickActiveSection(
+        boxes,
+        window.scrollY,
+        window.innerHeight,
+        document.documentElement.scrollHeight,
+      );
+      if (next) setActiveId(next);
+    };
+
+    const schedule = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    // Sections mount and grow as prefs hydrate and forecasts load, which moves
+    // every offset measured above.
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      observer.disconnect();
+    };
+  }, [onHome]);
 
   const useMyLocation = useCallback(() => {
     if (!("geolocation" in navigator)) {

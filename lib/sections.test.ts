@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SECTION_IDS, visibleSectionIds } from "./sections";
+import { SECTION_IDS, pickActiveSection, visibleSectionIds } from "./sections";
 
 describe("visibleSectionIds", () => {
   it("exposes every section once a location is saved", () => {
@@ -24,5 +24,56 @@ describe("visibleSectionIds", () => {
     const first = visibleSectionIds(true);
     first.pop();
     expect(visibleSectionIds(true)).toHaveLength(SECTION_IDS.length);
+  });
+});
+
+describe("pickActiveSection", () => {
+  // A page of four 700px sections in a 900px viewport.
+  const sections = [
+    { id: "today" as const, top: 0 },
+    { id: "forecast" as const, top: 700 },
+    { id: "locations" as const, top: 1400 },
+    { id: "settings" as const, top: 2100 },
+  ];
+  const VH = 900;
+  const DOC = 2100 + 400 + VH; // last section is only 400px tall
+
+  const pick = (scrollY: number) => pickActiveSection(sections, scrollY, VH, DOC);
+
+  it("returns null when there are no sections", () => {
+    expect(pickActiveSection([], 0, VH, DOC)).toBeNull();
+  });
+
+  it("reports the first section at the top of the page", () => {
+    expect(pick(0)).toBe("today");
+  });
+
+  it("advances only once a section has passed the marker", () => {
+    // Marker sits at scrollY + 315. Forecast starts at 700.
+    expect(pick(384)).toBe("today");
+    expect(pick(385)).toBe("forecast");
+  });
+
+  it("tracks the middle sections while scrolling", () => {
+    expect(pick(1085)).toBe("locations");
+    expect(pick(1785)).toBe("settings");
+  });
+
+  it("selects the final section once scrolled to the bottom", () => {
+    // The regression this replaces: a short last section never reaches the
+    // marker, so the nav stayed stuck on the previous section.
+    expect(pick(DOC - VH)).toBe("settings");
+  });
+
+  it("never returns a section the caller did not supply", () => {
+    const partial = [
+      { id: "today" as const, top: 0 },
+      { id: "settings" as const, top: 700 },
+    ];
+    for (const y of [0, 300, 700, 1200, 5000]) {
+      expect(["today", "settings"]).toContain(
+        pickActiveSection(partial, y, VH, 700 + 400 + VH),
+      );
+    }
   });
 });
