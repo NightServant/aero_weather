@@ -149,3 +149,43 @@ describe("Intl date/time formatters (fixed UTC)", () => {
     expect(formatWeekdayShort("2026-01-01T04:00:00Z", "America/Los_Angeles")).toBe("Wed");
   });
 });
+
+describe("Open-Meteo wall-clock strings", () => {
+  // With timezone=auto the API returns times already localised to the queried
+  // place, and with no offset: "2026-08-19T06:10" IS 6:10 in New York. Parsing
+  // that with `new Date` reads it in the *viewer's* zone, and formatting it
+  // back into the place's zone shifts it a second time. Viewing New York from
+  // Manila turned a 6:10 AM sunrise into "6:10 PM".
+  const SUNRISE = "2026-08-19T06:10";
+  const SUNSET = "2026-08-19T19:48";
+
+  it("keeps the stated wall-clock time regardless of the viewer's zone", () => {
+    expect(formatTime(SUNRISE, true, "America/New_York")).toBe("6:10 AM");
+    expect(formatTime(SUNSET, true, "America/New_York")).toBe("7:48 PM");
+  });
+
+  it("is unaffected by which zone is passed, since the string is already local", () => {
+    expect(formatTime(SUNRISE, true, "Asia/Manila")).toBe("6:10 AM");
+    expect(formatTime(SUNRISE, true, undefined)).toBe("6:10 AM");
+  });
+
+  it("honours the 24-hour preference", () => {
+    expect(formatTime(SUNSET, false, "America/New_York")).toMatch(/^19:48$/);
+  });
+
+  it("formats the hour only, without shifting it", () => {
+    expect(formatHour("2026-08-19T15:00", true, "America/New_York")).toBe("3 PM");
+    expect(formatHour("2026-08-19T00:00", true, "America/New_York")).toBe("12 AM");
+  });
+
+  it("keeps the calendar date the string names", () => {
+    // A late-evening wall clock must not roll into the next day.
+    expect(formatShortDate("2026-08-19T23:30", "America/New_York")).toBe("Aug 19");
+    expect(formatWeekdayShort("2026-08-19T23:30", "America/New_York")).toBe("Wed");
+  });
+
+  it("still handles absolute instants that carry an offset", () => {
+    // Anything with Z or an explicit offset is a real instant; keep converting.
+    expect(formatTime("2026-01-01T09:05:00Z", true, "UTC")).toBe("9:05 AM");
+  });
+});
