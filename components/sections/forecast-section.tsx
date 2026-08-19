@@ -1,7 +1,7 @@
 "use client";
 
 import { SectionHeader } from "./section-header";
-import { MarqueeView } from "@/components/forecast/marquee-view";
+import { DailyOutlook } from "@/components/forecast/daily-outlook";
 import { HourlyView } from "@/components/forecast/hourly-view";
 import { SummaryCards } from "@/components/forecast/summary-cards";
 import { useActiveForecast } from "@/components/shell/active-forecast-context";
@@ -27,7 +27,7 @@ export function ForecastSection() {
       
       <div className="space-y-3">
         <p className="card-subtitle-caps">14-day forecast</p>
-        <MarqueeView daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
+        <DailyOutlook daily={data.daily} current={data.current} unit={prefs.units.temperature} timezone={data.place.timezone} />
       </div>
 
       <div className="space-y-3">
@@ -39,7 +39,7 @@ export function ForecastSection() {
 }
 
 /** Shape-matched to the real 2-Week layout: text header, 4 summary columns,
- *  the 14-day marquee row, then the 24-hour rail. */
+ *  the 14-day outlook, then the 24-hour rail. */
 function ForecastSkeleton() {
   return (
     <div aria-busy="true" className="space-y-8">
@@ -61,7 +61,7 @@ function ForecastSkeleton() {
         ))}
       </div>
 
-      {/* 14-day forecast marquee */}
+      {/* 14-day forecast: rows on mobile/tablet, carousel from lg up */}
       <div className="space-y-3">
         <Skeleton aria-hidden="true" className="h-3 w-28 rounded" />
         <div className="flex gap-6 overflow-hidden">

@@ -189,3 +189,23 @@ describe("Open-Meteo wall-clock strings", () => {
     expect(formatTime("2026-01-01T09:05:00Z", true, "UTC")).toBe("9:05 AM");
   });
 });
+
+describe("Open-Meteo date-only strings", () => {
+  // daily.time entries carry no time part: "2026-08-19" is the calendar day
+  // in the queried place. Parsed as an instant it becomes UTC midnight, which
+  // is the previous evening anywhere west of Greenwich, so the whole 14-day
+  // outlook rendered one day behind.
+  it("keeps the calendar day for zones behind UTC", () => {
+    expect(formatShortDate("2026-08-19", "America/New_York")).toBe("Aug 19");
+    expect(formatWeekdayShort("2026-08-19", "America/New_York")).toBe("Wed");
+  });
+
+  it("keeps the calendar day for zones ahead of UTC", () => {
+    expect(formatShortDate("2026-08-19", "Asia/Manila")).toBe("Aug 19");
+    expect(formatWeekdayShort("2026-08-19", "Pacific/Auckland")).toBe("Wed");
+  });
+
+  it("formats the long date from the stated day", () => {
+    expect(formatDate("2026-08-19", "America/New_York")).toBe("Wednesday, August 19");
+  });
+});
