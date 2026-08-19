@@ -21,7 +21,7 @@ type Props = {
 export function SunriseCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
   return (
     <RailCard
-      icon={<Sunrise className="size-9 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
+      icon={<Sunrise className="size-7 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
       label="Sunrise"
       value={formatTime(sunriseIso, format12h, timezone)}
       caption={`${durationBetween(sunriseIso, sunsetIso)} of daylight`}
@@ -32,7 +32,7 @@ export function SunriseCard({ sunriseIso, sunsetIso, format12h, timezone }: Prop
 export function SunsetCard({ sunriseIso, sunsetIso, format12h, timezone }: Props) {
   return (
     <RailCard
-      icon={<Sunset className="size-9 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
+      icon={<Sunset className="size-7 text-accent-sun sm:size-10" strokeWidth={1.5} aria-hidden="true" />}
       label="Sunset"
       value={formatTime(sunsetIso, format12h, timezone)}
       caption={`${nightLength(sunriseIso, sunsetIso)} of night ahead`}
@@ -59,7 +59,7 @@ export function RailCard({
   const body = (
     <>
       {icon}
-      <h3 className="stat-title mt-3 sm:mt-4">
+      <h3 className="stat-title mt-2.5 sm:mt-4">
         {label} <span className="tabular whitespace-nowrap">{value}</span>
       </h3>
       {caption ? <p className="caption mt-0.5">{caption}</p> : null}
@@ -67,11 +67,12 @@ export function RailCard({
     </>
   );
   return (
-    <GlassCard variant="tint" className="h-full p-5 backdrop-blur sm:px-6 sm:py-6" data-animate="">
+    <GlassCard variant="tint" className="@container h-full p-3.5 backdrop-blur sm:px-6 sm:py-6" data-animate="">
       {side ? (
-        // Text left, side element right, vertically centered. The one-card carousel
-        // and the sm+ grid both give the card enough width for this side by side.
-        <div className="flex h-full items-center gap-4">
+        // Keyed to the card's own width, not the viewport: a two-up rail can be
+        // ~200px wide on a large screen, where a dial beside the text squeezed
+        // "UV Index Moderate" onto three lines.
+        <div className="flex h-full flex-col items-start gap-3 @[17rem]:flex-row @[17rem]:items-center @[17rem]:gap-4">
           <div className="min-w-0 flex-1">{body}</div>
           <div className="shrink-0">{side}</div>
         </div>
