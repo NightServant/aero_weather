@@ -217,7 +217,10 @@
   .text-display-temp {
     /* Fluid on phones: the old 4rem floor never shrank below 64px, which forced
        the icon + temperature row to wrap on narrow screens. */
-    font-size: clamp(3rem, 15vw, 6.5rem);
+    /* 22vw reaches the 6.5rem cap at ~473px, so tablet and desktop are
+       unchanged; below that the hero grows instead of sitting at a 3rem floor
+       barely larger than a section headline. */
+    font-size: clamp(3rem, 22vw, 6.5rem);
     line-height: 1;
     font-weight: 700;
     letter-spacing: -0.03em;
@@ -225,20 +228,20 @@
     font-variant-numeric: tabular-nums;
   }
   .text-headline {
-    font-size: clamp(2.25rem, 4vw, 3rem);
+    font-size: clamp(1.75rem, 4vw, 3rem);
     line-height: 1.12;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--primary);
   }
   .text-subtitle {
-    font-size: 1.1875rem;
+    font-size: clamp(1rem, 3.6vw, 1.1875rem);
     line-height: 1.55;
     font-weight: 400;
     color: var(--muted-foreground);
   }
   .kicker {
-    font-size: 1rem;
+    font-size: clamp(0.8125rem, 2.6vw, 1rem);
     line-height: 1.2;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -246,7 +249,7 @@
     color: var(--foreground);
   }
   .card-title-caps {
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 2.6vw, 1rem);
     line-height: 1.3;
     font-weight: 600;
     letter-spacing: 0.04em;

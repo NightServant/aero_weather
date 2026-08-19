@@ -53,16 +53,24 @@ export function CurrentConditions({ forecast, place, units }: Props) {
   const location = [place.name, place.country].filter(Boolean).join(", ").toUpperCase();
 
   return (
-    <section aria-label="Current conditions" className="space-y-6 mx-auto my-auto lg:mx-0 lg:my-0">
-      <div className="stagger-5 flex flex-wrap gap-6 md:border-l md:border-white/12 md:pl-6">
-        <div className="flex min-w-0 items-start gap-3">
+    <section
+      aria-label="Current conditions"
+      className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0"
+    >
+      {/* `contents` on small screens lets these two blocks be ordered
+          independently against the temperature below; from lg they re-form the
+          single bordered row the desktop layout has always had. */}
+      <div className="contents lg:flex lg:flex-wrap lg:gap-6 lg:border-l lg:border-white/12 lg:pl-6">
+        <div className="stagger-5 order-1 flex min-w-0 items-start gap-3 lg:order-none">
           <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
           <div>
             <h2 className="card-title-caps">Today - {dateline}</h2>
             <p className="card-subtitle-caps mt-1">{location}</p>
           </div>
         </div>
-        <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+        {/* Attribution, not an answer: it sits under the reading on a phone
+            rather than between the reader and the temperature. */}
+        <div className="order-5 flex min-w-0 items-start gap-3 lg:order-none lg:border-l lg:border-white/12 lg:pl-6">
           <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
           <div>
             <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
@@ -70,7 +78,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         </div>
       </div>
-      <div className="stagger-4 flex flex-nowrap items-center gap-4 py-4 sm:gap-10">
+      <div className="stagger-4 order-2 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4 lg:order-none">
         <span className="animate-float shrink-0">
           <AnimatedWeatherIcon
             kind={kind}
@@ -85,7 +93,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </p>
       </div>
 
-      <div className="stagger-5 flex flex-wrap gap-6">
+      <div className="stagger-5 order-3 flex flex-wrap gap-6 lg:order-none">
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
