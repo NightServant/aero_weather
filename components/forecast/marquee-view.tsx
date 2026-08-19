@@ -74,7 +74,10 @@ function MarqueeCard({
   return (
     <li
       aria-hidden={duplicate || undefined}
-      className={`tint-card card-interactive flex w-64 shrink-0 items-center gap-4 p-4 backdrop-blur ${duplicate ? "marquee-dup" : ""}`}
+      // No card-interactive/backdrop-blur here: these cards are not clickable,
+      // half are aria-hidden marquee duplicates, and DESIGN-SPEC keeps blur off
+      // the 14-card grid - 28 blurred layers on a permanently animating track.
+      className={`tint-card flex w-64 shrink-0 items-center gap-4 p-4 ${duplicate ? "marquee-dup" : ""}`}
     >
       <AnimatedWeatherIcon kind={kind} isDay={isDay} size={48} />
       <div className="min-w-0">

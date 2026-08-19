@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_URL } from "./robots";
+import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsConsent } from "@/components/shell/analytics-consent";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -59,6 +61,8 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster />
+          <AnalyticsConsent />
+          <Analytics />
         </Providers>
       </body>
     </html>

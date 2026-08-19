@@ -10,6 +10,7 @@ import {
   ServerOff,
   HardDrive,
   Share2,
+  BarChart3,
   Trash2,
   type LucideIcon,
 } from "lucide-react";
@@ -48,9 +49,22 @@ const CONTENT: Record<
   privacy: {
     icon: ShieldCheck,
     title: "Privacy",
-    description: "No accounts, no tracking, no analytics.",
+    description: "No accounts, no cookies, no personal data.",
     points: [
       { icon: ServerOff, text: "No backend of our own, and no personal data collected." },
+      {
+        icon: BarChart3,
+        text: (
+          <>
+            Anonymous, cookieless page counts only. Google Analytics stays off unless you
+            opt in. Full detail in the{" "}
+            <a href="/privacy" className="text-primary underline-offset-2 hover:underline">
+              privacy policy
+            </a>
+            .
+          </>
+        ),
+      },
       {
         icon: HardDrive,
         text: (

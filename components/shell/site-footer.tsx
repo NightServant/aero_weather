@@ -38,7 +38,7 @@ const COLUMNS: {
       { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "About Aero", dialog: "about", icon: <Info className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
-      { label: "Privacy", dialog: "privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "Privacy", href: "/privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
     ],
   },
 ];

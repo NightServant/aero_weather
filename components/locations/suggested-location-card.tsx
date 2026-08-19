@@ -34,22 +34,28 @@ function SuggestedLocationCardBase({ place, units, onOpenDetails, onSave }: Prop
 
   return (
     <div
-      className="tint-card card-interactive relative w-full p-4 transition-[opacity,transform] duration-300"
+      className="group tint-card card-interactive relative w-full p-4 transition-[opacity,transform] duration-300"
       data-saving={saving ? "true" : undefined}
       style={saving ? { opacity: 0, transform: "scale(0.94)" } : undefined}
     >
-      <div className="relative overflow-hidden rounded-[12px]">
-        <CityPhoto place={place} width={208} height={160} className="h-[160px] w-full rounded-[12px]" initialClassName="text-5xl" />
-      </div>
-
+      {/* Whole card opens details; Save sits above this overlay (z-20). */}
       <button
         type="button"
         onClick={() => onOpenDetails(place)}
         aria-label={`Details for ${place.name}`}
-        className="absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 hover:bg-black/60 focus-visible:bg-black/60"
+        className="absolute inset-0 z-10 rounded-[inherit] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+      />
+
+      <div className="relative overflow-hidden rounded-[12px]">
+        <CityPhoto place={place} width={208} height={160} className="h-[160px] w-full rounded-[12px]" initialClassName="text-5xl" />
+      </div>
+
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 group-hover:bg-black/60"
       >
-        <Info className="size-4" strokeWidth={1.5} aria-hidden="true" />
-      </button>
+        <Info className="size-4" strokeWidth={1.5} />
+      </span>
 
       <div className="mt-3 min-w-0">
         <h3 className="truncate text-[0.9375rem] leading-snug font-semibold text-text-strong">{place.name}</h3>
@@ -76,7 +82,7 @@ function SuggestedLocationCardBase({ place, units, onOpenDetails, onSave }: Prop
           // Let the exit animation play before the parent removes this card.
           window.setTimeout(() => onSave(place), 300);
         }}
-        className="glass-pill mt-4 inline-flex w-full items-center justify-center gap-1.5 py-2 text-sm font-medium text-foreground/90 transition-colors hover:bg-white/[0.14] disabled:opacity-60"
+        className="glass-pill relative z-20 mt-4 inline-flex w-full items-center justify-center gap-1.5 py-2 text-sm font-medium text-foreground/90 transition-colors hover:bg-white/[0.14] disabled:opacity-60"
       >
         {saving ? <Check className="size-4" strokeWidth={1.5} /> : <Plus className="size-4" strokeWidth={1.5} />}
         {saving ? "Saved" : "Save location"}
