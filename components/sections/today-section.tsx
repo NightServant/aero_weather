@@ -29,7 +29,7 @@ export function TodaySection() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6 md:mx-auto md:my-auto lg:grid-cols-5">
-        <div className="grid w-full grid-cols-1 content-start gap-6 lg:col-span-3">
+        <div className="flex w-full flex-col gap-6 lg:col-span-3">
           <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
            <AlertCard />
           <CurrentConditions forecast={data} place={place} units={prefs.units} />
