@@ -33,15 +33,24 @@ const FAQ = [
 
 export function FaqSection() {
   return (
-    <section id="faq" aria-labelledby="faq-h" className="mt-16 scroll-mt-28 md:mt-20">
+    <section
+      id="faq"
+      aria-labelledby="faq-h"
+      className="mt-16 scroll-mt-28 md:mt-20 lg:grid lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-start lg:gap-12"
+    >
+      {/* Two columns from lg. A single centred column capped the questions at
+          48rem and left the rest of a wide row empty; giving the heading its own
+          column uses that space instead of padding it out. */}
       <SectionHeader id="faq-h" kicker="Questions" title="Frequently asked" />
-      <Accordion type="single" collapsible className="mt-6 max-w-3xl">
+      <Accordion type="single" collapsible className="mt-6 lg:mt-8">
         {FAQ.map(({ q, a }) => (
           <AccordionItem key={q} value={q} className="border-white/[0.08]">
             <AccordionTrigger className="text-left text-[15px] font-medium">
               {q}
             </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-text-mid">
+            {/* The column is wider than comfortable prose, so the answer keeps
+                its own measure. */}
+            <AccordionContent className="max-w-[68ch] text-sm leading-relaxed text-text-mid">
               {a}
             </AccordionContent>
           </AccordionItem>
