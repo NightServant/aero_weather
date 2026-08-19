@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
 import { SearchTrigger } from "@/components/search/search-trigger";
@@ -18,6 +19,7 @@ import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
 import { visibleSectionIds } from "@/lib/sections";
+import { USE_LOCATION_EVENT } from "@/lib/ui-events";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -27,16 +29,36 @@ const NAV_ITEMS = [
   { id: "settings", href: "#settings", label: "Settings" },
 ] as const;
 
+/** Real routes, not in-page anchors: never scroll-spied, matched on pathname. */
+const ROUTE_ITEMS = [{ href: "/privacy", label: "Privacy" }] as const;
+
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("today");
   const [prefs, setPrefs, hydrated] = usePrefs();
+  const pathname = usePathname();
 
   // Mirrors the AppSections branch: pre-hydration it renders every section
   // (as skeletons), so only an empty state that has actually hydrated trims
   // the nav. Linking to a section AppSections skipped scrolls nowhere.
   const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
-  const navItems = NAV_ITEMS.filter((item) => visibleIds.includes(item.id));
+  // Off the single-page route (e.g. /privacy) a bare "#today" would resolve
+  // against the current document, where no section exists. Route home first.
+  const onHome = pathname === "/";
+  const navItems = [
+    ...NAV_ITEMS.filter((item) => visibleIds.includes(item.id)).map((item) => ({
+      key: item.id,
+      label: item.label,
+      href: onHome ? item.href : `/${item.href}`,
+      active: onHome && activeId === item.id,
+    })),
+    ...ROUTE_ITEMS.map((item) => ({
+      key: item.href,
+      label: item.label,
+      href: item.href,
+      active: pathname === item.href,
+    })),
+  ];
 
   // Scroll-spy: highlight the nav pill for the section currently in view.
   useEffect(() => {
@@ -57,7 +79,7 @@ export function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  const useMyLocation = () => {
+  const useMyLocation = useCallback(() => {
     if (!("geolocation" in navigator)) {
       toast.error("Geolocation not supported in this browser.");
       return;
@@ -83,7 +105,13 @@ export function Navbar() {
       () => toast.error("Location permission denied.", { id: "geo" }),
       { enableHighAccuracy: false, timeout: 8000 },
     );
-  };
+  }, [setPrefs]);
+
+  // Lets the footer's "Use my location" link run the navbar's handler.
+  useEffect(() => {
+    window.addEventListener(USE_LOCATION_EVENT, useMyLocation);
+    return () => window.removeEventListener(USE_LOCATION_EVENT, useMyLocation);
+  }, [useMyLocation]);
 
   return (
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
@@ -91,7 +119,7 @@ export function Navbar() {
         aria-label="Main"
         className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
       >
-        <Link href="#today" className="flex items-center gap-2.5 rounded-full">
+        <Link href={onHome ? "#today" : "/"} className="flex items-center gap-2.5 rounded-full">
           <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
           <span className="text-[17px] font-semibold tracking-tight">
             <span className="text-primary">Aero</span>
@@ -102,10 +130,10 @@ export function Navbar() {
         {/* Desktop nav pills */}
         <div className="ml-auto hidden items-center justify-between lg:flex">
           {navItems.map((item) => {
-            const active = activeId === item.id;
+            const active = item.active;
             return (
               <Link
-                key={item.href}
+                key={item.key}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
@@ -143,10 +171,10 @@ export function Navbar() {
               <div className="space-y-1 px-4 pb-8">
                 <SearchTrigger className="mb-3" />
                 {navItems.map((item) => {
-                  const active = activeId === item.id;
+                  const active = item.active;
                   return (
                     <Link
-                      key={item.href}
+                      key={item.key}
                       href={item.href}
                       onClick={() => setDrawerOpen(false)}
                       aria-current={active ? "page" : undefined}

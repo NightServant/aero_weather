@@ -61,7 +61,7 @@ export function SuggestedLocationsCarousel({ places, units, onOpenDetails, onSav
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${places.length}`}
-              className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6"
+              className="min-w-0 shrink-0 grow-0 basis-[78vw] pl-4 sm:basis-[280px] md:basis-[264px] md:pl-6 backdrop-blur"
             >
               <SuggestedLocationCard place={place} units={units} onOpenDetails={onOpenDetails} onSave={onSave} />
             </div>

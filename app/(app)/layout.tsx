@@ -3,7 +3,6 @@ import { Navbar } from "@/components/shell/navbar";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SkyBackground } from "@/components/shell/sky-background";
 import { ActiveForecastProvider } from "@/components/shell/active-forecast-context";
-import { FaqSection } from "@/components/sections/faq-section";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -19,7 +18,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Navbar />
         <main id="main" className="mx-auto w-full max-w-[1188px] flex-1 px-6 pb-16 pt-8 md:pt-10">
           {children}
-          <FaqSection />
         </main>
         <SiteFooter />
       </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/lib/api/types";
 import { usePrefs } from "@/hooks/use-prefs";
+import { FOCUS_SEARCH_EVENT } from "@/lib/ui-events";
 
 export function SearchTrigger({ className }: { className?: string }) {
   const [query, setQuery] = useState("");
@@ -32,8 +33,16 @@ export function SearchTrigger({ className }: { className?: string }) {
         inputRef.current?.blur();
       }
     };
+    const onFocusRequest = () => {
+      inputRef.current?.focus();
+      setOpen(true);
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(FOCUS_SEARCH_EVENT, onFocusRequest);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(FOCUS_SEARCH_EVENT, onFocusRequest);
+    };
   }, []);
 
   useEffect(() => {

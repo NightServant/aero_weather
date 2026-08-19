@@ -3,15 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, Info, ShieldCheck } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Info } from "lucide-react";
 import { usePrefs } from "@/hooks/use-prefs";
 import { visibleSectionIds } from "@/lib/sections";
+import { FOCUS_SEARCH_EVENT, USE_LOCATION_EVENT, emitUiEvent } from "@/lib/ui-events";
 import { InfoDialog, type InfoTopic } from "./info-dialog";
 
 /** Footer inventory is fixed by DESIGN-SPEC section 8. */
 const COLUMNS: {
   heading: string;
-  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic; icon?: React.ReactNode }[];
+  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic; event?: string; icon?: React.ReactNode }[];
 }[] = [
   {
     heading: "Weather",
@@ -25,8 +27,8 @@ const COLUMNS: {
   {
     heading: "Features",
     links: [
-      { label: "Search cities", href: "#locations" },
-      { label: "Use my location", href: "#today" },
+      { label: "Search cities", event: FOCUS_SEARCH_EVENT },
+      { label: "Use my location", event: USE_LOCATION_EVENT },
       { label: "Weather alerts", href: "#today" },
     ],
   },
@@ -38,7 +40,6 @@ const COLUMNS: {
       { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "About Aero", dialog: "about", icon: <Info className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
-      { label: "Privacy", href: "/privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
     ],
   },
 ];
@@ -46,16 +47,24 @@ const COLUMNS: {
 export function SiteFooter() {
   const [topic, setTopic] = useState<InfoTopic | null>(null);
   const [prefs, , hydrated] = usePrefs();
+  const pathname = usePathname();
+  const onHome = pathname === "/";
 
   // Same rule as the navbar: never link to a section AppSections did not render.
   const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
   const columns = COLUMNS.map((col) => ({
     ...col,
-    links: col.links.filter(
-      (link) =>
-        !link.href?.startsWith("#") ||
-        visibleIds.includes(link.href.slice(1) as (typeof visibleIds)[number]),
-    ),
+    links: col.links
+      .filter(
+        (link) =>
+          !link.href?.startsWith("#") ||
+          visibleIds.includes(link.href.slice(1) as (typeof visibleIds)[number]),
+      )
+      // Off the single-page route a bare hash resolves against the wrong
+      // document, so route home first and let the browser scroll on arrival.
+      .map((link) =>
+        !onHome && link.href?.startsWith("#") ? { ...link, href: `/${link.href}` } : link,
+      ),
   })).filter((col) => col.links.length > 0);
 
   return (
@@ -86,7 +95,12 @@ export function SiteFooter() {
                 ) : null;
                 return (
                   <li key={link.label} className="leading-[34px]">
-                    {link.dialog ? (
+                    {link.event ? (
+                      <button type="button" onClick={() => emitUiEvent(link.event!)} className={cls}>
+                        {link.label}
+                        {iconWrap}
+                      </button>
+                    ) : link.dialog ? (
                       <button type="button" onClick={() => setTopic(link.dialog!)} className={cls}>
                         {link.label}
                         {iconWrap}
