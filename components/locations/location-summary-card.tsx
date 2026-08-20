@@ -20,13 +20,16 @@ export function LocationSummaryCard({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col p-5 border-b border-white/12 md:border-b-0 md:border-l" data-animate="">
+    <div
+      className="flex min-w-0 flex-col border-b border-white/12 p-4 sm:p-5 md:border-b-0 md:border-l"
+      data-animate=""
+    >
       <div className="mb-3 flex items-center gap-2 text-muted-foreground">
         {icon}
         <h3 className="card-subtitle-caps">{label}</h3>
       </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="stat-value text-3xl truncate">{value}</span>
+      <div className="flex min-w-0 items-baseline gap-1.5">
+        <span className="stat-value min-w-0 break-words text-3xl sm:truncate">{value}</span>
         {unit ? (
           <span
             className={

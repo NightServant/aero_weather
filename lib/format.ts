@@ -19,47 +19,70 @@ export function windUnitLabel(unit: WindUnit): string {
   return "km/h";
 }
 
+/** An ISO-like local date, with or without a time, carrying no zone designator. */
+const WALL_CLOCK = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+
+/**
+ * Open-Meteo is queried with `timezone=auto`, so it returns times already
+ * localised to the place being viewed, written without an offset
+ * ("2026-08-19T06:10"), and calendar days with no time at all ("2026-08-19").
+ * Those are wall-clock readings, not instants: `new
+ * Date` reads them in the viewer's own zone, and formatting the result back
+ * into the place's zone shifts them a second time. Viewing New York from
+ * Manila turned a 6:10 AM sunrise into "6:10 PM".
+ *
+ * Re-anchor such strings as UTC and format them in UTC, so the digits printed
+ * are exactly the ones the API sent. Strings that do carry a Z or an offset
+ * are real instants and keep their normal conversion.
+ */
+export function resolveInstant(iso: string, timezone?: string): { date: Date; timeZone?: string } {
+  const m = WALL_CLOCK.exec(iso);
+  if (!m) return { date: new Date(iso), timeZone: timezone };
+  const utc = Date.UTC(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 0, m[5] ? +m[5] : 0, m[6] ? +m[6] : 0);
+  return { date: new Date(utc), timeZone: "UTC" };
+}
+
 export function formatTime(iso: string, format12h: boolean, timezone?: string): string {
-  const d = new Date(iso);
+  const { date, timeZone } = resolveInstant(iso, timezone);
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: format12h,
-    timeZone: timezone,
-  }).format(d);
+    timeZone,
+  }).format(date);
 }
 
 export function formatHour(iso: string, format12h: boolean, timezone?: string): string {
-  const d = new Date(iso);
+  const { date, timeZone } = resolveInstant(iso, timezone);
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     hour12: format12h,
-    timeZone: timezone,
-  }).format(d);
+    timeZone,
+  }).format(date);
 }
 
 export function formatDate(iso: string, timezone?: string): string {
-  const d = new Date(iso);
+  const { date, timeZone } = resolveInstant(iso, timezone);
   return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
-    timeZone: timezone,
-  }).format(d);
+    timeZone,
+  }).format(date);
 }
 
 export function formatShortDate(iso: string, timezone?: string): string {
-  const d = new Date(iso);
+  const { date, timeZone } = resolveInstant(iso, timezone);
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
-    timeZone: timezone,
-  }).format(d);
+    timeZone,
+  }).format(date);
 }
 
 export function formatWeekdayShort(iso: string, timezone?: string): string {
-  const d = new Date(iso);
-  return new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: timezone }).format(d);
+  const { date, timeZone } = resolveInstant(iso, timezone);
+  return new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone }).format(date);
 }
 
 export function relativeGreeting(date: Date = new Date(), timezone?: string): string {

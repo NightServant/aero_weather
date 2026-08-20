@@ -14,12 +14,12 @@ import type { PaletteKey } from "@/lib/prefs";
  */
 
 const SKY_PHOTOS: Partial<Record<PaletteKey, string>> = {
-  sunny: "/skies/sunny.jpg",
+  sunny: "/skies/sunny.webp",
   sunset: "/skies/sunset.webp",
-  rainy: "/skies/rainy.jpg",
+  rainy: "/skies/rainy.webp",
   stormy: "/skies/stormy.webp",
   cloudy: "/skies/cloudy.webp",
-  snowy: "/skies/snowy.jpg",
+  snowy: "/skies/snowy.webp",
   night: "/skies/night.webp",
 };
 

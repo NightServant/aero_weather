@@ -30,7 +30,17 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
   const region = [place.admin1, place.country].filter(Boolean).join(", ");
 
   return (
-    <div className="tint-card card-interactive relative w-full p-4">
+    <div className="group tint-card card-interactive relative w-full p-4">
+      {/* The card's hover lift promises a click target, so the whole surface is
+          the target. The info circle below is the visual cue for it, not a
+          second control. */}
+      <button
+        type="button"
+        onClick={() => onOpenDetails(place)}
+        aria-label={`Details for ${place.name}`}
+        className="absolute inset-0 z-10 rounded-[inherit] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+      />
+
       <div className="relative overflow-hidden rounded-[12px]">
         <CityPhoto
           place={place}
@@ -41,14 +51,12 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
         />
       </div>
 
-      <button
-        type="button"
-        onClick={() => onOpenDetails(place)}
-        aria-label={`Details for ${place.name}`}
-        className="absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 hover:bg-black/60 focus-visible:bg-black/60"
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 group-hover:bg-black/60"
       >
-        <Info className="size-4" strokeWidth={1.5} aria-hidden="true" />
-      </button>
+        <Info className="size-4" strokeWidth={1.5} />
+      </span>
 
       <div className="mt-3 min-w-0">
         <h3 className="truncate text-[0.9375rem] leading-snug font-semibold text-text-strong">

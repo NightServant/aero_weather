@@ -1,5 +1,3 @@
-import { GlassCard } from "@/components/aero/glass-card";
-
 /** Consistent in-flow section header (kicker + h2 title + optional subtitle). */
 export function SectionHeader({
   id,

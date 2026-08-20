@@ -85,7 +85,7 @@ export function LocationGallery({
             >
               <Image
                 src={url}
-                alt=""
+                alt={`Photo ${i + 1} of ${place.name}`}
                 fill
                 unoptimized
                 sizes="(max-width: 640px) 30vw, 160px"
@@ -118,7 +118,7 @@ export function LocationGallery({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={urls[index]}
-                alt=""
+                alt={`Photo ${index + 1} of ${place.name}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (hasMany) step(1);

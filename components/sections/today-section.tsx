@@ -5,7 +5,7 @@ import { CurrentConditions } from "@/components/today/current-conditions";
 import { UvIndexCard } from "@/components/today/detail-cards/uv-index-card";
 import { SunriseCard, SunsetCard } from "@/components/today/detail-cards/sunrise-sunset-card";
 import { HumidityCard } from "@/components/today/detail-cards/humidity-card";
-import { AlertCard } from "@/components/shell/alert-card";
+import { AirQualityCard } from "@/components/today/detail-cards/air-quality-card";
 import { useActiveForecast } from "@/components/shell/active-forecast-context";
 import { usePrefs } from "@/hooks/use-prefs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,7 @@ import { summarizeToday } from "@/lib/forecast-summary";
 
 /** Today section of the single-page scroll. Owns the page's only <h1>. */
 export function TodaySection() {
-  const { data, loading, error, place, hydrated } = useActiveForecast();
+  const { data, airQuality, loading, error, place, hydrated } = useActiveForecast();
   const [prefs] = usePrefs();
 
   if (!hydrated) return <TodaySkeleton />;
@@ -27,36 +27,42 @@ export function TodaySection() {
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 md:mx-auto md:my-auto">
-        <div className="grid gap-6 grid-cols-1 w-full lg:col-span-2">
+      <div className="grid grid-cols-1 gap-6 md:mx-auto md:my-auto lg:grid-cols-5">
+        <div className="flex w-full flex-col gap-6 lg:col-span-3">
           <GreetingHeader timezone={data.place.timezone} summary={summarizeToday(data)} />
-           <AlertCard />
+          <hr className="border-[var(--hairline)]" />
           <CurrentConditions forecast={data} place={place} units={prefs.units} />
         </div>
 
-        {/* Detail rail: horizontal snap-scroll carousel on smartphones (< sm),
-            reverting to the 2-col / vertical rail grid from sm upward. */}
-        <aside aria-label="Today's details" className="w-full lg:col-span-1 lg:mt-8">
+        {/* Detail rail. This was a snap-scroll carousel below sm, which at 320px
+            showed one of four cards through a scroller whose bar was hidden, so
+            nothing indicated the rest existed. These are comparable readings, so
+            they are a grid at every width: two up on phones, one up from lg. */}
+        <aside aria-label="Today's details" className="w-full lg:col-span-2 lg:mt-8">
           <ul
             role="list"
-            className="
-              -mx-4 flex list-none snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-              sm:mx-0 sm:grid sm:snap-none sm:content-start sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0
-              sm:auto-rows-fr sm:grid-cols-2 lg:grid-cols-1
-            "
+            className="grid list-none grid-cols-2 content-start gap-3 sm:gap-6"
           >
-            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+            {/* The two dial cards run full width and stack: at half width the
+                dial drops below a two-line title, where a full-width card is
+                wide enough to set them side by side and stay compact. Sunrise
+                and sunset pair below, humidity closes the rail. */}
+            {airQuality ? (
+              <li className="col-span-2 min-w-0">
+                <AirQualityCard usAqi={airQuality.usAqi} />
+              </li>
+            ) : null}
+            <li className="col-span-2 min-w-0">
+              <UvIndexCard uv={data.current.uvIndex} isDay={data.current.isDay} />
+            </li>
+            <li className="min-w-0">
               <SunriseCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
             </li>
-            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+            <li className="min-w-0">
               <SunsetCard sunriseIso={today.sunrise} sunsetIso={today.sunset} format12h={format12h} timezone={data.place.timezone} />
             </li>
-            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
+            <li className="col-span-2 min-w-0">
               <HumidityCard current={data.current} unit={prefs.units.temperature} />
-            </li>
-            <li className="min-w-0 shrink-0 basis-full snap-start sm:basis-auto">
-              <UvIndexCard uv={data.current.uvIndex} isDay={data.current.isDay} />
             </li>
           </ul>
         </aside>
@@ -70,9 +76,9 @@ export function TodaySection() {
 function TodaySkeleton() {
   return (
     <div aria-busy="true" className="space-y-8">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Hero column */}
-        <div className="grid content-start gap-8 lg:col-span-2">
+        <div className="grid content-start gap-8 lg:col-span-3">
           <div className="mt-8 space-y-3 text-center lg:text-left">
             <Skeleton aria-hidden="true" className="mx-auto h-10 w-64 max-w-full rounded-2xl lg:mx-0" />
             <Skeleton aria-hidden="true" className="mx-auto h-5 w-80 max-w-full rounded-lg lg:mx-0" />
@@ -89,13 +95,14 @@ function TodaySkeleton() {
           </div>
         </div>
 
-        {/* Detail rail: horizontal on phones, 2-up on sm, stacked on lg. */}
-        <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:px-0 lg:col-span-1 lg:mt-8 lg:grid-cols-1">
-          {[0, 1, 2, 3].map((i) => (
+        {/* Detail rail: 2-up on phones and sm, stacked on lg. Mirrors the real
+            grid so the layout does not shift when the data lands. */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:col-span-2 lg:mt-8">
+          {[0, 1, 2, 3, 4].map((i) => (
             <Skeleton
               key={i}
               aria-hidden="true"
-              className="h-[132px] w-[78vw] shrink-0 rounded-2xl sm:w-auto"
+              className={`h-[132px] rounded-2xl ${i === 0 ? "col-span-2 lg:col-span-1" : ""}`}
             />
           ))}
         </div>

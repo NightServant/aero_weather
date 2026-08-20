@@ -1,6 +1,13 @@
 import { AppSections } from "@/components/sections/app-sections";
+import { HashScroll } from "@/components/shell/hash-scroll";
 
-/** Single scrolling page: all four areas stacked as anchor-linked sections. */
+/** Single scrolling page: Today, 2-week, and Locations stacked as anchor-linked
+ *  sections. Settings and FAQ live at their own routes (`/settings`, `/faq`). */
 export default function AppHome() {
-  return <AppSections />;
+  return (
+    <>
+      <HashScroll />
+      <AppSections />
+    </>
+  );
 }

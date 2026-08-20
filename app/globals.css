@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
-  --font-mono: var(--font-poppins);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-heading: var(--font-poppins);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -217,36 +217,39 @@
   .text-display-temp {
     /* Fluid on phones: the old 4rem floor never shrank below 64px, which forced
        the icon + temperature row to wrap on narrow screens. */
-    font-size: clamp(3rem, 15vw, 6.5rem);
+    /* 22vw reaches the 6.5rem cap at ~473px, so tablet and desktop are
+       unchanged; below that the hero grows instead of sitting at a 3rem floor
+       barely larger than a section headline. */
+    font-size: clamp(3rem, 22vw, 6.5rem);
     line-height: 1;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
     color: var(--primary);
     font-variant-numeric: tabular-nums;
   }
   .text-headline {
-    font-size: clamp(2.25rem, 4vw, 3rem);
+    font-size: clamp(1.75rem, 4vw, 3rem);
     line-height: 1.12;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--primary);
   }
   .text-subtitle {
-    font-size: 1.125rem;
-    line-height: 1.5;
+    font-size: clamp(1rem, 3.6vw, 1.1875rem);
+    line-height: 1.55;
     font-weight: 400;
     color: var(--muted-foreground);
   }
   .kicker {
-    font-size: 1rem;
+    font-size: clamp(0.8125rem, 2.6vw, 1rem);
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--foreground);
   }
   .card-title-caps {
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 2.6vw, 1rem);
     line-height: 1.3;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -443,34 +446,6 @@ html.js [data-animate] {
 .animate-float { animation: aero-float 6s ease-in-out infinite alternate; }
 .animate-droplet { animation: aero-droplet 1.6s ease-in infinite; }
 
-/* Infinite horizontal marquee for the 14-day forecast. The track holds two
-   identical copies of the cards and slides 0 -> -50%; because every card carries
-   the same trailing margin (including the last), -50% lands copy #2 exactly on
-   copy #1's origin for a seamless, gapless loop. Pauses on hover/focus. */
-.marquee {
-  overflow: hidden;
-  /* fade the leading/trailing edges so cards enter and exit gracefully */
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: aero-marquee 60s linear infinite;
-}
-.marquee-track > li {
-  margin-right: 1.5rem;
-}
-.marquee:hover .marquee-track,
-.marquee:focus-within .marquee-track {
-  animation-play-state: paused;
-}
-
-@keyframes aero-marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
 /* Global kill switch (spec 4, mandatory). */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -480,17 +455,5 @@ html.js [data-animate] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  /* Marquee: stop the motion, drop the duplicate copy, and let users scroll it
-     by hand instead. animation-name:none makes the forced 0.01ms duration moot. */
-  .marquee {
-    overflow-x: auto;
-  }
-  .marquee-track {
-    animation: none;
-  }
-  .marquee-dup {
-    display: none;
   }
 }

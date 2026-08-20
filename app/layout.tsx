@@ -3,17 +3,40 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_URL } from "./robots";
+import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsConsent } from "@/components/shell/analytics-consent";
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
+const DESCRIPTION =
+  "A local-first weather companion with current conditions and a 14-day outlook for any city. Free for everyone, no sign-up required.";
+
 export const metadata: Metadata = {
-  title: "AeroWeather",
-  description: "A local-first weather companion. Free for everyone, no sign-up.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "AeroWeather - Local-First Weather Forecasts",
+    template: "%s | AeroWeather",
+  },
+  description: DESCRIPTION,
+  applicationName: "AeroWeather",
+  openGraph: {
+    title: "AeroWeather - Local-First Weather Forecasts",
+    description: DESCRIPTION,
+    url: "/",
+    siteName: "AeroWeather",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AeroWeather - Local-First Weather Forecasts",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -38,6 +61,8 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster />
+          <AnalyticsConsent />
+          <Analytics />
         </Providers>
       </body>
     </html>

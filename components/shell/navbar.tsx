@@ -3,54 +3,118 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
 import { SearchTrigger } from "@/components/search/search-trigger";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
+import { pickActiveSection, visibleSectionIds, type SectionBox } from "@/lib/sections";
+import { USE_LOCATION_EVENT } from "@/lib/ui-events";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { id: "today", href: "#today", label: "Today" },
   { id: "forecast", href: "#forecast", label: "2-week" },
   { id: "locations", href: "#locations", label: "Locations" },
-  { id: "settings", href: "#settings", label: "Settings" },
+] as const;
+
+/** Real routes, not in-page anchors: never scroll-spied, matched on pathname. */
+const ROUTE_ITEMS = [{ href: "/settings", label: "Settings" }] as const;
+
+/** Reference pages: in the small-screen menu and the footer, not the desktop bar. */
+const SECONDARY_ITEMS = [
+  { href: "/search", label: "Search" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/privacy", label: "Privacy" },
 ] as const;
 
 export function Navbar() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("today");
-  const [, setPrefs] = usePrefs();
+  const [prefs, setPrefs, hydrated] = usePrefs();
+  const pathname = usePathname();
 
-  // Scroll-spy: highlight the nav pill for the section currently in view.
+  const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
+  const onHome = pathname === "/";
+  const navItems = [
+    ...NAV_ITEMS.filter((item) => visibleIds.includes(item.id)).map((item) => ({
+      key: item.id,
+      label: item.label,
+      href: onHome ? item.href : `/${item.href}`,
+      active: onHome && activeId === item.id,
+    })),
+    ...ROUTE_ITEMS.map((item) => ({
+      key: item.href,
+      label: item.label,
+      href: item.href,
+      active: pathname === item.href,
+    })),
+  ];
+
+  // The menu is the small-screen home for everything, primary and secondary.
+  const menuItems = [
+    ...navItems,
+    ...SECONDARY_ITEMS.map((item) => ({
+      key: item.href,
+      label: item.label,
+      href: item.href,
+      active: pathname === item.href,
+    })),
+  ];
+
+  // Scroll-spy. Measuring on scroll is deterministic: an IntersectionObserver
+  // over a mid-viewport band only fired while crossing it, so the highlight
+  // lagged, and a short final section never reached the band at all.
   useEffect(() => {
-    const sections = NAV_ITEMS.map((i) => document.getElementById(i.id)).filter(
-      (el): el is HTMLElement => el !== null,
-    );
-    if (sections.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActiveId(visible.target.id);
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] },
-    );
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    if (!onHome) return;
+    let frame = 0;
 
-  const useMyLocation = () => {
+    const measure = () => {
+      frame = 0;
+      const boxes: SectionBox[] = [];
+      for (const item of NAV_ITEMS) {
+        const el = document.getElementById(item.id);
+        if (el) boxes.push({ id: item.id, top: el.getBoundingClientRect().top + window.scrollY });
+      }
+      const next = pickActiveSection(
+        boxes,
+        window.scrollY,
+        window.innerHeight,
+        document.documentElement.scrollHeight,
+      );
+      if (next) setActiveId(next);
+    };
+
+    const schedule = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    // Sections mount and grow as prefs hydrate and forecasts load, which moves
+    // every offset measured above.
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      observer.disconnect();
+    };
+  }, [onHome]);
+
+  const useMyLocation = useCallback(() => {
     if (!("geolocation" in navigator)) {
       toast.error("Geolocation not supported in this browser.");
       return;
@@ -76,87 +140,98 @@ export function Navbar() {
       () => toast.error("Location permission denied.", { id: "geo" }),
       { enableHighAccuracy: false, timeout: 8000 },
     );
-  };
+  }, [setPrefs]);
+
+  // Lets the footer's "Use my location" link run this handler.
+  useEffect(() => {
+    window.addEventListener(USE_LOCATION_EVENT, useMyLocation);
+    return () => window.removeEventListener(USE_LOCATION_EVENT, useMyLocation);
+  }, [useMyLocation]);
+
+  // /search renders its own header (back arrow plus the field itself).
+  if (pathname === "/search") return null;
 
   return (
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
+      {/* Desktop has room to show where you can go, so it does: the links sit
+          in the bar and the search takes a fixed slot beside them. Below lg
+          there is no such room, so the links collapse behind one menu and the
+          search spreads into the space they left. */}
       <nav
         aria-label="Main"
-        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
+        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 xl:grid xl:grid-cols-[1fr_auto_1fr]"
       >
-        <Link href="#today" className="flex items-center gap-2.5 rounded-full">
-          <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
-          <span className="text-[17px] font-semibold tracking-tight">
-            <span className="text-primary">Aero</span>
-            <span className="text-foreground">Weather</span>
-          </span>
-        </Link>
-
-        {/* Desktop nav pills */}
-        <div className="ml-auto hidden items-center justify-between lg:flex">
-          {NAV_ITEMS.map((item) => {
-            const active = activeId === item.id;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "rounded-full px-3.5 py-2 text-[15px] transition-colors duration-150",
-                  active
-                    ? "font-medium text-primary"
-                    : "text-muted-foreground hover:text-primary",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="ml-auto flex items-center gap-2 lg:ml-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link
+            href={onHome ? "#today" : "/"}
+            className="hidden shrink-0 items-center gap-2.5 rounded-full sm:flex"
+          >
+            <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
+            <span className="text-[17px] font-semibold tracking-tight">
+              <span className="text-primary">Aero</span>
+              <span className="text-foreground">Weather</span>
+            </span>
+          </Link>
           <IconCircleButton
             label="Use my location"
             onClick={useMyLocation}
             icon={<MapPin className="size-4" strokeWidth={1.5} />}
+            className="max-[359px]:hidden"
           />
-          <SearchTrigger className="hidden w-[210px] lg:block lg:w-[289px]" />
+        </div>
 
-          {/* Mobile menu */}
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <DrawerTrigger asChild>
-              <span className="lg:hidden">
-                <IconCircleButton label="Menu" icon={<Menu className="size-4" strokeWidth={1.5} />} />
-              </span>
-            </DrawerTrigger>
-            <DrawerContent aria-label="Menu">
-              <DrawerHeader>
-                <DrawerTitle>Menu</DrawerTitle>
-              </DrawerHeader>
-              <div className="space-y-1 px-4 pb-8">
-                <SearchTrigger className="mb-3" />
-                {NAV_ITEMS.map((item) => {
-                  const active = activeId === item.id;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setDrawerOpen(false)}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex h-12 items-center rounded-xl px-4 text-[15px] transition-colors",
-                        active
-                          ? "bg-primary/15 font-medium text-primary"
-                          : "text-foreground hover:bg-white/[0.06]",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            </DrawerContent>
-          </Drawer>
+        <div className="hidden items-center lg:ml-auto lg:flex xl:ml-0 xl:justify-self-center">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              aria-current={item.active ? "page" : undefined}
+              className={cn(
+                "rounded-full px-3 py-2 text-[15px] transition-colors duration-150",
+                item.active
+                  ? "font-medium text-primary"
+                  : "text-muted-foreground hover:text-primary",
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex min-w-0 flex-1 items-center gap-2 lg:ml-3 lg:flex-none xl:justify-self-end">
+          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:max-w-[360px] lg:flex-1 xl:w-[360px] xl:max-w-none xl:flex-none xl:shrink-0" />
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <IconCircleButton
+              label="Menu"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              icon={<Menu className="size-4" strokeWidth={1.5} />}
+              className="lg:hidden"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={10}
+            className="w-56 border-white/12"
+            style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
+          >
+            {menuItems.map((item) => (
+              <DropdownMenuItem key={item.key} asChild>
+                <Link
+                  href={item.href}
+                  aria-current={item.active ? "page" : undefined}
+                  className={cn(
+                    "flex h-10 cursor-pointer items-center rounded-lg px-3 text-[15px]",
+                    item.active ? "font-medium text-primary" : "text-foreground",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         </div>
       </nav>
     </header>

@@ -3,13 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, Info, ShieldCheck } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Info, ShieldCheck, HelpCircle } from "lucide-react";
+import { usePrefs } from "@/hooks/use-prefs";
+import { visibleSectionIds } from "@/lib/sections";
+import { FOCUS_SEARCH_EVENT, USE_LOCATION_EVENT, emitUiEvent } from "@/lib/ui-events";
 import { InfoDialog, type InfoTopic } from "./info-dialog";
 
 /** Footer inventory is fixed by DESIGN-SPEC section 8. */
 const COLUMNS: {
   heading: string;
-  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic; icon?: React.ReactNode }[];
+  links: { label: string; href?: string; external?: boolean; dialog?: InfoTopic; event?: string; icon?: React.ReactNode }[];
 }[] = [
   {
     heading: "Weather",
@@ -17,14 +21,14 @@ const COLUMNS: {
       { label: "Today", href: "#today" },
       { label: "2-week outlook", href: "#forecast" },
       { label: "Locations", href: "#locations" },
-      { label: "Settings", href: "#settings" },
+      { label: "Settings", href: "/settings" },
     ],
   },
   {
     heading: "Features",
     links: [
-      { label: "Search cities", href: "#locations" },
-      { label: "Use my location", href: "#today" },
+      { label: "Search cities", event: FOCUS_SEARCH_EVENT },
+      { label: "Use my location", event: USE_LOCATION_EVENT },
       { label: "Weather alerts", href: "#today" },
     ],
   },
@@ -36,13 +40,34 @@ const COLUMNS: {
       { label: "UV index scale", href: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "US AQI categories", href: "https://www.airnow.gov/aqi/aqi-basics/", external: true, icon: <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
       { label: "About Aero", dialog: "about", icon: <Info className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
-      { label: "Privacy", dialog: "privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "FAQ", href: "/faq", icon: <HelpCircle className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
+      { label: "Privacy", href: "/privacy", icon: <ShieldCheck className="size-3.5" strokeWidth={1.5} aria-hidden="true" /> },
     ],
   },
 ];
 
 export function SiteFooter() {
   const [topic, setTopic] = useState<InfoTopic | null>(null);
+  const [prefs, , hydrated] = usePrefs();
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+
+  // Same rule as the navbar: never link to a section AppSections did not render.
+  const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
+  const columns = COLUMNS.map((col) => ({
+    ...col,
+    links: col.links
+      .filter(
+        (link) =>
+          !link.href?.startsWith("#") ||
+          visibleIds.includes(link.href.slice(1) as (typeof visibleIds)[number]),
+      )
+      // Off the single-page route a bare hash resolves against the wrong
+      // document, so route home first and let the browser scroll on arrival.
+      .map((link) =>
+        !onHome && link.href?.startsWith("#") ? { ...link, href: `/${link.href}` } : link,
+      ),
+  })).filter((col) => col.links.length > 0);
 
   return (
     <footer className="mt-16 border-t border-white/[0.08] bg-[oklch(0.25_0.03_240/0.6)] backdrop-blur">
@@ -58,7 +83,7 @@ export function SiteFooter() {
           <p className="caption mt-1">Local-first weather. Free for everyone, no sign-up.</p>
         </div>
 
-        {COLUMNS.map((col) => (
+        {columns.map((col) => (
           <nav key={col.heading} aria-label={col.heading}>
             <h2 className="text-[15px] font-semibold text-foreground">{col.heading}</h2>
             <ul className="mt-3">
@@ -72,13 +97,18 @@ export function SiteFooter() {
                 ) : null;
                 return (
                   <li key={link.label} className="leading-[34px]">
-                    {link.dialog ? (
+                    {link.event ? (
+                      <button type="button" onClick={() => emitUiEvent(link.event!)} className={cls}>
+                        {link.label}
+                        {iconWrap}
+                      </button>
+                    ) : link.dialog ? (
                       <button type="button" onClick={() => setTopic(link.dialog!)} className={cls}>
                         {link.label}
                         {iconWrap}
                       </button>
                     ) : link.external ? (
-                      <a href={link.href} target="_blank" rel="noreferrer" className={cls}>
+                      <a href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>
                         {link.label}
                         {iconWrap}
                       </a>
@@ -98,7 +128,7 @@ export function SiteFooter() {
 
       <div className="bg-white/[0.06] backdrop-blur">
         <div className="mx-auto flex max-w-[1188px] flex-col gap-1 px-6 py-3 text-[13px] text-text-mid sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 Aero · v1.0.0</p>
+          <p>© {new Date().getFullYear()} Aero · v1.0.0</p>
           <div className="sm:text-right">
             <p>Weather data © Open-Meteo (CC BY 4.0) · Made with Next.js</p>
             <p>
@@ -106,7 +136,7 @@ export function SiteFooter() {
               <a
                 href="https://commons.wikimedia.org/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="underline-offset-2 transition-colors duration-150 hover:text-foreground hover:underline"
               >
                 Wikimedia Commons
@@ -115,7 +145,7 @@ export function SiteFooter() {
               <a
                 href="https://stocksnap.io/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="underline-offset-2 transition-colors duration-150 hover:text-foreground hover:underline"
               >
                 StockSnap
