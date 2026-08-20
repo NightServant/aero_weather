@@ -21,7 +21,7 @@ export function SummaryCardsSection({ places, forecasts, activeId, units }: Prop
   const iconCls = "size-4";
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-6 xl:grid-cols-4">
       <LocationSummaryCard
         label="Saved"
         icon={<MapPin className={iconCls} strokeWidth={1.5} aria-hidden="true" />}
