@@ -7,7 +7,7 @@ import { EmptyLocation } from "@/components/shell/empty-location";
 import { usePrefs } from "@/hooks/use-prefs";
 
 function Divider() {
-  return <hr className="border-white/[0.06]" />;
+  return <hr className="border-[var(--hairline)]" />;
 }
 
 /**

@@ -63,7 +63,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
   return (
     <section
       aria-label="Current conditions"
-      className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0"
+      className="flex w-full flex-col gap-6"
     >
       {/* 1. Where and when, plus any advisory: the context the reading needs. */}
       <div className="stagger-5 grid gap-6 md:grid-cols-2">
@@ -90,7 +90,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         ) : null}
       </div>
-      <div className="stagger-4 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4">
+      <div className="stagger-4 flex flex-col items-center gap-1 py-2 sm:flex-row sm:items-center sm:gap-10 sm:py-4">
         <span className="animate-float shrink-0">
           <AnimatedWeatherIcon
             kind={kind}

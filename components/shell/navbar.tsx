@@ -28,8 +28,10 @@ const NAV_ITEMS = [
 ] as const;
 
 /** Real routes, not in-page anchors: never scroll-spied, matched on pathname. */
-const ROUTE_ITEMS = [
-  { href: "/settings", label: "Settings" },
+const ROUTE_ITEMS = [{ href: "/settings", label: "Settings" }] as const;
+
+/** Reference pages: in the small-screen menu and the footer, not the desktop bar. */
+const SECONDARY_ITEMS = [
   { href: "/faq", label: "FAQ" },
   { href: "/privacy", label: "Privacy" },
 ] as const;
@@ -50,6 +52,17 @@ export function Navbar() {
       active: onHome && activeId === item.id,
     })),
     ...ROUTE_ITEMS.map((item) => ({
+      key: item.href,
+      label: item.label,
+      href: item.href,
+      active: pathname === item.href,
+    })),
+  ];
+
+  // The menu is the small-screen home for everything, primary and secondary.
+  const menuItems = [
+    ...navItems,
+    ...SECONDARY_ITEMS.map((item) => ({
       key: item.href,
       label: item.label,
       href: item.href,
@@ -145,9 +158,12 @@ export function Navbar() {
         className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr]"
       >
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link href={onHome ? "#today" : "/"} className="flex shrink-0 items-center gap-2.5 rounded-full">
+          <Link
+            href={onHome ? "#today" : "/"}
+            className="hidden shrink-0 items-center gap-2.5 rounded-full sm:flex"
+          >
             <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
-            <span className="hidden text-[17px] font-semibold tracking-tight sm:inline">
+            <span className="text-[17px] font-semibold tracking-tight">
               <span className="text-primary">Aero</span>
               <span className="text-foreground">Weather</span>
             </span>
@@ -196,7 +212,7 @@ export function Navbar() {
             className="w-56 border-white/12"
             style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
           >
-            {navItems.map((item) => (
+            {menuItems.map((item) => (
               <DropdownMenuItem key={item.key} asChild>
                 <Link
                   href={item.href}
