@@ -96,7 +96,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
             kind={kind}
             isDay={c.isDay}
             size={220}
-            className="max-sm:!h-[112px] max-sm:!w-[112px]"
+            className="!h-[calc(var(--hero-temp)*2.1)] !w-[calc(var(--hero-temp)*2.1)]"
           />
         </span>
         <p aria-live="polite" className="text-display-temp min-w-0 whitespace-nowrap">
