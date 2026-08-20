@@ -35,7 +35,7 @@ const WALL_CLOCK = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?$/
  * are exactly the ones the API sent. Strings that do carry a Z or an offset
  * are real instants and keep their normal conversion.
  */
-function resolveInstant(iso: string, timezone?: string): { date: Date; timeZone?: string } {
+export function resolveInstant(iso: string, timezone?: string): { date: Date; timeZone?: string } {
   const m = WALL_CLOCK.exec(iso);
   if (!m) return { date: new Date(iso), timeZone: timezone };
   const utc = Date.UTC(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 0, m[5] ? +m[5] : 0, m[6] ? +m[6] : 0);

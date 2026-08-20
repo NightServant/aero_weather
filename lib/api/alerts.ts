@@ -1,4 +1,5 @@
 import type { Forecast } from "./types";
+import { resolveInstant } from "../format";
 import { weatherCodeToKind } from "./weather-code";
 
 export type AlertSeverity = "advisory" | "watch" | "warning";
@@ -70,13 +71,21 @@ export function deriveAlerts(forecast: Forecast): WeatherAlert[] {
 }
 
 function labelForDay(iso: string, tz?: string): string {
-  const d = new Date(iso);
-  return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: tz }).format(d);
+  const { date, timeZone } = resolveInstant(iso, tz);
+  return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone }).format(date);
 }
 
-function formatWindow(startIso: string, endIso: string, tz?: string): string {
-  const opts: Intl.DateTimeFormatOptions = { hour: "numeric", timeZone: tz };
-  const s = new Intl.DateTimeFormat("en-US", opts).format(new Date(startIso));
-  const e = new Intl.DateTimeFormat("en-US", opts).format(new Date(endIso));
-  return `${s} to ${e}`;
+/**
+ * Open-Meteo returns wall-clock strings, so these go through resolveInstant
+ * like every other time in the app: parsing them as instants shifted the
+ * window by the viewer's offset. A window one hour long reads as a single
+ * time, since "1 PM to 1 PM" looks like a fault rather than a short storm.
+ */
+export function formatWindow(startIso: string, endIso: string, tz?: string): string {
+  const opts: Intl.DateTimeFormatOptions = { hour: "numeric" };
+  const start = resolveInstant(startIso, tz);
+  const end = resolveInstant(endIso, tz);
+  const s = new Intl.DateTimeFormat("en-US", { ...opts, timeZone: start.timeZone }).format(start.date);
+  const e = new Intl.DateTimeFormat("en-US", { ...opts, timeZone: end.timeZone }).format(end.date);
+  return s === e ? `around ${s}` : `${s} to ${e}`;
 }

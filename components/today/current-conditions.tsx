@@ -1,6 +1,6 @@
 "use client";
 
-import { Wind, Calendar, Thermometer, Eye, Gauge, Cloudy } from "lucide-react";
+import { Wind, Calendar, Bell, Thermometer, Eye, Gauge, Cloudy } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import {
   compassToWord,
@@ -10,6 +10,7 @@ import {
   windUnitLabel,
 } from "@/lib/format";
 import { weatherCodeToKind, WEATHER_LABEL } from "@/lib/api/weather-code";
+import { deriveAlerts } from "@/lib/api/alerts";
 import {
   cloudCoverNote,
   feelsLikeNote,
@@ -57,19 +58,35 @@ export function CurrentConditions({ forecast, place, units }: Props) {
     .format(new Date())
     .toUpperCase();
   const location = [place.name, place.country].filter(Boolean).join(", ").toUpperCase();
+  const [alert] = deriveAlerts(forecast);
 
   return (
     <section
       aria-label="Current conditions"
       className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0"
     >
-      {/* 1. Where and when, so the reading below has a subject. */}
-      <div className="stagger-5 flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
-        <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
-        <div>
-          <h2 className="card-title-caps">Today - {dateline}</h2>
-          <p className="card-subtitle-caps mt-1">{location}</p>
+      {/* 1. Where and when, plus any advisory: the context the reading needs. */}
+      <div className="stagger-5 grid gap-6 md:grid-cols-2">
+        <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+          <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
+          <div className="min-w-0">
+            <h2 className="card-title-caps">Today - {dateline}</h2>
+            <p className="card-subtitle-caps mt-1">{location}</p>
+          </div>
         </div>
+
+        {alert ? (
+          <div
+            role="status"
+            className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6"
+          >
+            <Bell className="size-6 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />
+            <div className="min-w-0">
+              <h2 className="card-title-caps">{alert.title}</h2>
+              <p className="caption mt-0.5">{alert.summary}</p>
+            </div>
+          </div>
+        ) : null}
       </div>
       <div className="stagger-4 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4">
         <span className="animate-float shrink-0">
@@ -86,7 +103,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </p>
       </div>
 
-      <div className="stagger-5 flex flex-wrap gap-6">
+      <div className="stagger-5 grid gap-6 md:grid-cols-2">
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>

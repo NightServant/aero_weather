@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { deriveAlerts } from "./alerts";
+import { deriveAlerts, formatWindow } from "./alerts";
 import type { Forecast, DailyPoint, HourlyPoint } from "./types";
 
 const hour = (weatherCode: number, time = "2026-01-01T12:00:00Z"): HourlyPoint => ({
@@ -77,5 +77,32 @@ describe("deriveAlerts", () => {
     );
     expect(alerts).toHaveLength(1);
     expect(alerts[0].severity).toBe("watch");
+  });
+});
+
+describe("formatWindow", () => {
+  // Open-Meteo hourly entries are wall-clock strings for the queried place.
+  // Parsing them as instants shifted the window by the viewer's own offset,
+  // so a New York storm read at Manila hours.
+  it("keeps the stated hours whatever zone the reader is in", () => {
+    expect(formatWindow("2026-08-21T13:00", "2026-08-21T16:00", "America/New_York")).toBe(
+      "1 PM to 4 PM",
+    );
+    expect(formatWindow("2026-08-21T13:00", "2026-08-21T16:00", "Asia/Manila")).toBe(
+      "1 PM to 4 PM",
+    );
+  });
+
+  it("reads a single-hour window as one time, not a range to itself", () => {
+    // Previously rendered "1 PM to 1 PM", which looks like a fault.
+    expect(formatWindow("2026-08-21T13:00", "2026-08-21T13:00", "Asia/Manila")).toBe(
+      "around 1 PM",
+    );
+  });
+
+  it("still converts a real instant that carries an offset", () => {
+    expect(formatWindow("2026-08-21T13:00:00Z", "2026-08-21T15:00:00Z", "UTC")).toBe(
+      "1 PM to 3 PM",
+    );
   });
 });

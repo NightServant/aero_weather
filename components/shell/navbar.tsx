@@ -133,15 +133,15 @@ export function Navbar() {
 
   return (
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
-      {/* Three zones: identity and the location control on the left, search
-          centred in the free space, navigation collected behind one menu on the
-          right. The links were five text targets competing with the wordmark
-          and the search field for the same bar. */}
+      {/* Desktop has room to show where you can go, so it does: the links sit
+          in the bar and the search takes a fixed slot beside them. Below lg
+          there is no such room, so the links collapse behind one menu and the
+          search spreads into the space they left. */}
       <nav
         aria-label="Main"
-        className="tint-card backdrop-blur mx-auto grid h-16 max-w-[1200px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6"
+        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6"
       >
-        <Link href={onHome ? "#today" : "/"} className="flex items-center gap-2.5 rounded-full">
+        <Link href={onHome ? "#today" : "/"} className="flex shrink-0 items-center gap-2.5 rounded-full">
           <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
           <span className="hidden text-[17px] font-semibold tracking-tight sm:inline">
             <span className="text-primary">Aero</span>
@@ -149,9 +149,27 @@ export function Navbar() {
           </span>
         </Link>
 
-        <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px]" />
+        <div className="hidden items-center lg:ml-4 lg:flex lg:shrink-0">
+          {navItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              aria-current={item.active ? "page" : undefined}
+              className={cn(
+                "rounded-full px-3.5 py-2 text-[15px] transition-colors duration-150",
+                item.active
+                  ? "font-medium text-primary"
+                  : "text-muted-foreground hover:text-primary",
+              )}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
 
-        <div className="flex items-center gap-2">
+        <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:ml-4 lg:w-auto lg:max-w-[420px] lg:flex-1" />
+
+        <div className="flex shrink-0 items-center gap-2">
           <IconCircleButton
             label="Use my location"
             onClick={useMyLocation}
@@ -165,6 +183,7 @@ export function Navbar() {
               aria-haspopup="menu"
               aria-expanded={menuOpen}
               icon={<Menu className="size-4" strokeWidth={1.5} />}
+              className="lg:hidden"
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent
