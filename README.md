@@ -4,6 +4,8 @@
 
 # AeroWeather
 
+**Live: <https://aero-weather-nightservants-projects.vercel.app>**
+
 A modern weather web app built with Next.js 16 (App Router, Turbopack) and React 19. AeroWeather shows current conditions and a two-week outlook for any city in the world, presented as a single scrolling page with a dark glassmorphic interface and weather-driven gradient palettes.
 
 ## 1. App Overview
@@ -150,18 +152,46 @@ Both are optional; the app runs without them.
 
 | Variable | Effect when unset |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | The origin is inferred instead: from `VERCEL_PROJECT_PRODUCTION_URL` on Vercel, `VERCEL_BRANCH_URL` on a preview, and `http://localhost:3000` otherwise. Only set this for a custom domain. |
+| `NEXT_PUBLIC_SITE_URL` | The origin is inferred: from `VERCEL_PROJECT_PRODUCTION_URL` on Vercel, `VERCEL_BRANCH_URL` on a preview, `http://localhost:3000` otherwise. Set it for a custom domain, or wherever inference does not work (see Deployment). |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics stays dormant and the consent prompt never appears. Set a `G-XXXXXXXXXX` measurement id to enable the opt-in flow. |
 
 Both are read at build time, so a change to either needs a redeploy rather than
 just a new value: every route is prerendered and the origin is baked into
 `robots.txt`, `sitemap.xml`, and the Open Graph tags.
 
-**Deploying:** Vercel is the better fit. The build is fully static (every route
-prerendered, no server rendering, no database), and the Next.js 16 metadata routes
-this app uses — `opengraph-image`, `robots`, `sitemap` — are first-party there rather
-than going through a compatibility layer. Import the repo and deploy: no
-environment variables are required, because the origin resolves from Vercel's own.
+### Deployment
+
+Vercel is the better fit. The build is fully static (every route prerendered, no
+server rendering, no database), and the Next.js 16 metadata routes this app uses
+— `opengraph-image`, `robots`, `sitemap` — are first-party there rather than
+going through a compatibility layer. Import the repo and deploy; with the CLI
+linked, `vercel --prod` deploys from the working copy.
+
+Three things about the current deployment are worth knowing, each of which cost
+a debugging round to find:
+
+- **`NEXT_PUBLIC_SITE_URL` is set in Production and needs to stay set.**
+  `VERCEL_PROJECT_PRODUCTION_URL` is not exposed in this project's builds, so
+  without the override the origin resolves to `http://localhost:3000` and that
+  gets baked into `robots.txt`, the sitemap, and the Open Graph tags. Removing
+  the project's broken custom domain did not change this, so the domain was not
+  the cause.
+- **Deployment Protection has to stay disabled while the app is on a
+  `.vercel.app` address.** Standard Protection exempts custom production
+  domains, not generated Vercel URLs, so with no custom domain it puts the
+  whole public site behind an SSO redirect, `robots.txt` included. Re-enable it
+  once a custom domain exists, and check the result with an unauthenticated
+  `curl` rather than trusting the setting's name.
+- **The site cannot be indexed yet.** Vercel serves `x-robots-tag: noindex` on
+  every `.vercel.app` URL, and a response header overrides `robots.txt`. Only a
+  custom domain lifts it. Link previews are unaffected: they read the Open Graph
+  tags and ignore that header.
+
+After any change to either variable, verify rather than assume:
+
+```bash
+curl -s https://YOUR-DOMAIN/robots.txt   # the Sitemap: line must name your domain
+```
 
 ## 6. Privacy and analytics
 
