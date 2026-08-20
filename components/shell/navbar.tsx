@@ -25,11 +25,14 @@ const NAV_ITEMS = [
   { id: "today", href: "#today", label: "Today" },
   { id: "forecast", href: "#forecast", label: "2-week" },
   { id: "locations", href: "#locations", label: "Locations" },
-  { id: "settings", href: "#settings", label: "Settings" },
 ] as const;
 
 /** Real routes, not in-page anchors: never scroll-spied, matched on pathname. */
-const ROUTE_ITEMS = [{ href: "/privacy", label: "Privacy" }] as const;
+const ROUTE_ITEMS = [
+  { href: "/settings", label: "Settings" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/privacy", label: "Privacy" },
+] as const;
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);

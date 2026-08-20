@@ -1,4 +1,4 @@
-export const SECTION_IDS = ["today", "forecast", "locations", "settings"] as const;
+export const SECTION_IDS = ["today", "forecast", "locations"] as const;
 
 export type SectionId = (typeof SECTION_IDS)[number];
 
@@ -7,10 +7,12 @@ export type SectionId = (typeof SECTION_IDS)[number];
  *
  * AppSections drops the forecast and locations sections until a location is
  * saved, so nav and footer share this list rather than each hardcoding the
- * branch — linking to an absent anchor scrolls nowhere.
+ * branch — linking to an absent anchor scrolls nowhere. Settings and FAQ are
+ * not in this list at all: they are standalone routes (`/settings`, `/faq`),
+ * not anchors in this scroll.
  */
 export function visibleSectionIds(hasLocation: boolean): SectionId[] {
-  return hasLocation ? [...SECTION_IDS] : ["today", "settings"];
+  return hasLocation ? [...SECTION_IDS] : ["today"];
 }
 
 export type SectionBox = { id: SectionId; top: number };
@@ -26,7 +28,8 @@ export const ACTIVE_MARKER_RATIO = 0.35;
  *
  * - The final section is often shorter than the remaining scroll, so it can
  *   never reach the marker. Once the page is scrolled to the bottom the last
- *   section wins outright, otherwise Settings could never highlight.
+ *   section wins outright, otherwise a short final section could never
+ *   highlight.
  * - Before the first section reaches the marker (page top) the first section
  *   is still the answer, not "nothing".
  *

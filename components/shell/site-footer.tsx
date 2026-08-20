@@ -21,7 +21,7 @@ const COLUMNS: {
       { label: "Today", href: "#today" },
       { label: "2-week outlook", href: "#forecast" },
       { label: "Locations", href: "#locations" },
-      { label: "Settings", href: "#settings" },
+      { label: "Settings", href: "/settings" },
     ],
   },
   {

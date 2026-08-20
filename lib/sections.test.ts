@@ -7,9 +7,10 @@ describe("visibleSectionIds", () => {
   });
 
   it("hides forecast and locations while no location is saved", () => {
-    // AppSections renders only #today and #settings in the empty state, so nav
-    // and footer must not link to anchors that are absent from the document.
-    expect(visibleSectionIds(false)).toEqual(["today", "settings"]);
+    // AppSections renders only #today in the empty state, so nav and footer
+    // must not link to anchors that are absent from the document. Settings and
+    // FAQ are standalone routes now, not part of this scroll at all.
+    expect(visibleSectionIds(false)).toEqual(["today"]);
   });
 
   it("never returns an id outside the known section list", () => {
@@ -28,15 +29,15 @@ describe("visibleSectionIds", () => {
 });
 
 describe("pickActiveSection", () => {
-  // A page of four 700px sections in a 900px viewport.
+  // A page of three 700px sections in a 900px viewport. Locations, the last
+  // section since settings moved off this scroll, is only 400px tall.
   const sections = [
     { id: "today" as const, top: 0 },
     { id: "forecast" as const, top: 700 },
     { id: "locations" as const, top: 1400 },
-    { id: "settings" as const, top: 2100 },
   ];
   const VH = 900;
-  const DOC = 2100 + 400 + VH; // last section is only 400px tall
+  const DOC = 1400 + 400 + VH; // last section is only 400px tall
 
   const pick = (scrollY: number) => pickActiveSection(sections, scrollY, VH, DOC);
 
@@ -55,23 +56,24 @@ describe("pickActiveSection", () => {
   });
 
   it("tracks the middle sections while scrolling", () => {
+    // Marker sits at scrollY + 315. Locations starts at 1400.
+    expect(pick(1084)).toBe("forecast");
     expect(pick(1085)).toBe("locations");
-    expect(pick(1785)).toBe("settings");
   });
 
   it("selects the final section once scrolled to the bottom", () => {
     // The regression this replaces: a short last section never reaches the
     // marker, so the nav stayed stuck on the previous section.
-    expect(pick(DOC - VH)).toBe("settings");
+    expect(pick(DOC - VH)).toBe("locations");
   });
 
   it("never returns a section the caller did not supply", () => {
     const partial = [
       { id: "today" as const, top: 0 },
-      { id: "settings" as const, top: 700 },
+      { id: "locations" as const, top: 700 },
     ];
     for (const y of [0, 300, 700, 1200, 5000]) {
-      expect(["today", "settings"]).toContain(
+      expect(["today", "locations"]).toContain(
         pickActiveSection(partial, y, VH, 700 + 400 + VH),
       );
     }
