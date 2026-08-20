@@ -1,8 +1,7 @@
 "use client";
 
-import { Wind, Calendar, BookOpen } from "lucide-react";
+import { Wind, Calendar, BookOpen, Thermometer, Eye, Gauge, Cloudy } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
-import { AlertCard } from "@/components/shell/alert-card";
 import {
   compassToWord,
   formatTemp,
@@ -11,6 +10,12 @@ import {
   windUnitLabel,
 } from "@/lib/format";
 import { weatherCodeToKind, WEATHER_LABEL } from "@/lib/api/weather-code";
+import {
+  cloudCoverNote,
+  feelsLikeNote,
+  formatVisibility,
+  visibilityNote,
+} from "@/lib/weather-metrics";
 import type { Forecast, Place, UnitPrefs } from "@/lib/api/types";
 
 type Props = {
@@ -122,7 +127,51 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </div>
       </div>
 
-      <AlertCard className="order-5 lg:order-none" />
+      {/* Four readings the API already returns and nothing displayed. Same
+          grammar as the conditions row above: hairline, icon, value, note. */}
+      <div className="stagger-5 order-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:order-none">
+        <Metric
+          icon={<Thermometer className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />}
+          title={`Feels like ${formatTemp(c.apparentTemperature, units.temperature)}${tempLabel}`}
+          note={feelsLikeNote(c.apparentTemperature, c.temperature)}
+        />
+        <Metric
+          icon={<Eye className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />}
+          title={`Visibility ${formatVisibility(c.visibility)}`}
+          note={visibilityNote(c.visibility)}
+        />
+        <Metric
+          icon={<Gauge className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />}
+          title={`Pressure ${Math.round(c.pressure)} hPa`}
+          note="Surface pressure"
+        />
+        <Metric
+          icon={<Cloudy className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />}
+          title={`Cloud cover ${Math.round(c.cloudCover)}%`}
+          note={cloudCoverNote(c.cloudCover)}
+        />
+      </div>
     </section>
+  );
+}
+
+/** One reading in the hairline grammar shared with the conditions row. */
+function Metric({
+  icon,
+  title,
+  note,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  note: string;
+}) {
+  return (
+    <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+      {icon}
+      <div className="min-w-0">
+        <h3 className="stat-title tabular truncate">{title}</h3>
+        <p className="caption mt-0.5">{note}</p>
+      </div>
+    </div>
   );
 }
