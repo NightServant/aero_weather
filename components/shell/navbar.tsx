@@ -148,6 +148,9 @@ export function Navbar() {
     return () => window.removeEventListener(USE_LOCATION_EVENT, useMyLocation);
   }, [useMyLocation]);
 
+  // /search renders its own header (back arrow plus the field itself).
+  if (pathname === "/search") return null;
+
   return (
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
       {/* Desktop has room to show where you can go, so it does: the links sit

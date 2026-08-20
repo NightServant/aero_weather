@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { toast } from "sonner";
 import { usePrefs } from "@/hooks/use-prefs";
 import { addPlace, findSamePlace } from "@/lib/prefs";
@@ -35,25 +35,37 @@ export function SearchPage() {
 
   return (
     <div className="pb-8">
-      <div className="max-w-2xl">
-        <p className="kicker">Search</p>
-        <h1 className="text-headline mt-3">Find a city</h1>
-        <p className="text-subtitle mt-2">
-          Search by city name, ZIP code, or coordinates, or pick a suggestion below. Selected
-          cities save to this device and become your active forecast.
-        </p>
+      {/* Stands in for the site bar on this route: a way back, and the field
+          this page is for. */}
+      <h1 className="sr-only">Find a city</h1>
 
-        <div className="mt-6 flex h-11 items-center gap-3 rounded-full border border-[var(--hairline-strong)] px-4">
-          <Search className="size-4 shrink-0 text-foreground/55" strokeWidth={1.5} />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search cities, ZIP codes, or coordinates"
-            placeholder="Search cities, ZIP codes, or coordinates…"
-            className="w-full min-w-0 flex-1 text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
-          />
+      <header className="sticky top-0 z-40 -mx-6 mb-6 bg-[oklch(0.17_0.02_245/0.92)] px-6 py-3 backdrop-blur">
+        <div className="mx-auto flex max-w-2xl items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="glass-pill grid size-10 shrink-0 place-items-center text-foreground/80 transition-colors duration-150 hover:bg-white/[0.14] hover:text-foreground active:scale-[0.98]"
+          >
+            <ArrowLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />
+          </button>
+
+          <div className="flex h-11 min-w-0 flex-1 items-center gap-3 rounded-full border border-[var(--hairline-strong)] px-4">
+            <Search className="size-4 shrink-0 text-foreground/55" strokeWidth={1.5} />
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search cities, ZIP codes, or coordinates"
+              placeholder="Search cities, ZIP codes, or coordinates…"
+              className="w-full min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/55 outline-none focus-visible:outline-none focus-visible:shadow-none"
+            />
+          </div>
         </div>
+      </header>
+
+      <div className="max-w-2xl">
 
         {showResults ? (
           <div className="mt-2">
