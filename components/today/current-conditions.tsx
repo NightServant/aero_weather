@@ -109,7 +109,10 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
-            <h3 className="stat-title">
+            <h3
+              className="stat-title truncate"
+              title={`${WEATHER_LABEL[kind]} with ${windWord(c.windSpeed, units.wind)} winds`}
+            >
               {WEATHER_LABEL[kind]} with {windWord(c.windSpeed, units.wind)} winds
             </h3>
             <p className="caption tabular mt-0.5">
