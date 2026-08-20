@@ -63,28 +63,15 @@ export function CurrentConditions({ forecast, place, units }: Props) {
       aria-label="Current conditions"
       className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0"
     >
-      {/* `contents` on small screens lets these two blocks be ordered
-          independently against the temperature below; from lg they re-form the
-          single bordered row the desktop layout has always had. */}
-      <div className="contents lg:flex lg:flex-wrap lg:gap-6 lg:border-l lg:border-white/12 lg:pl-6">
-        <div className="stagger-5 order-1 flex min-w-0 items-start gap-3 lg:order-none">
-          <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
-          <div>
-            <h2 className="card-title-caps">Today - {dateline}</h2>
-            <p className="card-subtitle-caps mt-1">{location}</p>
-          </div>
-        </div>
-        {/* Attribution, not an answer: it sits under the reading on a phone
-            rather than between the reader and the temperature. */}
-        <div className="order-6 flex min-w-0 items-start gap-3 lg:order-none lg:border-l lg:border-white/12 lg:pl-6">
-          <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
-          <div>
-            <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
-            <p className="caption mt-0.5">Data by Open-Meteo</p>
-          </div>
+      {/* 1. Where and when, so the reading below has a subject. */}
+      <div className="stagger-5 flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+        <Calendar className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
+        <div>
+          <h2 className="card-title-caps">Today - {dateline}</h2>
+          <p className="card-subtitle-caps mt-1">{location}</p>
         </div>
       </div>
-      <div className="stagger-4 order-2 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4 lg:order-none">
+      <div className="stagger-4 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4">
         <span className="animate-float shrink-0">
           <AnimatedWeatherIcon
             kind={kind}
@@ -99,9 +86,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </p>
       </div>
 
-      <hr className="order-3 border-[var(--hairline)] lg:order-none" />
-
-      <div className="stagger-5 order-4 flex flex-wrap gap-6 lg:order-none">
+      <div className="stagger-5 flex flex-wrap gap-6">
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
@@ -127,9 +112,11 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </div>
       </div>
 
+      <hr className="border-[var(--hairline)]" />
+
       {/* Four readings the API already returns and nothing displayed. Same
           grammar as the conditions row above: hairline, icon, value, note. */}
-      <div className="stagger-5 order-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:order-none">
+      <div className="stagger-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
         <Metric
           icon={<Thermometer className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />}
           title={`Feels like ${formatTemp(c.apparentTemperature, units.temperature)}${tempLabel}`}
@@ -150,6 +137,14 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           title={`Cloud cover ${Math.round(c.cloudCover)}%`}
           note={cloudCoverNote(c.cloudCover)}
         />
+      </div>
+
+      <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
+        <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
+        <div>
+          <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
+          <p className="caption mt-0.5">Data by Open-Meteo</p>
+        </div>
       </div>
     </section>
   );

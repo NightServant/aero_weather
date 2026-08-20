@@ -12,7 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePrefs } from "@/hooks/use-prefs";
@@ -174,14 +173,6 @@ export function Navbar() {
             className="w-56 border-white/12"
             style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
           >
-            <DropdownMenuItem
-              onSelect={() => useMyLocation()}
-              className="flex h-10 cursor-pointer items-center gap-2 rounded-lg px-3 text-[15px] text-foreground"
-            >
-              <MapPin className="size-4" strokeWidth={1.5} aria-hidden="true" />
-              Use my location
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/10" />
             {navItems.map((item) => (
               <DropdownMenuItem key={item.key} asChild>
                 <Link
