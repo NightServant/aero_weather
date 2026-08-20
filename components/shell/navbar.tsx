@@ -139,24 +139,32 @@ export function Navbar() {
           search spreads into the space they left. */}
       <nav
         aria-label="Main"
-        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6"
+        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr]"
       >
-        <Link href={onHome ? "#today" : "/"} className="flex shrink-0 items-center gap-2.5 rounded-full">
-          <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
-          <span className="hidden text-[17px] font-semibold tracking-tight sm:inline">
-            <span className="text-primary">Aero</span>
-            <span className="text-foreground">Weather</span>
-          </span>
-        </Link>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link href={onHome ? "#today" : "/"} className="flex shrink-0 items-center gap-2.5 rounded-full">
+            <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
+            <span className="hidden text-[17px] font-semibold tracking-tight sm:inline">
+              <span className="text-primary">Aero</span>
+              <span className="text-foreground">Weather</span>
+            </span>
+          </Link>
+          <IconCircleButton
+            label="Use my location"
+            onClick={useMyLocation}
+            icon={<MapPin className="size-4" strokeWidth={1.5} />}
+            className="max-[359px]:hidden"
+          />
+        </div>
 
-        <div className="hidden items-center lg:ml-4 lg:flex lg:shrink-0">
+        <div className="hidden items-center lg:flex lg:justify-self-center">
           {navItems.map((item) => (
             <Link
               key={item.key}
               href={item.href}
               aria-current={item.active ? "page" : undefined}
               className={cn(
-                "rounded-full px-3.5 py-2 text-[15px] transition-colors duration-150",
+                "rounded-full px-3 py-2 text-[15px] transition-colors duration-150",
                 item.active
                   ? "font-medium text-primary"
                   : "text-muted-foreground hover:text-primary",
@@ -167,15 +175,8 @@ export function Navbar() {
           ))}
         </div>
 
-        <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:ml-4 lg:w-auto lg:max-w-[420px] lg:flex-1" />
-
-        <div className="flex shrink-0 items-center gap-2">
-          <IconCircleButton
-            label="Use my location"
-            onClick={useMyLocation}
-            icon={<MapPin className="size-4" strokeWidth={1.5} />}
-            className="max-[359px]:hidden"
-          />
+        <div className="flex min-w-0 flex-1 items-center gap-2 lg:flex-none lg:justify-self-end">
+          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:w-[360px] lg:max-w-none lg:shrink-0" />
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <IconCircleButton
