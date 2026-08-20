@@ -2,6 +2,7 @@
 
 import { Wind, Calendar, BookOpen } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
+import { AlertCard } from "@/components/shell/alert-card";
 import {
   compassToWord,
   formatTemp,
@@ -70,7 +71,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </div>
         {/* Attribution, not an answer: it sits under the reading on a phone
             rather than between the reader and the temperature. */}
-        <div className="order-5 flex min-w-0 items-start gap-3 lg:order-none lg:border-l lg:border-white/12 lg:pl-6">
+        <div className="order-6 flex min-w-0 items-start gap-3 lg:order-none lg:border-l lg:border-white/12 lg:pl-6">
           <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
           <div>
             <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
@@ -93,7 +94,9 @@ export function CurrentConditions({ forecast, place, units }: Props) {
         </p>
       </div>
 
-      <div className="stagger-5 order-3 flex flex-wrap gap-6 lg:order-none">
+      <hr className="order-3 border-[var(--hairline)] lg:order-none" />
+
+      <div className="stagger-5 order-4 flex flex-wrap gap-6 lg:order-none">
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
           <div>
@@ -118,6 +121,8 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         </div>
       </div>
+
+      <AlertCard className="order-5 lg:order-none" />
     </section>
   );
 }
