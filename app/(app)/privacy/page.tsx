@@ -29,17 +29,53 @@ const THIRD_PARTIES = [
   },
 ];
 
-function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-headline mt-10 mb-3 text-[1.35rem]">{children}</h2>;
+/** Section order, used for both the headings and the contents list beside them. */
+const SECTIONS = [
+  "The short version",
+  "What is stored on your device",
+  "Who else receives a request",
+  "Location",
+  "Analytics",
+  "Artificial intelligence",
+  "Erasing your data",
+  "Children",
+] as const;
+
+const slug = (label: string) => label.toLowerCase().replace(/[^a-z]+/g, "-");
+
+function H2({ children }: { children: string }) {
+  return (
+    <h2 id={slug(children)} className="text-headline mt-10 mb-3 scroll-mt-24 text-[1.35rem]">
+      {children}
+    </h2>
+  );
 }
 
 export default function PrivacyPage() {
   return (
-    <article className="max-w-3xl pb-8">
-      <p className="kicker">Privacy</p>
-      <h1 className="text-headline mt-3">Privacy policy</h1>
-      <p className="text-subtitle mt-2">Last updated {UPDATED}.</p>
+    <div className="pb-8 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
+      <header className="lg:sticky lg:top-28">
+        <p className="kicker">Privacy</p>
+        <h1 className="text-headline mt-3">Privacy policy</h1>
+        <p className="text-subtitle mt-2">Last updated {UPDATED}.</p>
 
+        <nav aria-label="Sections" className="mt-6 hidden lg:block">
+          <ul className="space-y-1.5">
+            {SECTIONS.map((label) => (
+              <li key={label}>
+                <a
+                  href={`#${slug(label)}`}
+                  className="text-sm text-text-mid transition-colors duration-150 hover:text-foreground"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <article className="max-w-[68ch] lg:mt-0">
       <H2>The short version</H2>
       <p className="text-sm leading-relaxed text-text-mid">
         AeroWeather has no backend of its own, no accounts, and no advertising. We do not
@@ -139,6 +175,7 @@ export default function PrivacyPage() {
           Back to the forecast
         </Link>
       </p>
-    </article>
+      </article>
+    </div>
   );
 }
