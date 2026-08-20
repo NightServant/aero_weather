@@ -215,8 +215,12 @@
   }
 }
 
-/* ---- Typography scale (spec 3) ---- */
-@layer utilities {
+/* ---- Typography scale (spec 3) ----
+   In the components layer, not utilities: these are project classes and a
+   Tailwind size utility on the same element has to be able to win. In the
+   utilities layer they were declared after Tailwind's own and took every tie,
+   so `stat-value text-3xl` came out at 20px rather than 30px. */
+@layer components {
   .text-display-temp {
     /* Fluid on phones: the old 4rem floor never shrank below 64px, which forced
        the icon + temperature row to wrap on narrow screens. */
