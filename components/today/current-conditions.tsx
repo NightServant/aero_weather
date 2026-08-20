@@ -1,6 +1,6 @@
 "use client";
 
-import { Wind, Calendar, BookOpen, Thermometer, Eye, Gauge, Cloudy } from "lucide-react";
+import { Wind, Calendar, Thermometer, Eye, Gauge, Cloudy } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import {
   compassToWord,
@@ -137,14 +137,6 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           title={`Cloud cover ${Math.round(c.cloudCover)}%`}
           note={cloudCoverNote(c.cloudCover)}
         />
-      </div>
-
-      <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
-        <BookOpen className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
-        <div>
-          <h2 className="card-title-caps">Aero Almanac - {WEATHER_LABEL[kind]}</h2>
-          <p className="caption mt-0.5">Data by Open-Meteo</p>
-        </div>
       </div>
     </section>
   );
