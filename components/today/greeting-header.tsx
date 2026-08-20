@@ -12,7 +12,7 @@ export function GreetingHeader({ timezone, summary }: Props) {
   return (
     <div className="mt-4 text-center lg:mt-8 lg:text-left">
       <h1 id="today-h" className="text-headline">{relativeGreeting(new Date(), timezone)}!</h1>
-      <p className="text-subtitle mt-1.5 lg:mt-2">{summary}</p>
+      <p className="text-subtitle mt-1.5">{summary}</p>
     </div>
   );
 }

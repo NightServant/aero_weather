@@ -25,7 +25,7 @@ export function AirQualityCard({ usAqi }: { usAqi: number }) {
       side={
         <svg
           viewBox="0 0 72 72"
-          className="size-[68px] shrink-0 -rotate-90"
+          className="size-[56px] shrink-0 -rotate-90"
           role="img"
           aria-label={`US AQI ${rounded}, ${label}`}
         >

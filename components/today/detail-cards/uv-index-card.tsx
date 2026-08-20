@@ -53,7 +53,7 @@ export function UvIndexCard({ uv, isDay = true }: { uv: number; isDay?: boolean 
       side={
         <svg
           viewBox="0 0 72 72"
-          className="h-16 w-16"
+          className="size-[56px] shrink-0"
           role="img"
           aria-label={`UV index ${rounded}, ${label}`}
         >

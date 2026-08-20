@@ -72,7 +72,7 @@ export function RailCard({
         // Keyed to the card's own width, not the viewport: a two-up rail can be
         // ~200px wide on a large screen, where a dial beside the text squeezed
         // "UV Index Moderate" onto three lines.
-        <div className="flex h-full flex-col items-start gap-3 @[17rem]:flex-row @[17rem]:items-center @[17rem]:gap-4">
+        <div className="flex h-full flex-col items-start gap-3 @min-[12rem]:flex-row @min-[12rem]:items-center @min-[12rem]:gap-3">
           <div className="min-w-0 flex-1">{body}</div>
           <div className="shrink-0">{side}</div>
         </div>

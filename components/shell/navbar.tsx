@@ -9,12 +9,12 @@ import { toast } from "sonner";
 import { IconCircleButton } from "@/components/aero/icon-circle-button";
 import { SearchTrigger } from "@/components/search/search-trigger";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
@@ -33,17 +33,12 @@ const NAV_ITEMS = [
 const ROUTE_ITEMS = [{ href: "/privacy", label: "Privacy" }] as const;
 
 export function Navbar() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("today");
   const [prefs, setPrefs, hydrated] = usePrefs();
   const pathname = usePathname();
 
-  // Mirrors the AppSections branch: pre-hydration it renders every section
-  // (as skeletons), so only an empty state that has actually hydrated trims
-  // the nav. Linking to a section AppSections skipped scrolls nowhere.
   const visibleIds = visibleSectionIds(!hydrated || prefs.locations.length > 0);
-  // Off the single-page route (e.g. /privacy) a bare "#today" would resolve
-  // against the current document, where no section exists. Route home first.
   const onHome = pathname === "/";
   const navItems = [
     ...NAV_ITEMS.filter((item) => visibleIds.includes(item.id)).map((item) => ({
@@ -60,11 +55,9 @@ export function Navbar() {
     })),
   ];
 
-  // Scroll-spy. An IntersectionObserver over a thin mid-viewport band used to
-  // drive this, but it only fired while crossing the band: the highlight
-  // lagged a beat behind the scroll, and a final section shorter than the
-  // remaining scroll never reached the band at all, so Settings could never
-  // light up. Measuring on scroll is deterministic and always current.
+  // Scroll-spy. Measuring on scroll is deterministic: an IntersectionObserver
+  // over a mid-viewport band only fired while crossing it, so the highlight
+  // lagged, and a short final section never reached the band at all.
   useEffect(() => {
     if (!onHome) return;
     let frame = 0;
@@ -133,7 +126,7 @@ export function Navbar() {
     );
   }, [setPrefs]);
 
-  // Lets the footer's "Use my location" link run the navbar's handler.
+  // Lets the footer's "Use my location" link run this handler.
   useEffect(() => {
     window.addEventListener(USE_LOCATION_EVENT, useMyLocation);
     return () => window.removeEventListener(USE_LOCATION_EVENT, useMyLocation);
@@ -141,83 +134,70 @@ export function Navbar() {
 
   return (
     <header className="sticky top-4 z-40 px-4 md:top-6 md:px-6">
+      {/* Three zones: identity and the location control on the left, search
+          centred in the free space, navigation collected behind one menu on the
+          right. The links were five text targets competing with the wordmark
+          and the search field for the same bar. */}
       <nav
         aria-label="Main"
-        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4 md:px-6"
+        className="tint-card backdrop-blur mx-auto grid h-16 max-w-[1200px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6"
       >
         <Link href={onHome ? "#today" : "/"} className="flex items-center gap-2.5 rounded-full">
           <Image src="/brand/aero-logo.svg" alt="" width={36} height={36} priority />
-          <span className="text-[17px] font-semibold tracking-tight">
+          <span className="hidden text-[17px] font-semibold tracking-tight sm:inline">
             <span className="text-primary">Aero</span>
             <span className="text-foreground">Weather</span>
           </span>
         </Link>
 
-        {/* Desktop nav pills */}
-        <div className="ml-auto hidden items-center justify-between lg:flex">
-          {navItems.map((item) => {
-            const active = item.active;
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "rounded-full px-3.5 py-2 text-[15px] transition-colors duration-150",
-                  active
-                    ? "font-medium text-primary"
-                    : "text-muted-foreground hover:text-primary",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
+        <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px]" />
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-3">
+        <div className="flex items-center gap-2">
           <IconCircleButton
             label="Use my location"
             onClick={useMyLocation}
             icon={<MapPin className="size-4" strokeWidth={1.5} />}
+            className="max-[359px]:hidden"
           />
-          <SearchTrigger className="hidden w-[210px] lg:block lg:w-[289px]" />
-
-          {/* Mobile menu */}
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <DrawerTrigger asChild>
-              <span className="lg:hidden">
-                <IconCircleButton label="Menu" icon={<Menu className="size-4" strokeWidth={1.5} />} />
-              </span>
-            </DrawerTrigger>
-            <DrawerContent aria-label="Menu">
-              <DrawerHeader>
-                <DrawerTitle>Menu</DrawerTitle>
-              </DrawerHeader>
-              <div className="space-y-1 px-4 pb-8">
-                <SearchTrigger className="mb-3" />
-                {navItems.map((item) => {
-                  const active = item.active;
-                  return (
-                    <Link
-                      key={item.key}
-                      href={item.href}
-                      onClick={() => setDrawerOpen(false)}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex h-12 items-center rounded-xl px-4 text-[15px] transition-colors",
-                        active
-                          ? "bg-primary/15 font-medium text-primary"
-                          : "text-foreground hover:bg-white/[0.06]",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            </DrawerContent>
-          </Drawer>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <IconCircleButton
+              label="Menu"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              icon={<Menu className="size-4" strokeWidth={1.5} />}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={10}
+            className="w-56 border-white/12"
+            style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
+          >
+            <DropdownMenuItem
+              onSelect={() => useMyLocation()}
+              className="flex h-10 cursor-pointer items-center gap-2 rounded-lg px-3 text-[15px] text-foreground"
+            >
+              <MapPin className="size-4" strokeWidth={1.5} aria-hidden="true" />
+              Use my location
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-white/10" />
+            {navItems.map((item) => (
+              <DropdownMenuItem key={item.key} asChild>
+                <Link
+                  href={item.href}
+                  aria-current={item.active ? "page" : undefined}
+                  className={cn(
+                    "flex h-10 cursor-pointer items-center rounded-lg px-3 text-[15px]",
+                    item.active ? "font-medium text-primary" : "text-foreground",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         </div>
       </nav>
     </header>

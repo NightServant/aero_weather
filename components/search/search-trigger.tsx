@@ -73,7 +73,7 @@ export function SearchTrigger({ className }: { className?: string }) {
   };
 
   return (
-    <div ref={wrapRef} className={cn("relative", className)}>
+    <div ref={wrapRef} className={cn("relative min-w-0", className)}>
       {/* Figma navbar search: compact pill, "Search location", trailing magnifier. */}
       <div
         className={cn(

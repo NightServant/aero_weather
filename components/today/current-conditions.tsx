@@ -55,7 +55,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
   return (
     <section
       aria-label="Current conditions"
-      className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0 lg:flex-1"
+      className="mx-auto my-auto flex flex-col gap-6 lg:mx-0 lg:my-0"
     >
       {/* `contents` on small screens lets these two blocks be ordered
           independently against the temperature below; from lg they re-form the
@@ -78,7 +78,7 @@ export function CurrentConditions({ forecast, place, units }: Props) {
           </div>
         </div>
       </div>
-      <div className="stagger-4 order-2 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4 lg:order-none lg:flex-1">
+      <div className="stagger-4 order-2 flex flex-nowrap items-center gap-4 py-2 sm:gap-10 sm:py-4 lg:order-none">
         <span className="animate-float shrink-0">
           <AnimatedWeatherIcon
             kind={kind}
