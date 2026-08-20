@@ -33,7 +33,7 @@ export function deriveAlerts(forecast: Forecast): WeatherAlert[] {
     alerts.push({
       id: `thunderstorm-${startIso}`,
       title: `${labelForDay(startIso, forecast.place.timezone)} alert`,
-      summary: `Severe thunderstorm watch issued for your area, ${formatWindow(startIso, endIso, forecast.place.timezone)}.`,
+      summary: `Thunderstorm ${formatWindow(startIso, endIso, forecast.place.timezone)}.`,
       severity: "watch",
       windowLabel: formatWindow(startIso, endIso, forecast.place.timezone),
       startIso,
@@ -46,7 +46,7 @@ export function deriveAlerts(forecast: Forecast): WeatherAlert[] {
     alerts.push({
       id: `wind-${dailyHighWind.date}`,
       title: "Wind advisory",
-      summary: `Gusts expected to reach ${Math.round(dailyHighWind.windSpeedMax)} km/h ${labelForDay(dailyHighWind.date, forecast.place.timezone).toLowerCase()}.`,
+      summary: `Gusts to ${Math.round(dailyHighWind.windSpeedMax)} km/h ${labelForDay(dailyHighWind.date, forecast.place.timezone).toLowerCase()}.`,
       severity: "advisory",
       windowLabel: labelForDay(dailyHighWind.date, forecast.place.timezone),
       startIso: dailyHighWind.date,
@@ -59,7 +59,7 @@ export function deriveAlerts(forecast: Forecast): WeatherAlert[] {
     alerts.push({
       id: `rain-${heavyRain.date}`,
       title: "Heavy rain advisory",
-      summary: `${Math.round(heavyRain.precipitationSum)} mm of rainfall expected ${labelForDay(heavyRain.date, forecast.place.timezone).toLowerCase()}.`,
+      summary: `${Math.round(heavyRain.precipitationSum)} mm of rain ${labelForDay(heavyRain.date, forecast.place.timezone).toLowerCase()}.`,
       severity: "advisory",
       windowLabel: labelForDay(heavyRain.date, forecast.place.timezone),
       startIso: heavyRain.date,

@@ -83,7 +83,9 @@ export function CurrentConditions({ forecast, place, units }: Props) {
             <Bell className="size-6 text-accent-sun" strokeWidth={1.5} aria-hidden="true" />
             <div className="min-w-0">
               <h2 className="card-title-caps">{alert.title}</h2>
-              <p className="caption mt-0.5">{alert.summary}</p>
+              <p className="caption mt-0.5 truncate" title={alert.summary}>
+                {alert.summary}
+              </p>
             </div>
           </div>
         ) : null}
