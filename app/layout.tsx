@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
-import { SITE_URL } from "./robots";
+import { SITE_URL } from "@/lib/site-url";
 import { Analytics } from "@vercel/analytics/next";
 import { AnalyticsConsent } from "@/components/shell/analytics-consent";
 

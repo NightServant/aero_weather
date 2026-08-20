@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "./robots";
+import { SITE_URL } from "@/lib/site-url";
 
 /**
  * Only the real page (`/`) is listed. `/today`, `/forecast`, and `/locations`
