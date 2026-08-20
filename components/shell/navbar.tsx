@@ -32,6 +32,7 @@ const ROUTE_ITEMS = [{ href: "/settings", label: "Settings" }] as const;
 
 /** Reference pages: in the small-screen menu and the footer, not the desktop bar. */
 const SECONDARY_ITEMS = [
+  { href: "/search", label: "Search" },
   { href: "/faq", label: "FAQ" },
   { href: "/privacy", label: "Privacy" },
 ] as const;
