@@ -40,7 +40,7 @@ export function SearchPage() {
       <h1 className="sr-only">Find a city</h1>
 
       <header className="sticky top-0 z-40 -mx-6 mb-6 bg-[oklch(0.17_0.02_245/0.92)] px-6 py-3 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => router.back()}
@@ -50,7 +50,7 @@ export function SearchPage() {
             <ArrowLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />
           </button>
 
-          <div className="flex h-11 min-w-0 flex-1 items-center gap-3 rounded-full border border-[var(--hairline-strong)] px-4">
+          <div className="flex h-11 min-w-0 max-w-2xl flex-1 items-center gap-3 rounded-full border border-[var(--hairline-strong)] px-4">
             <Search className="size-4 shrink-0 text-foreground/55" strokeWidth={1.5} />
             <input
               autoFocus
