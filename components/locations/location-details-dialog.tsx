@@ -11,6 +11,15 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerClose,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import { CityPhoto } from "./city-photo";
 import { LocationGallery } from "./location-gallery";
@@ -61,6 +70,7 @@ export function LocationDetailsDialog({
   const [description, setDescription] = useState<string | null | undefined>(undefined);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const isDesktop = useIsDesktop();
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     if (!open || !place) return;
@@ -81,19 +91,21 @@ export function LocationDetailsDialog({
   const today = forecast?.daily[0];
   const tz = place.timezone;
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="max-w-[calc(100%-2rem)] gap-0 overflow-hidden border-white/12 p-0 backdrop-blur sm:max-w-3xl lg:max-w-5xl xl:max-w-6xl"
-        style={{ background: "oklch(0.2 0.025 245 / 0.77)" }}
-        onEscapeKeyDown={(e) => lightboxOpen && e.preventDefault()}
-        onInteractOutside={(e) => lightboxOpen && e.preventDefault()}
-      >
+  // A sheet that rises from the edge the thumb is nearest reads as native on a
+  // phone, and Vaul gives it drag-to-dismiss. From md up the same content is a
+  // centred dialog, where a bottom sheet would be an odd import from mobile.
+  // Both are Radix dialogs underneath but expose different primitives, so the
+  // body is built once and handed whichever set is in play.
+  const Close = isMobile ? DrawerClose : DialogClose;
+  const Header = isMobile ? DrawerHeader : DialogHeader;
+  const Title = isMobile ? DrawerTitle : DialogTitle;
+  const Description = isMobile ? DrawerDescription : DialogDescription;
+
+  const inner = (
         <div className="relative flex max-h-[88vh] flex-col">
           {/* Single close control, pinned to the dialog's top-right: it sits over the
               map on desktop and over the header photo on mobile (where the map is hidden). */}
-          <DialogClose asChild>
+          <Close asChild>
             <button
               type="button"
               aria-label="Close"
@@ -101,7 +113,7 @@ export function LocationDetailsDialog({
             >
               <X className="size-5" strokeWidth={1.5} aria-hidden="true" />
             </button>
-          </DialogClose>
+          </Close>
 
           {/* Body: scrolls as a unit on mobile; on desktop the info column scrolls on
               its own (2/5) beside the full-height map (3/5). */}
@@ -109,13 +121,13 @@ export function LocationDetailsDialog({
             <div className="grid lg:min-h-0 lg:flex-1 lg:grid-cols-[2fr_3fr] lg:grid-rows-1">
               {/* Info column (2/5): header photo flush on top, then padded content. */}
               <div className="lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-white/12 [scrollbar-width:thin]">
-                <DialogHeader className="relative gap-0 p-0">
+                <Header className="relative gap-0 p-0">
                   <div className="relative h-40 w-full sm:h-48">
                     <CityPhoto place={place} width={768} height={192} className="h-full w-full rounded-none" initialClassName="text-7xl" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" aria-hidden="true" />
                     <div className="absolute bottom-3 left-5 right-5">
-                      <DialogTitle className="text-2xl font-semibold text-white">{place.name}</DialogTitle>
-                      <DialogDescription className="mt-0.5 text-sm text-white/75">{region}</DialogDescription>
+                      <Title className="text-2xl font-semibold text-white">{place.name}</Title>
+                      <Description className="mt-0.5 text-sm text-white/75">{region}</Description>
                     </div>
                     {kind ? (
                       <span className="absolute top-3 left-5 inline-flex items-center gap-2 rounded-full bg-black/50 py-1.5 pr-3.5 pl-2.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">
@@ -127,7 +139,7 @@ export function LocationDetailsDialog({
                       </span>
                     ) : null}
                   </div>
-                </DialogHeader>
+                </Header>
 
                 <div className="space-y-6 p-6">
                   <section>
@@ -190,6 +202,28 @@ export function LocationDetailsDialog({
             )}
           </div>
         </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent aria-label={place.name} className="max-h-[92vh] border-white/12 p-0">
+          {inner}
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-[calc(100%-2rem)] gap-0 overflow-hidden border-white/12 p-0 backdrop-blur sm:max-w-3xl lg:max-w-5xl xl:max-w-6xl"
+        style={{ background: "oklch(0.2 0.025 245 / 0.77)" }}
+        onEscapeKeyDown={(e) => lightboxOpen && e.preventDefault()}
+        onInteractOutside={(e) => lightboxOpen && e.preventDefault()}
+      >
+        {inner}
       </DialogContent>
     </Dialog>
   );

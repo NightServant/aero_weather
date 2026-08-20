@@ -156,7 +156,7 @@ export function Navbar() {
           search spreads into the space they left. */}
       <nav
         aria-label="Main"
-        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr]"
+        className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 xl:grid xl:grid-cols-[1fr_auto_1fr]"
       >
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
@@ -177,7 +177,7 @@ export function Navbar() {
           />
         </div>
 
-        <div className="hidden items-center lg:flex lg:justify-self-center">
+        <div className="hidden items-center lg:ml-auto lg:flex xl:ml-0 xl:justify-self-center">
           {navItems.map((item) => (
             <Link
               key={item.key}
@@ -195,8 +195,8 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center gap-2 lg:flex-none lg:justify-self-end">
-          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:w-[360px] lg:max-w-none lg:shrink-0" />
+        <div className="flex min-w-0 flex-1 items-center gap-2 lg:ml-3 lg:flex-none xl:justify-self-end">
+          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:max-w-[360px] lg:flex-1 xl:w-[360px] xl:max-w-none xl:flex-none xl:shrink-0" />
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <IconCircleButton

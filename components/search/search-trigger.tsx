@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { Place } from "@/lib/api/types";
 import { usePrefs } from "@/hooks/use-prefs";
 import { FOCUS_SEARCH_EVENT } from "@/lib/ui-events";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function SearchTrigger({ className }: { className?: string }) {
   const [query, setQuery] = useState("");
@@ -14,6 +15,7 @@ export function SearchTrigger({ className }: { className?: string }) {
   const [isMac, setIsMac] = useState(true);
   const [prefs, setPrefs] = usePrefs();
   const router = useRouter();
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -83,10 +85,12 @@ export function SearchTrigger({ className }: { className?: string }) {
       >
         <input
           ref={inputRef}
+          readOnly={isMobile}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setOpen(true)}
+          onClick={isMobile ? () => router.push("/search") : undefined}
+          onFocus={isMobile ? () => router.push("/search") : () => setOpen(true)}
           placeholder="Search location"
           aria-label="Search saved locations"
           aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
