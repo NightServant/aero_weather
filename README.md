@@ -150,13 +150,18 @@ Both are optional; the app runs without them.
 
 | Variable | Effect when unset |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | `robots.txt`, `sitemap.xml`, and the Open Graph tags fall back to `https://aeroweather.app`. Set this to your real origin before deploying. |
+| `NEXT_PUBLIC_SITE_URL` | The origin is inferred instead: from `VERCEL_PROJECT_PRODUCTION_URL` on Vercel, `VERCEL_BRANCH_URL` on a preview, and `http://localhost:3000` otherwise. Only set this for a custom domain. |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics stays dormant and the consent prompt never appears. Set a `G-XXXXXXXXXX` measurement id to enable the opt-in flow. |
+
+Both are read at build time, so a change to either needs a redeploy rather than
+just a new value: every route is prerendered and the origin is baked into
+`robots.txt`, `sitemap.xml`, and the Open Graph tags.
 
 **Deploying:** Vercel is the better fit. The build is fully static (every route
 prerendered, no server rendering, no database), and the Next.js 16 metadata routes
 this app uses — `opengraph-image`, `robots`, `sitemap` — are first-party there rather
-than going through a compatibility layer.
+than going through a compatibility layer. Import the repo and deploy: no
+environment variables are required, because the origin resolves from Vercel's own.
 
 ## 6. Privacy and analytics
 
