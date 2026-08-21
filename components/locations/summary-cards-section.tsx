@@ -20,9 +20,16 @@ export function SummaryCardsSection({ places, forecasts, activeId, units }: Prop
   const active = places.find((p) => p.id === activeId) ?? places[0];
   const iconCls = "size-4";
 
+  // Saved and Active run the full width below `sm`. Both carry text that has
+  // no fixed length - the place name most of all - and a half-width column at
+  // 320px broke "Bamban" across two lines mid-word. The two numeric metrics
+  // stay two-up: their values are short and the density is worth keeping.
+  const wide = "col-span-2 sm:col-span-1";
+
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-6 xl:grid-cols-4">
       <LocationSummaryCard
+        className={wide}
         label="Saved"
         icon={<MapPin className={iconCls} strokeWidth={1.5} aria-hidden="true" />}
         value={summary.savedCount}
@@ -32,6 +39,7 @@ export function SummaryCardsSection({ places, forecasts, activeId, units }: Prop
       </LocationSummaryCard>
 
       <LocationSummaryCard
+        className={wide}
         label="Active"
         icon={<Star className={iconCls} strokeWidth={1.5} aria-hidden="true" />}
         value={active?.name ?? "—"}
@@ -47,7 +55,7 @@ export function SummaryCardsSection({ places, forecasts, activeId, units }: Prop
         value={summary.avgTemp == null ? "—" : formatTemp(summary.avgTemp, units.temperature, false)}
         unit={summary.avgTemp == null ? undefined : `°${tempUnitLabel(units.temperature)}`}
       >
-        Mean of current temperatures across saved places.
+        Mean across saved places.
       </LocationSummaryCard>
 
       <LocationSummaryCard
@@ -58,7 +66,7 @@ export function SummaryCardsSection({ places, forecasts, activeId, units }: Prop
         accent={summary.rainCount > 0}
       >
         {summary.rainCount > 0
-          ? "Currently seeing rain or showers."
+          ? "Rain or showers right now."
           : "No rain reported right now."}
       </LocationSummaryCard>
     </div>

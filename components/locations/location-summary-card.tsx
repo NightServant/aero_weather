@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
+
 /** One summary metric. Left accent border on desktop, bottom accent on mobile —
  *  identical to the Forecast/Settings summary cards. */
 export function LocationSummaryCard({
@@ -10,6 +12,7 @@ export function LocationSummaryCard({
   value,
   unit,
   accent,
+  className,
   children,
 }: {
   label: string;
@@ -17,11 +20,16 @@ export function LocationSummaryCard({
   value: string | number;
   unit?: string;
   accent?: boolean;
+  /** Grid placement from the caller (column span at a given breakpoint). */
+  className?: string;
   children: ReactNode;
 }) {
   return (
     <div
-      className="flex min-w-0 flex-col border-b border-white/12 p-4 sm:p-5 md:border-b-0 md:border-l"
+      className={cn(
+        "flex min-w-0 flex-col border-b border-white/12 p-4 sm:p-5 md:border-b-0 md:border-l",
+        className,
+      )}
       data-animate=""
     >
       <div className="mb-3 flex items-center gap-2 text-muted-foreground">
