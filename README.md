@@ -12,12 +12,15 @@ A modern weather web app built with Next.js 16 (App Router, Turbopack) and React
 
 AeroWeather is a single-page weather dashboard that runs entirely in the browser. There is no account and no backend of its own. All preferences (saved cities, units, time format) live in `localStorage` on the device. Anonymous, cookieless page counts are collected; Google Analytics is opt-in and stays off until you allow it (see [Privacy and analytics](#6-privacy-and-analytics)). Weather, air quality, and geocoding data are fetched on demand from Open-Meteo's three public, key-less endpoints (Forecast, Geocoding, Air Quality).
 
-The interface is one continuously scrolling page composed of four anchor-linked sections, followed by an FAQ. A sticky top navbar links to each section plus the privacy page, and highlights the section currently in view; on small screens the links collapse into a slide-up drawer menu:
+The interface is one continuously scrolling page of three anchor-linked sections:
 
 - **Today** — current conditions plus detail cards (air quality, UV index, sunrise, sunset, humidity/dew point) for the active city.
 - **2-Week** — a "Next 24 hours" hourly rail, the 14-day outlook, and summary cards.
 - **Locations** — summary cards, tabbed Saved / Suggested carousels, and a per-place details dialog with description, photo gallery, and interactive map.
-- **Settings** — units, time format, and notification toggles.
+
+Settings, the FAQ, and the privacy policy are standalone routes (`/settings`, `/faq`, `/privacy`) rather than more of that scroll, so a session ends where the weather ends instead of in preference controls nobody asked for.
+
+A sticky top navbar carries the three anchors plus **Settings**, and highlights the section currently in view. Below `lg` the links collapse behind one menu and the bar reads menu, search, locate from left to right — the menu on the edge the thumb reaches, the field in the middle. That menu holds every destination, each row led by its own icon; it leaves out Search, because the field sitting beside it already is the search. FAQ and Privacy live there and in the footer.
 
 AeroWeather is designed to be free for everyone — no sign-up, no rate limits surfaced to the user, no premium tier.
 
@@ -58,12 +61,13 @@ Beyond these fixed brand colors, the hero surface carries one of seven weather-d
 ## 3. Features
 
 ### Inline location search
-The top-bar search field is a real input, not a button. Typing immediately runs a debounced geocoding query against Open-Meteo's geocoding API and renders results in an opaque dropdown directly under the input. Saved cities appear in the dropdown when the query is empty. `⌘K` / `Ctrl+K` focuses the field from anywhere.
+The top-bar search field is a real input, not a button. Typing immediately runs a debounced geocoding query against Open-Meteo's geocoding API and renders results in an opaque dropdown directly under the input. Saved cities appear in the dropdown when the query is empty. `⌘K` / `Ctrl+K` focuses the field from anywhere. Below `md` a dropdown over a phone-width bar would cover the very list it is filtering, so the field hands off to a full `/search` route instead: same query, same results, given the whole screen.
 
 ### Today section
-- Greeting header with a plain-language summary of the day for the active city.
+- Greeting header with a plain-language summary of the day for the active city, written short on purpose: from `lg` it sits beside the detail rail, where a longer line wrapped and pushed the temperature down the page.
 - Any active weather alert surfaces in an alert card at the top.
 - Hero block with the temperature, weather summary, "feels like / high / low" line, and a weather-driven gradient scene (animated sun, clouds, rain droplets, snowflakes, lightning, or moon depending on conditions).
+- The readings around the temperature are held to one line each. From `lg` the hero shares its row with the detail rail, which leaves those cells about 265px wide: the dateline abbreviates its month, and a condition too long for the cell ends in an ellipsis rather than running under the reading beside it.
 - Detail cards: **Air Quality** (US AQI with a banded dial), UV Index, Sunrise and Sunset, and Humidity (with dew point) — all timezone-correct for the selected city.
 - The cards are a grid at every width (two up on phones, no horizontal scroller), and the temperature is the largest element on the page rather than the greeting.
 
@@ -74,7 +78,7 @@ A single scrolling section (no layout switcher):
 - **Summary cards** — cumulative rain total, peak wind, temperature range over the period, and any active weather alerts.
 
 ### Locations
-- **Summary cards** — at-a-glance metrics across your saved places: total saved, active location, average temperature, and how many are seeing rain right now. Left accent border on desktop, bottom accent on mobile (matching the 2-Week and Settings sections).
+- **Summary cards** — at-a-glance metrics across your saved places: total saved, active location, average temperature, and how many are seeing rain right now. Left accent border on desktop, bottom accent on mobile (matching the 2-Week and Settings sections). Saved and Active run the full width below `sm`: both carry text of no fixed length, and a half-width column at 320px broke a place name across two lines mid-word. The two numeric metrics stay side by side, where short values keep the density worth having.
 - **Saved / Suggested tabs** — a tabbed pair of carousels. *Saved* holds your places; *Suggested* offers a curated set of popular cities, filtered to hide anything you already track.
 - Each card shows a hero photo, name, region, live weather icon, temperature, and condition, with an **info** button in the top-right corner. Country-level places fall back to a gradient tile instead of a flag.
 - **Location details dialog** — opens from any card's info button. A hero header with a current-weather badge, a short overview (Wikipedia), a photo gallery (Wikimedia Commons) with a full-screen lightbox (prev/next + keyboard nav), an interactive **OpenStreetMap / Leaflet** map with a satellite toggle and an "Open in Google Maps" link, and metadata (coordinates, elevation, time zone, sunrise, sunset). The map, gallery, and description load only when the dialog opens.
@@ -95,7 +99,7 @@ Seven palettes — sunny, sunset, rainy, stormy, cloudy, snowy, night — each w
 All surface cards use a semi-transparent background, a 1px strong-hairline border, and a backdrop blur. The base color system is a dark blue/slate palette — only the weather hero gradients carry weather hue.
 
 ### Use-my-location
-The map-pin button in the top bar requests the browser's geolocation, reverse-geocodes the coordinates via Open-Meteo, and adds the resolved place to your saved cities as the active location.
+The map-pin button at the right end of the top bar requests the browser's geolocation, reverse-geocodes the coordinates via Open-Meteo, and adds the resolved place to your saved cities as the active location. It is the one control the bar drops below 360px, where the search field needs the width more; the footer's **Use my location** link runs the same handler.
 
 ### Units & locale
 - Temperature: °C / °F
@@ -142,6 +146,20 @@ against is invisible when the machine's zone matches the city's:
 ```bash
 TZ=Asia/Manila npm test
 ```
+
+Two things in the shell look decorative and are not, each of which cost a
+debugging round. `data-scroll-behavior="smooth"` on `<html>` in
+[`app/layout.tsx`](app/layout.tsx) is what keeps route navigation instant: this
+app sets `scroll-behavior: smooth` in CSS for its anchor nav, and Next 16 no
+longer overrides that during a route change the way Next 15 did, so without the
+attribute every navigation animates the full scroll distance. And
+[`components/shell/scroll-to-top.tsx`](components/shell/scroll-to-top.tsx)
+covers what the attribute does not: the browser carries the old scroll offset
+across a client-side navigation and clamps it to the new page's height, and Next
+skips its own scroll-to-top when the result leaves the incoming content
+technically in view — which parked `/faq` 176px down with its heading behind the
+navbar, while taller routes escaped it by luck. It deliberately stands aside for
+hash targets and for back/forward, so anchors and restored positions still work.
 
 Open-Meteo's APIs are key-less and open, so the app runs with no configuration at all.
 Two optional variables affect deployment only — see below.
