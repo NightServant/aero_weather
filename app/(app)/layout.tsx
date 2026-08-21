@@ -3,10 +3,12 @@ import { Navbar } from "@/components/shell/navbar";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SkyBackground } from "@/components/shell/sky-background";
 import { ActiveForecastProvider } from "@/components/shell/active-forecast-context";
+import { ScrollToTop } from "@/components/shell/scroll-to-top";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <ActiveForecastProvider>
+      <ScrollToTop />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:text-primary-foreground"

@@ -48,6 +48,15 @@ export default function RootLayout({
     <html
       lang="en"
       data-palette="night"
+      /* `globals.css` sets `scroll-behavior: smooth` for the single-page
+         anchor nav. Next 16 no longer overrides that during a route change
+         (it did through 15), so navigating to /settings or /faq animated the
+         whole scroll distance instead of jumping - and because the incoming
+         route is shorter, the browser clamped the animation part-way and left
+         the page a few hundred pixels down, heading under the navbar. This
+         attribute opts back into the override: auto during navigation, smooth
+         again for in-page anchors. */
+      data-scroll-behavior="smooth"
       className={`${poppins.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
