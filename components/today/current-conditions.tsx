@@ -35,7 +35,7 @@ const WIND_THRESHOLDS: Record<string, [number, number]> = {
   ms: [3, 8],
 };
 
-/** Figma copy pattern: "Clear with light winds". Thresholds per display unit. */
+/** Figma copy pattern, shortened to "Clear, light winds". Thresholds per display unit. */
 function windWord(speed: number, unit: string): string {
   const [light, moderate] = WIND_THRESHOLDS[unit] ?? WIND_THRESHOLDS.kmh;
   if (speed < light) return "light";
@@ -49,8 +49,10 @@ export function CurrentConditions({ forecast, place, units }: Props) {
   const kind = weatherCodeToKind(c.weatherCode);
   const tempLabel = tempUnitLabel(units.temperature);
 
+  // Short month, not long: "TODAY - AUGUST 21, 2026" wrapped onto a second
+  // line in this half-width cell once the hero sits beside the detail rail.
   const dateline = new Intl.DateTimeFormat("en-US", {
-    month: "long",
+    month: "short",
     day: "numeric",
     year: "numeric",
     timeZone: forecast.place.timezone,
@@ -108,12 +110,12 @@ export function CurrentConditions({ forecast, place, units }: Props) {
       <div className="stagger-5 grid gap-6 md:grid-cols-2">
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <AnimatedWeatherIcon kind={kind} isDay={c.isDay} size={24} />
-          <div>
+          <div className="min-w-0">
             <h3
               className="stat-title truncate"
-              title={`${WEATHER_LABEL[kind]} with ${windWord(c.windSpeed, units.wind)} winds`}
+              title={`${WEATHER_LABEL[kind]}, ${windWord(c.windSpeed, units.wind)} winds`}
             >
-              {WEATHER_LABEL[kind]} with {windWord(c.windSpeed, units.wind)} winds
+              {WEATHER_LABEL[kind]}, {windWord(c.windSpeed, units.wind)} winds
             </h3>
             <p className="caption tabular mt-0.5">
               High {formatTemp(today.tempMax, units.temperature)}
@@ -125,8 +127,8 @@ export function CurrentConditions({ forecast, place, units }: Props) {
 
         <div className="flex min-w-0 items-start gap-3 md:border-l md:border-white/12 md:pl-6">
           <Wind className="size-6 text-foreground/80" strokeWidth={1.5} aria-hidden="true" />
-          <div>
-            <h3 className="stat-title tabular">
+          <div className="min-w-0">
+            <h3 className="stat-title tabular truncate">
               Wind {formatWind(c.windSpeed)} {windUnitLabel(units.wind)}
             </h3>
             <p className="caption mt-0.5">From the {compassToWord(c.windDirection)}</p>

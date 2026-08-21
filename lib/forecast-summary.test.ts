@@ -49,27 +49,27 @@ const forecast = (over: Partial<Forecast>): Forecast => ({
 
 describe("summarizeToday", () => {
   it("warns on thunderstorms", () => {
-    expect(summarizeToday(forecast({ current: current(95) }))).toMatch(/Severe weather/i);
+    expect(summarizeToday(forecast({ current: current(95) }))).toMatch(/Storms moving through/i);
   });
 
-  it("recommends waterproofs for rain/drizzle", () => {
-    expect(summarizeToday(forecast({ current: current(61) }))).toMatch(/waterproof/i);
-    expect(summarizeToday(forecast({ current: current(51) }))).toMatch(/waterproof/i);
+  it("recommends a jacket for rain/drizzle", () => {
+    expect(summarizeToday(forecast({ current: current(61) }))).toMatch(/jacket/i);
+    expect(summarizeToday(forecast({ current: current(51) }))).toMatch(/jacket/i);
   });
 
   it("mentions slower travel for snow", () => {
-    expect(summarizeToday(forecast({ current: current(71) }))).toMatch(/snow/i);
+    expect(summarizeToday(forecast({ current: current(71) }))).toMatch(/snow today\. roads will be slow/i);
   });
 
   it("differentiates clear days by upcoming precip chance", () => {
     const settled = forecast({ current: current(0), hourly: Array.from({ length: 12 }, () => hour(0)) });
-    expect(summarizeToday(settled)).toMatch(/bright, settled/i);
+    expect(summarizeToday(settled)).toMatch(/clear and settled/i);
 
     const showersLater = forecast({
       current: current(0),
       hourly: [hour(0), hour(45), ...Array.from({ length: 10 }, () => hour(0))],
     });
-    expect(summarizeToday(showersLater)).toMatch(/before evening showers/i);
+    expect(summarizeToday(showersLater)).toMatch(/showers later/i);
   });
 
   it("handles partly-cloudy, fog, and the mixed fallback", () => {
@@ -84,7 +84,7 @@ describe("summarizeToday", () => {
       ...Array.from({ length: 12 }, () => hour(0)),
       ...Array.from({ length: 12 }, () => hour(90)),
     ];
-    expect(summarizeToday(forecast({ current: current(0), hourly }))).toMatch(/bright, settled/i);
+    expect(summarizeToday(forecast({ current: current(0), hourly }))).toMatch(/clear and settled/i);
   });
 });
 

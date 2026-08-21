@@ -48,26 +48,29 @@ export function summarizeToday(forecast: Forecast): string {
     .slice(0, 12)
     .reduce((max, h) => Math.max(max, h.precipitationProbability), 0);
 
+  // One short line under the greeting. It sits beside the hero at laptop
+  // widths, where anything longer than roughly forty characters wraps and
+  // pushes the temperature down, so these stay clipped to two clauses.
   if (kind === "thunderstorm" || kind === "thunderstorm-hail") {
-    return "Severe weather is moving through - stay indoors when storms arrive.";
+    return "Storms moving through. Stay inside.";
   }
   if (kind === "rain" || kind === "rain-showers" || kind === "drizzle") {
-    return "Rain through the day - a waterproof layer is the right call.";
+    return "Wet out there. Take a jacket.";
   }
   if (kind === "snow" || kind === "snow-showers") {
-    return "Snow is in the forecast - leave time for slower travel.";
+    return "Snow today. Roads will be slow.";
   }
   if (kind === "clear" || kind === "mainly-clear") {
     if (precipChance > 30) {
-      return "A bright window before evening showers - pack a light layer for the commute.";
+      return "Clear for now, showers later.";
     }
-    return "A bright, settled day - good time to be outside.";
+    return "Clear and settled. Good day to be out.";
   }
   if (kind === "partly-cloudy") {
-    return "Sun and cloud through the day - comfortable across the board.";
+    return "Sun and cloud, mild all day.";
   }
   if (kind === "fog") {
-    return "Fog is hanging on - visibility will improve through the morning.";
+    return "Fog is sitting low. Drive slow.";
   }
-  return "A mixed day ahead - keep a layer handy.";
+  return "Mixed day. Keep a layer handy.";
 }
