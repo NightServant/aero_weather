@@ -2,7 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Menu } from "lucide-react";
+import {
+  CalendarDays,
+  HelpCircle,
+  Map,
+  MapPin,
+  Menu,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sun,
+  type LucideIcon,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -17,25 +27,37 @@ import {
 import { usePrefs } from "@/hooks/use-prefs";
 import { reverseGeocode } from "@/lib/api/geocoding";
 import { addPlace } from "@/lib/prefs";
-import { pickActiveSection, visibleSectionIds, type SectionBox } from "@/lib/sections";
+import {
+  pickActiveSection,
+  visibleSectionIds,
+  type SectionBox,
+  type SectionId,
+} from "@/lib/sections";
 import { USE_LOCATION_EVENT } from "@/lib/ui-events";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
-  { id: "today", href: "#today", label: "Today" },
-  { id: "forecast", href: "#forecast", label: "2-week" },
-  { id: "locations", href: "#locations", label: "Locations" },
-] as const;
+/** Icons are for the small-screen menu only: a stack of text rows at one
+ *  weight reads as a single block, and a leading glyph gives each row a shape
+ *  to aim at. The desktop bar stays text, where there is room to read it. */
+const NAV_ITEMS: readonly { id: SectionId; href: string; label: string; icon: LucideIcon }[] = [
+  { id: "today", href: "#today", label: "Today", icon: Sun },
+  { id: "forecast", href: "#forecast", label: "2-week", icon: CalendarDays },
+  { id: "locations", href: "#locations", label: "Locations", icon: Map },
+];
 
 /** Real routes, not in-page anchors: never scroll-spied, matched on pathname. */
-const ROUTE_ITEMS = [{ href: "/settings", label: "Settings" }] as const;
+const ROUTE_ITEMS: readonly { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/settings", label: "Settings", icon: SlidersHorizontal },
+];
 
-/** Reference pages: in the small-screen menu and the footer, not the desktop bar. */
-const SECONDARY_ITEMS = [
-  { href: "/search", label: "Search" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/privacy", label: "Privacy" },
-] as const;
+/** Reference pages: in the small-screen menu and the footer, not the desktop bar.
+ *  `/search` is deliberately absent. Below `md` the search field in this same
+ *  bar navigates there on focus, so a menu row pointing at it duplicated the
+ *  control the reader had just skipped past. */
+const SECONDARY_ITEMS: readonly { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/faq", label: "FAQ", icon: HelpCircle },
+  { href: "/privacy", label: "Privacy", icon: ShieldCheck },
+];
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -49,12 +71,14 @@ export function Navbar() {
     ...NAV_ITEMS.filter((item) => visibleIds.includes(item.id)).map((item) => ({
       key: item.id,
       label: item.label,
+      icon: item.icon,
       href: onHome ? item.href : `/${item.href}`,
       active: onHome && activeId === item.id,
     })),
     ...ROUTE_ITEMS.map((item) => ({
       key: item.href,
       label: item.label,
+      icon: item.icon,
       href: item.href,
       active: pathname === item.href,
     })),
@@ -66,6 +90,7 @@ export function Navbar() {
     ...SECONDARY_ITEMS.map((item) => ({
       key: item.href,
       label: item.label,
+      icon: item.icon,
       href: item.href,
       active: pathname === item.href,
     })),
@@ -161,6 +186,11 @@ export function Navbar() {
         aria-label="Main"
         className="tint-card backdrop-blur mx-auto flex h-16 max-w-[1200px] items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6 xl:grid xl:grid-cols-[1fr_auto_1fr]"
       >
+        {/* Below lg the reading order is menu, search, locate: the menu opens
+            from the left edge where the thumb expects it, the field takes the
+            middle, and locate closes the row. The pin keeps that trailing slot
+            at every width rather than jumping back beside the wordmark, so it
+            stays next to the search it belongs with. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href={onHome ? "#today" : "/"}
@@ -172,12 +202,46 @@ export function Navbar() {
               <span className="text-foreground">Weather</span>
             </span>
           </Link>
-          <IconCircleButton
-            label="Use my location"
-            onClick={useMyLocation}
-            icon={<MapPin className="size-4" strokeWidth={1.5} />}
-            className="max-[359px]:hidden"
-          />
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <IconCircleButton
+                label="Menu"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                icon={<Menu className="size-4" strokeWidth={1.5} />}
+                className="lg:hidden"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={10}
+              className="w-56 border-white/12"
+              style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
+            >
+              {menuItems.map((item) => (
+                <DropdownMenuItem key={item.key} asChild>
+                  <Link
+                    href={item.href}
+                    aria-current={item.active ? "page" : undefined}
+                    className={cn(
+                      "flex h-10 cursor-pointer items-center gap-3 rounded-lg px-3 text-[15px]",
+                      item.active ? "font-medium text-primary" : "text-foreground",
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        "size-4 shrink-0",
+                        item.active ? "text-primary" : "text-muted-foreground",
+                      )}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="hidden items-center lg:ml-auto lg:flex xl:ml-0 xl:justify-self-center">
@@ -198,40 +262,18 @@ export function Navbar() {
           ))}
         </div>
 
+        {/* 340px, not 360: at xl the links sit in an `auto` column between two
+            equal `1fr` columns, so this cluster has to fit its half or it
+            overflows leftward into the links. Search + gap + pin = 388 against
+            a ~399 share with the widest link set. */}
         <div className="flex min-w-0 flex-1 items-center gap-2 lg:ml-3 lg:flex-none xl:justify-self-end">
-          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:max-w-[360px] lg:flex-1 xl:w-[360px] xl:max-w-none xl:flex-none xl:shrink-0" />
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <IconCircleButton
-              label="Menu"
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              icon={<Menu className="size-4" strokeWidth={1.5} />}
-              className="lg:hidden"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            sideOffset={10}
-            className="w-56 border-white/12"
-            style={{ background: "oklch(0.17 0.02 245 / 0.97)" }}
-          >
-            {menuItems.map((item) => (
-              <DropdownMenuItem key={item.key} asChild>
-                <Link
-                  href={item.href}
-                  aria-current={item.active ? "page" : undefined}
-                  className={cn(
-                    "flex h-10 cursor-pointer items-center rounded-lg px-3 text-[15px]",
-                    item.active ? "font-medium text-primary" : "text-foreground",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <SearchTrigger className="mx-auto w-full min-w-0 max-w-[560px] lg:mx-0 lg:max-w-[360px] lg:flex-1 xl:w-[340px] xl:max-w-none xl:flex-none xl:shrink-0" />
+          <IconCircleButton
+            label="Use my location"
+            onClick={useMyLocation}
+            icon={<MapPin className="size-4" strokeWidth={1.5} />}
+            className="max-[359px]:hidden"
+          />
         </div>
       </nav>
     </header>
