@@ -90,7 +90,11 @@ Five questions answer the things people actually ask (accounts, data sources, th
 14-day horizon, where saved cities live, geolocation accuracy). A real `/privacy`
 page names every third party that receives a request from your browser. The app
 also ships `robots.txt`, `sitemap.xml`, a generated Open Graph image, and a custom
-404 page.
+404 page. [`public/googleca0ee448c31dbcb3.html`](public/googleca0ee448c31dbcb3.html)
+is the Google Search Console verification file for this property; it is served at
+the site root, and its one line of content is Google's fixed format, where the
+token is the filename. Verifying a property and being indexed are separate
+things — see Deployment for why this one is still not indexed.
 
 ### Weather-driven palettes
 Seven palettes — sunny, sunset, rainy, stormy, cloudy, snowy, night — each with weather-appropriate gradient hues, scene accent colors, and a `--hero-text` token that auto-selects a readable foreground. Palettes are tuned in chroma and lightness for the dark interface so hero cards sit quietly against the dark surface instead of glowing. The active palette is derived from the current conditions of the selected city.
@@ -214,7 +218,13 @@ a debugging round to find:
 - **The site cannot be indexed yet.** Vercel serves `x-robots-tag: noindex` on
   every `.vercel.app` URL, and a response header overrides `robots.txt`. Only a
   custom domain lifts it. Link previews are unaffected: they read the Open Graph
-  tags and ignore that header.
+  tags and ignore that header. Search Console verification is unaffected too, and
+  passing it changes nothing here: Google crawls, reads the header, and declines
+  to index, which shows up as "Excluded by 'noindex' tag". Google treats
+  `vercel.app` subdomains as separate sites, so the property verified against this
+  address does not carry over to a custom domain — add the domain as its own
+  property once it exists. The verification file is already served on whatever
+  domain points at the project, so that second verification is one click.
 
 After any change to either variable, verify rather than assume:
 
