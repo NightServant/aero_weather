@@ -101,8 +101,12 @@ export function LocationDetailsDialog({
   const Title = isMobile ? DrawerTitle : DialogTitle;
   const Description = isMobile ? DrawerDescription : DialogDescription;
 
+  // One height cap per surface. Below md the drawer owns it and this fills what
+  // the drawer allows (`min-h-0 flex-1`, so the scrolling body can shrink and
+  // the footer always has its row); from md the dialog is a grid, where those
+  // two are inert and the cap here is what bounds it.
   const inner = (
-        <div className="relative flex max-h-[88vh] flex-col">
+        <div className="relative flex min-h-0 flex-1 flex-col md:max-h-[88dvh]">
           {/* Single close control, pinned to the dialog's top-right: it sits over the
               map on desktop and over the header photo on mobile (where the map is hidden). */}
           <Close asChild>
@@ -186,8 +190,14 @@ export function LocationDetailsDialog({
             </div>
           </div>
 
-          {/* Fixed footer actions */}
-          <div className="flex flex-col-reverse gap-2 border-t border-white/12 bg-[oklch(0.2_0.025_245_/_0.85)] p-4 backdrop-blur sm:flex-row sm:justify-end">
+          {/* Fixed footer actions. The extra bottom padding below `sm` is for
+              the browser's own furniture: Brave and Chrome on Android park a
+              navigation bar along the bottom edge, and a button flush against
+              the sheet's last pixel reads as sitting underneath it even when
+              it is not. `env(safe-area-inset-bottom)` adds the home indicator
+              on top of that where the page opts into it, and resolves to 0
+              everywhere else. */}
+          <div className="flex flex-col-reverse gap-2 border-t border-white/12 bg-[oklch(0.2_0.025_245_/_0.85)] p-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] backdrop-blur sm:flex-row sm:justify-end sm:pb-4">
             {mode === "saved" ? (
               <>
                 <Button variant="ghost" className="text-destructive" onClick={() => { onRemove?.(place); onOpenChange(false); }}>
@@ -207,7 +217,16 @@ export function LocationDetailsDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent aria-label={place.name} className="max-h-[92vh] border-white/12 p-0">
+        {/* The height has to be set through the same data-variant the drawer
+            ships with, `data-[vaul-drawer-direction=bottom]:max-h-[80vh]`: a
+            plain `max-h-*` utility loses to it on specificity, so the previous
+            `max-h-[92vh]` here never applied and the sheet was 80vh. And dvh,
+            not vh, because `100vh` on Android is the viewport with the browser
+            chrome retracted, which is taller than what is actually on screen. */}
+        <DrawerContent
+          aria-label={place.name}
+          className="border-white/12 p-0 data-[vaul-drawer-direction=bottom]:max-h-[90dvh]"
+        >
           {inner}
         </DrawerContent>
       </Drawer>
