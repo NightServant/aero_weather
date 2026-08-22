@@ -80,8 +80,8 @@ A single scrolling section (no layout switcher):
 ### Locations
 - **Summary cards** — at-a-glance metrics across your saved places: total saved, active location, average temperature, and how many are seeing rain right now. Left accent border on desktop, bottom accent on mobile (matching the 2-Week and Settings sections). Saved and Active run the full width below `sm`: both carry text of no fixed length, and a half-width column at 320px broke a place name across two lines mid-word. The two numeric metrics stay side by side, where short values keep the density worth having.
 - **Saved / Suggested tabs** — a tabbed pair of carousels. *Saved* holds your places; *Suggested* offers a curated set of popular cities, filtered to hide anything you already track.
-- Each card shows a hero photo, name, region, live weather icon, temperature, and condition, with an **info** button in the top-right corner. Country-level places fall back to a gradient tile instead of a flag.
-- **Location details dialog** — opens from any card's info button. A hero header with a current-weather badge, a short overview (Wikipedia), a photo gallery (Wikimedia Commons) with a full-screen lightbox (prev/next + keyboard nav), an interactive **OpenStreetMap / Leaflet** map with a satellite toggle and an "Open in Google Maps" link, and metadata (coordinates, elevation, time zone, sunrise, sunset). The map, gallery, and description load only when the dialog opens.
+- Each card shows a hero photo, name, region, live weather icon, temperature, and condition. Nothing sits on top of the photo: the whole card is the target that opens its details, so the badge that used to mark the corner was decoration over the one element already doing the most work. Country-level places fall back to a gradient tile instead of a flag.
+- **Location details dialog** — opens from anywhere on a card. A centred dialog from `md`, and a drag-to-dismiss bottom sheet below it, where a centred box would waste the width. A hero header with a current-weather badge, a short overview (Wikipedia), a photo gallery (Wikimedia Commons) with a full-screen lightbox (prev/next + keyboard nav), an interactive **OpenStreetMap / Leaflet** map with a satellite toggle and an "Open in Google Maps" link, and metadata (coordinates, elevation, time zone, sunrise, sunset). The map, gallery, and description load only when the dialog opens.
 - From a saved place's dialog you can **View forecast** (makes it the active location and jumps to Today) or **Remove** it. From a suggested place you can **Save** it — which animates it into your saved list and updates the summary cards instantly.
 - Add new cities via the **+** button (opens a search dialog) or via the top-bar search.
 
@@ -160,6 +160,17 @@ skips its own scroll-to-top when the result leaves the incoming content
 technically in view — which parked `/faq` 176px down with its heading behind the
 navbar, while taller routes escaped it by luck. It deliberately stands aside for
 hash targets and for back/forward, so anchors and restored positions still work.
+
+One more of the same kind, in the details sheet. Vaul ships its height as
+`data-[vaul-drawer-direction=bottom]:max-h-[80vh]`, and a plain `max-h-*`
+utility passed to `DrawerContent` loses to that attribute selector on
+specificity — silently, so the sheet had been 80vh for as long as there had
+been a number there saying otherwise. Height overrides on that component have
+to be written through the same variant. Give the sheet's body its own second
+cap on top of that and the two disagree: the taller one wins, nothing clips
+the overflow, and the footer hangs below the bottom of the screen with the
+actions on it. One cap per surface, and in `dvh` rather than `vh`, since
+`100vh` on Android measures the viewport with the browser chrome retracted.
 
 Open-Meteo's APIs are key-less and open, so the app runs with no configuration at all.
 Two optional variables affect deployment only — see below.
