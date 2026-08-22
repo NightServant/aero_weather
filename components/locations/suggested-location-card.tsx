@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
-import { Info, Plus, Check } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import { CityPhoto } from "./city-photo";
 import { CityCardSkeleton } from "./city-card-skeleton";
@@ -38,7 +38,8 @@ function SuggestedLocationCardBase({ place, units, onOpenDetails, onSave }: Prop
       data-saving={saving ? "true" : undefined}
       style={saving ? { opacity: 0, transform: "scale(0.94)" } : undefined}
     >
-      {/* Whole card opens details; Save sits above this overlay (z-20). */}
+      {/* Whole card opens details; Save sits above this overlay (z-20). No
+          badge over the photo: see the note in saved-location-card. */}
       <button
         type="button"
         onClick={() => onOpenDetails(place)}
@@ -49,13 +50,6 @@ function SuggestedLocationCardBase({ place, units, onOpenDetails, onSave }: Prop
       <div className="relative overflow-hidden rounded-[12px]">
         <CityPhoto place={place} width={208} height={160} className="h-[160px] w-full rounded-[12px]" initialClassName="text-5xl" />
       </div>
-
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 group-hover:bg-black/60"
-      >
-        <Info className="size-4" strokeWidth={1.5} />
-      </span>
 
       <div className="mt-3 min-w-0">
         <h3 className="truncate text-[0.9375rem] leading-snug font-semibold text-text-strong">{place.name}</h3>

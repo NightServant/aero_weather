@@ -1,7 +1,6 @@
 "use client";
 
 import { memo } from "react";
-import { Info } from "lucide-react";
 import { AnimatedWeatherIcon } from "@/components/icons/animated-weather-icon";
 import { CityPhoto } from "./city-photo";
 import { CityCardSkeleton } from "./city-card-skeleton";
@@ -31,9 +30,10 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
 
   return (
     <div className="group tint-card card-interactive relative w-full p-4">
-      {/* The card's hover lift promises a click target, so the whole surface is
-          the target. The info circle below is the visual cue for it, not a
-          second control. */}
+      {/* The whole surface is the click target. There is no badge over the
+          photo marking it: the circle that used to sit there was decoration,
+          not a control, and a photo, a name, a reading and a glyph is already
+          enough for one card to carry. */}
       <button
         type="button"
         onClick={() => onOpenDetails(place)}
@@ -50,13 +50,6 @@ function SavedLocationCardBase({ place, forecast, unit, onOpenDetails }: Props) 
           initialClassName="text-5xl"
         />
       </div>
-
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-6 right-6 grid size-9 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors duration-150 group-hover:bg-black/60"
-      >
-        <Info className="size-4" strokeWidth={1.5} />
-      </span>
 
       <div className="mt-3 min-w-0">
         <h3 className="truncate text-[0.9375rem] leading-snug font-semibold text-text-strong">
